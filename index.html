@@ -311,6 +311,7 @@ function TopBar({ route, setRoute, query, setQuery, onSearch, isAdmin, setShowLo
         ) : (
           <Btn variant="accent" size="sm" icon={<Icon.camera s={14}/>} onClick={()=>setRoute("contribute")}>Sumbang</Btn>
           <Btn variant="ghost" size="sm" icon={<Icon.lock s={13}/>} onClick={()=>setShowLogin(true)}>Admin</Btn>
+      </>
         )}
       </div>
     </header>
