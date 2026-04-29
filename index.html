@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Dipterokarp Malaysia — Tree Database</title>
+<title>Dipterokarp Malaysia â Tree Database</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -75,7 +75,7 @@ window.addEventListener('error', (e) => { if (!e.filename && !e.error) e.prevent
 const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
 // ============================================================
-// CONFIGURATION — replace with your values
+// CONFIGURATION â replace with your values
 // ============================================================
 const SUPABASE_URL  = 'https://xrntnarchlglhllvlrnv.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhybnRuYXJjaGxnbGhsbHZscm52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTU4MzksImV4cCI6MjA4MDk5MTgzOX0.Q0PjW5dMU07EDoR-GGDpIjATlSC5AJxNeEdOlYaO96w';
@@ -94,7 +94,7 @@ async function dbUpdate(id, data) { const r = await fetch(`${SUPABASE_URL}/rest/
 async function dbDelete(id)       { const r = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${id}`, { method: 'DELETE', headers: headers() }); if (!r.ok) throw new Error(await r.text()); }
 
 // ============================================================
-// MAP DB ROW → DISPLAY OBJECT
+// MAP DB ROW â DISPLAY OBJECT
 // ============================================================
 function mapRow(s) {
   if (!s) return null;
@@ -109,22 +109,22 @@ function mapRow(s) {
     iucn,
     conservation_status: s.conservation_status || '',
     endemic: !!s.endemic_to_malaysia,
-    height: s.height_range || '—',
-    dbh: s.trunk_diameter || '—',
-    habit: s.habitat || '—',
+    height: s.height_range || 'â',
+    dbh: s.trunk_diameter || 'â',
+    habit: s.habitat || 'â',
     distribution: [
       s.distribution_peninsular && 'Peninsular Malaysia',
       s.distribution_sabah      && 'Sabah',
       s.distribution_sarawak    && 'Sarawak',
     ].filter(Boolean),
-    altitude: s.elevation_range || '—',
-    habitat: s.habitat || '—',
-    phenology: s.flowering_pattern || '—',
-    description: [s.bark_description, s.leaf_description].filter(Boolean).join(' ') || '—',
-    uses: s.economic_importance || '—',
+    altitude: s.elevation_range || 'â',
+    habitat: s.habitat || 'â',
+    phenology: s.flowering_pattern || 'â',
+    description: [s.bark_description, s.leaf_description].filter(Boolean).join(' ') || 'â',
+    uses: s.economic_importance || 'â',
     ecological_notes: s.ecological_notes || '',
     threats: [],
-    photos: 0, contributors: 0, lastUpdated: '—',
+    photos: 0, contributors: 0, lastUpdated: 'â',
     similar: [],
     _raw: s,
   };
@@ -297,7 +297,7 @@ function TopBar({ route, setRoute, query, setQuery, onSearch, isAdmin, setShowLo
         <div style={{flex:1,maxWidth:460,marginLeft:16}}>
           <form onSubmit={e=>{e.preventDefault();onSearch();}}>
             <Input value={query} onChange={e=>setQuery(e.target.value)}
-              placeholder="Cari nama saintifik, nama Melayu, genus…"
+              placeholder="Cari nama saintifik, nama Melayu, genusâ¦"
               icon={<Icon.search s={15}/>}/>
           </form>
         </div>
@@ -339,7 +339,7 @@ function Home({ species, loading, setRoute, setSpeciesId, setQuery, onSearch }) 
         <div style={{display:"inline-flex",alignItems:"center",gap:8,padding:"5px 12px",
           background:"var(--accent-2)",color:"var(--accent)",borderRadius:999,fontSize:12,fontWeight:500,marginBottom:24}}>
           <span style={{width:6,height:6,borderRadius:999,background:"var(--accent)"}}/>
-          {loading ? "Memuatkan…" : `${species.length} spesies · Dipterocarpaceae · data terbuka`}
+          {loading ? "Memuatkanâ¦" : `${species.length} spesies Â· Dipterocarpaceae Â· data terbuka`}
         </div>
         <h1 style={{fontSize:56,lineHeight:1.05,fontWeight:600,letterSpacing:"-0.03em",margin:"0 0 20px",textWrap:"balance"}}>
           Dipterokarp Malaysia, dalam satu arkib carian.
@@ -353,7 +353,7 @@ function Home({ species, loading, setRoute, setSpeciesId, setQuery, onSearch }) 
             borderRadius:12,boxShadow:"var(--shadow)"}}>
             <Icon.search s={18}/>
             <input value={heroQ} onChange={e=>setHeroQ(e.target.value)}
-              placeholder="Cuba: Shorea, Meranti, Keruing, Hopea…"
+              placeholder="Cuba: Shorea, Meranti, Keruing, Hopeaâ¦"
               style={{flex:1,background:"none",border:"none",outline:"none",fontSize:16,padding:"8px 0"}}/>
             <Btn variant="primary" size="md" type="submit">Cari</Btn>
           </div>
@@ -372,10 +372,10 @@ function Home({ species, loading, setRoute, setSpeciesId, setQuery, onSearch }) 
       <section style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:0,marginBottom:80,
         background:"var(--surface)",border:"1px solid var(--border)",borderRadius:12,overflow:"hidden"}}>
         {[
-          [loading?"…":species.length, "Spesies dikatalog"],
-          [loading?"…":genera,         "Genus"],
-          [loading?"…":endemicCount,   "Endemik Malaysia"],
-          [loading?"…":vuCount,        "Terancam (IUCN)"],
+          [loading?"â¦":species.length, "Spesies dikatalog"],
+          [loading?"â¦":genera,         "Genus"],
+          [loading?"â¦":endemicCount,   "Endemik Malaysia"],
+          [loading?"â¦":vuCount,        "Terancam (IUCN)"],
         ].map(([n,l],i)=>(
           <div key={i} style={{padding:"24px 28px",borderRight:i<3?"1px solid var(--border)":"none"}}>
             <div style={{fontSize:32,fontWeight:600,letterSpacing:"-0.02em"}}>{n}</div>
@@ -404,7 +404,7 @@ function Home({ species, loading, setRoute, setSpeciesId, setQuery, onSearch }) 
         {[
           { n:"01", t:"Cari & layari", d:"Cari spesies menggunakan nama saintifik, genus, famili, atau nama Melayu." },
           { n:"02", t:"Baca rekod", d:"Taksonomi penuh, huraian, taburan mengikut negeri, dan status pemuliharaan berganda." },
-          { n:"03", t:"Dipterocarpaceae", d:"Pangkalan data khusus famili Dipterocarpaceae — meranti, keruing, resak, dan lebih banyak lagi." },
+          { n:"03", t:"Dipterocarpaceae", d:"Pangkalan data khusus famili Dipterocarpaceae â meranti, keruing, resak, dan lebih banyak lagi." },
         ].map(({n,t,d})=>(
           <div key={n} style={{padding:24,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:12}}>
             <div style={{fontFamily:"var(--mono)",fontSize:12,color:"var(--text-3)",marginBottom:12}}>{n}</div>
@@ -435,7 +435,7 @@ function Home({ species, loading, setRoute, setSpeciesId, setQuery, onSearch }) 
         <div style={{textAlign:"center",padding:"80px 0",color:"var(--text-3)"}}>
           <div style={{width:32,height:32,border:"2px solid var(--border)",borderTopColor:"var(--accent)",
             borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}}/>
-          Memuatkan data dari Supabase…
+          Memuatkan data dari Supabaseâ¦
         </div>
       )}
     </div>
@@ -508,7 +508,7 @@ function Browse({ species, query, setQuery, setRoute, setSpeciesId }) {
         <p style={{fontSize:14,color:"var(--text-2)",margin:"6px 0 0"}}>
           {filtered.length} spesies
           {query && <> sepadan "<span style={{color:"var(--text)"}}>{query}</span>"</>}
-          {activeCount>0 && <> · {activeCount} penapis digunakan</>}
+          {activeCount>0 && <> Â· {activeCount} penapis digunakan</>}
         </p>
       </div>
 
@@ -558,12 +558,12 @@ function Browse({ species, query, setQuery, setRoute, setSpeciesId }) {
         <main>
           <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
             <Input value={query} onChange={e=>setQuery(e.target.value)}
-              placeholder="Cari nama saintifik, genus, nama Melayu…"
+              placeholder="Cari nama saintifik, genus, nama Melayuâ¦"
               icon={<Icon.search s={15}/>}/>
             <select value={sort} onChange={e=>setSort(e.target.value)}
               style={{background:"var(--surface)",border:"1px solid var(--border-strong)",
                 borderRadius:"var(--radius-sm)",padding:"9px 12px",fontSize:13,color:"var(--text)",cursor:"pointer"}}>
-              <option value="name">A → Z</option>
+              <option value="name">A â Z</option>
               <option value="status">Paling terancam</option>
             </select>
             <div style={{display:"flex",border:"1px solid var(--border-strong)",borderRadius:"var(--radius-sm)",overflow:"hidden"}}>
@@ -612,10 +612,10 @@ function Browse({ species, query, setQuery, setRoute, setSpeciesId }) {
                     <div style={{fontSize:14,fontStyle:"italic",fontWeight:500}}>{s.sci}</div>
                     <div style={{fontSize:11,color:"var(--text-3)",fontFamily:"var(--mono)"}}>{s.family}</div>
                   </div>
-                  <div style={{fontSize:13}}>{s.common[0]||"—"}</div>
+                  <div style={{fontSize:13}}>{s.common[0]||"â"}</div>
                   <div style={{fontSize:13,fontStyle:"italic",color:"var(--text-2)"}}>{s.genus}</div>
                   <div><Pill status={s.iucn} size="sm"/></div>
-                  <div style={{fontSize:12,color:"var(--text-3)"}}>{s.distribution.map(d=>d.replace("Peninsular Malaysia","Pen.")).join(", ") || "—"}</div>
+                  <div style={{fontSize:12,color:"var(--text-3)"}}>{s.distribution.map(d=>d.replace("Peninsular Malaysia","Pen.")).join(", ") || "â"}</div>
                 </button>
               ))}
             </div>
@@ -697,7 +697,7 @@ function Detail({ species, speciesId, setSpeciesId, setRoute, setQuery }) {
             <div style={{marginTop:20}}>
               <div style={{fontSize:12,color:"var(--text-3)",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:6}}>Nama tempatan</div>
               <div style={{fontSize:16}}>
-                {s.common.map((c,i)=>(<span key={c}>{c}{i<s.common.length-1&&<span style={{color:"var(--text-3)"}}> · </span>}</span>))}
+                {s.common.map((c,i)=>(<span key={c}>{c}{i<s.common.length-1&&<span style={{color:"var(--text-3)"}}> Â· </span>}</span>))}
               </div>
             </div>
           )}
@@ -734,7 +734,7 @@ function Detail({ species, speciesId, setSpeciesId, setRoute, setQuery }) {
       {tab==="overview" && (
         <div style={{display:"grid",gridTemplateColumns:"1fr 280px",gap:48}}>
           <div>
-            {s.description && s.description!=="—" && (
+            {s.description && s.description!=="â" && (
               <Section title="Huraian / Description">
                 <p style={{fontSize:15,lineHeight:1.7,color:"var(--text)",margin:0}}>{s.description}</p>
               </Section>
@@ -745,7 +745,7 @@ function Detail({ species, speciesId, setSpeciesId, setRoute, setQuery }) {
               <DataPair k="Corak berbunga" v={s.phenology}/>
               {s.ecological_notes && <DataPair k="Nota ekologi" v={s.ecological_notes}/>}
             </Section>
-            {s.uses && s.uses!=="—" && (
+            {s.uses && s.uses!=="â" && (
               <Section title="Kepentingan ekonomi">
                 <p style={{fontSize:15,lineHeight:1.7,color:"var(--text)",margin:0}}>{s.uses}</p>
               </Section>
@@ -757,7 +757,7 @@ function Detail({ species, speciesId, setSpeciesId, setRoute, setQuery }) {
               <Mini k="Genus" v={<span style={{fontStyle:"italic"}}>{s.genus}</span>}/>
               <Mini k="Famili" v={<span style={{fontStyle:"italic"}}>{s.family}</span>}/>
               <Mini k="Endemik" v={s.endemic?"Ya":"Tidak"}/>
-              <Mini k="Taburan" v={s.distribution.length===0?"—":s.distribution.length+" kawasan"} last/>
+              <Mini k="Taburan" v={s.distribution.length===0?"â":s.distribution.length+" kawasan"} last/>
             </div>
           </aside>
         </div>
@@ -768,7 +768,7 @@ function Detail({ species, speciesId, setSpeciesId, setRoute, setQuery }) {
           <h3 style={{fontSize:16,fontWeight:600,margin:"0 0 16px"}}>Pengelasan taksonomi</h3>
           {[
             ["Kingdom","Plantae"],["Clade","Tracheophytes / Angiosperms"],["Order","Malvales"],
-            ["Family",s.family],["Genus",s.genus],["Species",s.sci.split(" ")[1]||"—"],
+            ["Family",s.family],["Genus",s.genus],["Species",s.sci.split(" ")[1]||"â"],
             ["Nama diterima",s.sci],
           ].map(([k,v],i)=>(
             <div key={k} style={{display:"grid",gridTemplateColumns:"180px 1fr",padding:"10px 0",borderTop:i>0?"1px solid var(--border)":"none"}}>
@@ -876,7 +876,7 @@ function About() {
         <div>
           <h3 style={{fontSize:15,fontWeight:600,margin:"0 0 12px"}}>Famili Dipterocarpaceae</h3>
           <p style={{fontSize:14,color:"var(--text-2)",lineHeight:1.7,margin:0}}>
-            Dipterocarpaceae ialah famili pokok tropika yang mendominasi hutan hujan Asia Tenggara. Di Malaysia, famili ini merangkumi spesies meranti, keruing, resak, balau, dan banyak lagi — asas ekosistem hutan dan industri perkayuan.
+            Dipterocarpaceae ialah famili pokok tropika yang mendominasi hutan hujan Asia Tenggara. Di Malaysia, famili ini merangkumi spesies meranti, keruing, resak, balau, dan banyak lagi â asas ekosistem hutan dan industri perkayuan.
           </p>
         </div>
       </div>
@@ -936,7 +936,7 @@ function AdminPanel({ species, onClose, onSave, onDelete, toast }) {
         ) : (
           <div style={{padding:24}}>
             <div style={{marginBottom:16}}>
-              <Input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Tapis mengikut nama…" icon={<Icon.search s={14}/>}/>
+              <Input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Tapis mengikut namaâ¦" icon={<Icon.search s={14}/>}/>
             </div>
             <div style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:8,overflow:"hidden"}}>
               <div style={{display:"grid",gridTemplateColumns:"1.6fr 1fr 0.8fr 70px 90px",padding:"10px 16px",borderBottom:"1px solid var(--border)",background:"var(--surface-2)",fontSize:11,fontWeight:500,color:"var(--text-3)",textTransform:"uppercase",letterSpacing:"0.04em"}}>
@@ -946,7 +946,7 @@ function AdminPanel({ species, onClose, onSave, onDelete, toast }) {
                 {filtered.map((s,i)=>(
                   <div key={s.id} style={{display:"grid",gridTemplateColumns:"1.6fr 1fr 0.8fr 70px 90px",padding:"11px 16px",borderTop:i>0?"1px solid var(--border)":"none",alignItems:"center"}}>
                     <div style={{fontSize:14,fontStyle:"italic",fontWeight:500,color:"var(--text)"}}>{s.sci}</div>
-                    <div style={{fontSize:13,color:"var(--text-2)"}}>{s.common[0]||"—"}</div>
+                    <div style={{fontSize:13,color:"var(--text-2)"}}>{s.common[0]||"â"}</div>
                     <div style={{fontSize:13,fontStyle:"italic",color:"var(--text-2)"}}>{s.genus}</div>
                     <div><Pill status={s.iucn} size="sm"/></div>
                     <div style={{display:"flex",gap:6,justifyContent:"flex-end"}}>
@@ -1007,7 +1007,7 @@ function SpeciesForm({ initial, isNew, onSave, onCancel, saving }) {
           ["Habitat","habitat",""],
           ["Julat Altitud","elevation_range","e.g. 0-400m"],
           ["Corak Berbunga","flowering_pattern",""],
-          ["URL Imej","image_url","https://…"],
+          ["URL Imej","image_url","https://â¦"],
         ].map(([label,key,ph])=>(
           <div key={key} style={{display:"flex",flexDirection:"column",gap:4}}>
             <label style={{fontSize:11,fontWeight:500,color:"var(--text-3)",textTransform:"uppercase",letterSpacing:"0.06em"}}>{label}</label>
@@ -1042,7 +1042,7 @@ function SpeciesForm({ initial, isNew, onSave, onCancel, saving }) {
       <div style={{display:"flex",gap:8,justifyContent:"flex-end",marginTop:20,paddingTop:16,borderTop:"1px solid var(--border)"}}>
         <Btn variant="secondary" onClick={onCancel}>Batal</Btn>
         <Btn variant="accent" disabled={saving||!d.scientific_name||!d.genus} onClick={()=>onSave(d)}>
-          {saving?"Menyimpan…":"Simpan rekod"}
+          {saving?"Menyimpanâ¦":"Simpan rekod"}
         </Btn>
       </div>
     </div>
@@ -1212,7 +1212,7 @@ function Contribute({ species, toast, setRoute }) {
                   <Icon.upload s={28}/>
                   <div style={{textAlign:"center"}}>
                     <div style={{fontSize:14,fontWeight:500,color:"var(--text-2)"}}>Klik untuk pilih gambar</div>
-                    <div style={{fontSize:12,marginTop:4}}>JPG, PNG, WEBP · Maks 10MB</div>
+                    <div style={{fontSize:12,marginTop:4}}>JPG, PNG, WEBP Â· Maks 10MB</div>
                   </div>
                 </div>
               )}
@@ -1247,7 +1247,7 @@ function Contribute({ species, toast, setRoute }) {
                 upd("species_name", sel?sel.sci:e.target.value);
               }}>
               <option value="">-- Pilih spesies --</option>
-              {species.map(s=>(<option key={s.id} value={s.id}>{s.sci}{s.common[0]?" — "+s.common[0]:""}</option>))}
+              {species.map(s=>(<option key={s.id} value={s.id}>{s.sci}{s.common[0]?" â "+s.common[0]:""}</option>))}
             </select>
           </div>
 
@@ -1279,7 +1279,7 @@ function Contribute({ species, toast, setRoute }) {
 
           <div>
             <div style={{fontSize:12,fontWeight:500,color:"var(--text-3)",textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:6}}>Nota Tambahan</div>
-            <textarea style={{...iStyle,minHeight:72,resize:"vertical"}} value={form.notes} placeholder="Tarikh, ketinggian, keadaan cuaca…" onChange={e=>upd("notes",e.target.value)}/>
+            <textarea style={{...iStyle,minHeight:72,resize:"vertical"}} value={form.notes} placeholder="Tarikh, ketinggian, keadaan cuacaâ¦" onChange={e=>upd("notes",e.target.value)}/>
           </div>
 
           {/* Consent */}
@@ -1291,7 +1291,7 @@ function Contribute({ species, toast, setRoute }) {
           </label>
 
           <Btn variant="accent" full disabled={submitting} onClick={submit}>
-            {submitting ? "Menghantar…" : "Hantar untuk Semakan"}
+            {submitting ? "Menghantarâ¦" : "Hantar untuk Semakan"}
           </Btn>
         </div>
       </div>
@@ -1338,7 +1338,7 @@ function Approvals({ toast, setRoute }) {
           body: JSON.stringify({ image_url: imageUrl, updated_at: new Date().toISOString() })
         });
       }
-      toast(status==="approved" ? "✓ Gambar diluluskan & dikemaskini." : "Gambar ditolak.");
+      toast(status==="approved" ? "â Gambar diluluskan & dikemaskini." : "Gambar ditolak.");
       setSubs(prev=>prev.map(s=>s.id===id?{...s,status}:s));
     } catch(e) { toast(e.message, true); }
   };
@@ -1353,7 +1353,7 @@ function Approvals({ toast, setRoute }) {
           <h1 style={{fontSize:24,fontWeight:600,margin:"0 0 4px",letterSpacing:"-0.02em"}}>Kelulusan Foto</h1>
           <p style={{fontSize:13,color:"var(--text-3)",margin:0}}>{pendingCount} menunggu semakan</p>
         </div>
-        <Btn variant="secondary" size="sm" onClick={()=>setRoute("home")}>← Kembali</Btn>
+        <Btn variant="secondary" size="sm" onClick={()=>setRoute("home")}>â Kembali</Btn>
       </div>
 
       {/* Filter tabs */}
@@ -1374,7 +1374,7 @@ function Approvals({ toast, setRoute }) {
       {loading ? (
         <div style={{textAlign:"center",padding:64,color:"var(--text-3)"}}>
           <div style={{width:32,height:32,border:"2px solid var(--border)",borderTopColor:"var(--accent)",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}}/>
-          Memuatkan…
+          Memuatkanâ¦
         </div>
       ) : shown.length===0 ? (
         <div style={{textAlign:"center",padding:64,color:"var(--text-3)",background:"var(--surface)",borderRadius:12,border:"1px dashed var(--border-strong)"}}>
@@ -1396,8 +1396,8 @@ function Approvals({ toast, setRoute }) {
               </div>
               {/* Info */}
               <div style={{padding:14}}>
-                <div style={{fontSize:14,fontWeight:500,fontStyle:"italic",marginBottom:4}}>{sub.species_name||"—"}</div>
-                <div style={{fontSize:12,color:"var(--text-3)",marginBottom:8}}>{sub.photo_type} · {sub.state||"—"} {sub.locality?"· "+sub.locality:""}</div>
+                <div style={{fontSize:14,fontWeight:500,fontStyle:"italic",marginBottom:4}}>{sub.species_name||"â"}</div>
+                <div style={{fontSize:12,color:"var(--text-3)",marginBottom:8}}>{sub.photo_type} Â· {sub.state||"â"} {sub.locality?"Â· "+sub.locality:""}</div>
                 <div style={{fontSize:12,color:"var(--text-2)",marginBottom:2}}>oleh {sub.contributor_name||"Tanpa nama"}</div>
                 {sub.notes && <div style={{fontSize:12,color:"var(--text-3)",marginTop:6,lineHeight:1.5}}>{sub.notes}</div>}
                 <div style={{fontSize:11,color:"var(--text-3)",marginTop:6,fontFamily:"var(--mono)"}}>{sub.submitted_at?.slice(0,10)||""}</div>
@@ -1405,8 +1405,8 @@ function Approvals({ toast, setRoute }) {
               {/* Actions */}
               {sub.status==="pending" && (
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",borderTop:"1px solid var(--border)"}}>
-                  <button onClick={()=>updateStatus(sub.id,"rejected",sub.species_id,sub.image_url)} style={{padding:"11px",background:"none",border:"none",borderRight:"1px solid var(--border)",cursor:"pointer",fontSize:13,color:"var(--danger)",fontWeight:500}}>✕ Tolak</button>
-                  <button onClick={()=>updateStatus(sub.id,"approved",sub.species_id,sub.image_url)} style={{padding:"11px",background:"none",border:"none",cursor:"pointer",fontSize:13,color:"var(--accent)",fontWeight:500}}>✓ Lulus</button>
+                  <button onClick={()=>updateStatus(sub.id,"rejected",sub.species_id,sub.image_url)} style={{padding:"11px",background:"none",border:"none",borderRight:"1px solid var(--border)",cursor:"pointer",fontSize:13,color:"var(--danger)",fontWeight:500}}>â Tolak</button>
+                  <button onClick={()=>updateStatus(sub.id,"approved",sub.species_id,sub.image_url)} style={{padding:"11px",background:"none",border:"none",cursor:"pointer",fontSize:13,color:"var(--accent)",fontWeight:500}}>â Lulus</button>
                 </div>
               )}
             </div>
@@ -1459,12 +1459,12 @@ function App() {
     if (formData.id) {
       await dbUpdate(formData.id, payload);
       setRawSpecies(prev=>prev.map(s=>s.id===formData.id?{...s,...payload}:s));
-      toast("✓ Rekod dikemaskini.");
+      toast("â Rekod dikemaskini.");
     } else {
       payload.created_at = new Date().toISOString();
       const res = await dbInsert(payload);
       setRawSpecies(prev=>[...(res[0]?[res[0]]:prev), ...prev]);
-      toast("✓ Spesies baru ditambah.");
+      toast("â Spesies baru ditambah.");
     }
   };
 
@@ -1508,9 +1508,9 @@ function App() {
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             <div style={{width:22,height:22,borderRadius:6,background:"var(--accent)",display:"inline-flex",alignItems:"center",justifyContent:"center",color:"white"}}><Icon.leaf s={13}/></div>
             <span style={{fontWeight:500,color:"var(--text)"}}>Dipterokarp Malaysia</span>
-            <span style={{color:"var(--text-3)"}}>· Dipterocarpaceae Database</span>
+            <span style={{color:"var(--text-3)"}}>Â· Dipterocarpaceae Database</span>
           </div>
-          <div style={{fontFamily:"var(--mono)",fontSize:12,color:"var(--text-3)"}}>v1.0 · CC-BY 4.0 · 2025–2026</div>
+          <div style={{fontFamily:"var(--mono)",fontSize:12,color:"var(--text-3)"}}>v1.0 Â· CC-BY 4.0 Â· 2025â2026</div>
         </div>
       </footer>
 
