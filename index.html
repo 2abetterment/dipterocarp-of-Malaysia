@@ -3,1480 +3,943 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Pokok PM — Tree Database of Peninsular Malaysia</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-
+<title>Dipterokarp Malaysia</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #FAFAFA;
-    --surface: #FFFFFF;
-    --surface-2: #F4F4F4;
-    --border: #E6E6E6;
-    --border-strong: #D4D4D4;
-    --text: #0A0A0A;
-    --text-2: #525252;
-    --text-3: #8A8A8A;
-    --accent: #1F5E3A;
-    --accent-2: #E8F0EA;
-    --warn: #B45309;
-    --danger: #B91C1C;
-    --radius: 8px;
-    --radius-sm: 6px;
-    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
-    --shadow: 0 4px 14px -4px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.04);
-    --ui: "Geist", -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
-    --mono: "Geist Mono", "SF Mono", Menlo, monospace;
-  }
-  [data-theme="dark"] {
-    --bg: #0A0A0A;
-    --surface: #141414;
-    --surface-2: #1C1C1C;
-    --border: #262626;
-    --border-strong: #383838;
-    --text: #FAFAFA;
-    --text-2: #A3A3A3;
-    --text-3: #707070;
-    --accent: #65B585;
-    --accent-2: #1C2E22;
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--ui);
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-    font-size: 14px;
-    line-height: 1.5;
-  }
-  button, input, select, textarea { font-family: inherit; }
-  ::selection { background: var(--accent); color: white; }
-  ::placeholder { color: var(--text-3); }
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  .scientific { font-style: italic; }
-  /* hide number spinners */
-  input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+:root {
+  --bg:#FAFAFA;--surface:#FFF;--surface-2:#F4F4F4;--border:#E6E6E6;
+  --border-strong:#D4D4D4;--text:#0A0A0A;--text-2:#525252;--text-3:#8A8A8A;
+  --accent:#1F5E3A;--accent-2:#E8F0EA;--danger:#B91C1C;
+  --radius:8px;--radius-sm:6px;
+  --shadow:0 4px 14px -4px rgba(0,0,0,0.08),0 2px 4px -2px rgba(0,0,0,0.04);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:"Geist",-apple-system,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit}
+::placeholder{color:var(--text-3)}
+.sci{font-style:italic}
 </style>
 </head>
 <body>
 <div id="root"></div>
-
-<template id="__bundler_thumbnail">
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-    <rect width="100" height="100" fill="#FAFAFA"/>
-    <circle cx="50" cy="50" r="22" fill="none" stroke="#0A0A0A" stroke-width="1.5"/>
-    <path d="M50 32C42 40 38 46 38 54c0 6 5 10 12 10s12-4 12-10c0-8-4-14-12-22z" fill="#1F5E3A"/>
-  </svg>
-</template>
-
-<script>
-window.addEventListener('error', (e) => { if (!e.filename && !e.error) e.preventDefault(); });
-</script>
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
-
 <script type="text/babel">
-const { useState, useEffect, useMemo, useRef } = React;
+const {useState,useEffect,useMemo,useCallback,useContext,createContext,useRef} = React;
 
-// ============ DATA ============
-const SPECIES = [
-  { id: "shorea-curtisii", sci: "Shorea curtisii", author: "Dyer ex King", family: "Dipterocarpaceae", genus: "Shorea",
-    common: ["Seraya", "Meranti Seraya", "Damar Siput Jantan"], iucn: "VU", mrl: "EN", endemic: false,
-    height: "40–55 m", dbh: "Up to 1.5 m", habit: "Emergent canopy tree",
-    distribution: ["Perak","Pahang","Selangor","Terengganu","Kelantan","Johor"],
-    altitude: "300–1000 m", habitat: "Hill dipterocarp forest on ridges and steep slopes",
-    phenology: "Mass flowering in irregular cycles (3–7 yr); fruiting Aug–Oct",
-    description: "Massive emergent dipterocarp distinguished by its silvery-grey crown that forms characteristic 'seraya ridges' visible from the air. Bark fissured, dark grey-black, exuding pale yellow dammar resin. Leaves coriaceous, elliptic-oblong, 8–14 cm; underside silvery-pubescent when young. Fruits five-winged samaras, the three larger wings spathulate.",
-    uses: "Light hardwood timber (Light Red Meranti) for joinery, plywood, general construction. Dammar resin historically tapped for varnishes.",
-    threats: ["Logging","Forest conversion","Fragmentation"],
-    photos: 47, contributors: 12, lastUpdated: "Mar 2026",
-    similar: ["Shorea leprosula","Shorea parvifolia","Shorea acuminata"] },
-  { id: "koompassia-excelsa", sci: "Koompassia excelsa", author: "(Becc.) Taub.", family: "Fabaceae", genus: "Koompassia",
-    common: ["Tualang","Mengaris","Honey Bee Tree"], iucn: "LC", mrl: "VU", endemic: false,
-    height: "60–88 m", dbh: "Up to 3 m", habit: "Super-emergent",
-    distribution: ["Perak","Kedah","Pahang","Terengganu","Johor"],
-    altitude: "0–600 m", habitat: "Lowland evergreen rainforest, often near rivers",
-    phenology: "Flowers Mar–May; pods Jun–Aug",
-    description: "One of the tallest trees in the tropics. Smooth, pale silver-grey trunk free of branches for the first 30 m. Crown broad and umbrella-like, supporting colonies of giant honey bees (Apis dorsata). Bark slippery and waxy — an evolved defence against sun bears. Leaves pinnately compound with 5–7 pairs of leaflets.",
-    uses: "Traditionally protected for the wild honey it hosts. Timber rarely felled due to cultural reverence and difficulty.",
-    threats: ["Selective logging","Habitat loss"],
-    photos: 84, contributors: 31, lastUpdated: "Apr 2026",
-    similar: ["Koompassia malaccensis"] },
-  { id: "neobalanocarpus-heimii", sci: "Neobalanocarpus heimii", author: "(King) P.S.Ashton", family: "Dipterocarpaceae", genus: "Neobalanocarpus",
-    common: ["Chengal","Cengal","Penak"], iucn: "EN", mrl: "EN", endemic: true,
-    height: "45–60 m", dbh: "Up to 2.5 m", habit: "Emergent",
-    distribution: ["Terengganu","Pahang","Johor","Kelantan"],
-    altitude: "0–1000 m", habitat: "Mixed dipterocarp forest, undulating terrain",
-    phenology: "Irregular masting; fruits Jul–Sep",
-    description: "Endemic to the Malay Peninsula. Among the most valuable timbers in Southeast Asia. Monotypic genus. Trunk straight, cylindrical; bark thin grey-brown, scaly. Leaves elliptic, glossy above, glaucous below. Fruit a single-seeded nut without prominent wings — unusual within Dipterocarpaceae. Heartwood deep yellow-brown, extremely dense and durable.",
-    uses: "Heavy hardwood — timber of choice for traditional Malay houses, boats, and bridges. Resists marine borers.",
-    threats: ["Overlogging","Endemism with restricted range","Slow growth"],
-    photos: 38, contributors: 19, lastUpdated: "Mar 2026",
-    similar: ["Hopea odorata","Shorea glauca"] },
-  { id: "intsia-palembanica", sci: "Intsia palembanica", author: "Miq.", family: "Fabaceae", genus: "Intsia",
-    common: ["Merbau","Ipil"], iucn: "VU", mrl: "EN", endemic: false,
-    height: "30–45 m", dbh: "Up to 2 m", habit: "Canopy tree",
-    distribution: ["Perak","Selangor","Pahang","Negeri Sembilan","Johor"],
-    altitude: "0–600 m", habitat: "Lowland and hill forest, well-drained soils",
-    phenology: "Flowers Apr–Jun; pods Sep–Dec",
-    description: "Malaysia's national tree. Stately leguminous canopy tree with distinctive buttressed base and a dense, dark green crown. Bark pale grey, smooth, flaking in irregular plates. Bipinnately compound leaves with 2 pairs of large leaflets. Heartwood is the prized 'Merbau' — orange-brown, exceptionally durable.",
-    uses: "Premium hardwood for flooring, decking, furniture, decorative veneers. Heartwood yields a yellow dye.",
-    threats: ["Overharvesting for international trade","Slow regeneration"],
-    photos: 122, contributors: 48, lastUpdated: "Apr 2026",
-    similar: ["Intsia bijuga"] },
-  { id: "dipterocarpus-baudii", sci: "Dipterocarpus baudii", author: "Korth.", family: "Dipterocarpaceae", genus: "Dipterocarpus",
-    common: ["Keruing Bulu"], iucn: "CR", mrl: "CR", endemic: false,
-    height: "30–45 m", dbh: "1.2 m", habit: "Canopy tree",
-    distribution: ["Johor","Pahang","Terengganu"],
-    altitude: "0–500 m", habitat: "Lowland mixed dipterocarp forest",
-    phenology: "Mast flowering; fruits Sep–Nov",
-    description: "Heavily threatened dipterocarp recognised by the dense rusty-brown indumentum on twigs, buds, and leaf undersurfaces. Bark grey-brown, scaly. Leaves large (15–30 cm), ovate, with prominent parallel secondary veins. Two long wings on the fruit, persistent and reddish-brown.",
-    uses: "Heavy hardwood (Keruing) for heavy construction, boat-building, railway sleepers.",
-    threats: ["Illegal logging","Plantation conversion","Small population"],
-    photos: 9, contributors: 4, lastUpdated: "Jan 2026",
-    similar: ["Dipterocarpus cornutus","Dipterocarpus crinitus"] },
-  { id: "eusideroxylon-zwageri", sci: "Eusideroxylon zwageri", author: "Teijsm. & Binn.", family: "Lauraceae", genus: "Eusideroxylon",
-    common: ["Belian","Bornean Ironwood"], iucn: "VU", mrl: "EN", endemic: false,
-    height: "30–50 m", dbh: "2.2 m", habit: "Canopy tree",
-    distribution: ["Pahang","Johor"],
-    altitude: "0–500 m", habitat: "Lowland evergreen rainforest",
-    phenology: "Flowers Feb–Apr; fruits Aug–Dec",
-    description: "Borneo's signature ironwood, marginally present in Peninsular Malaysia. Bark thick, deeply furrowed, greyish-brown. Leaves alternate, simple, leathery, elliptic. Drupes large, ovoid, 12–18 cm. Wood is the densest in commercial Asian trade — it sinks in water.",
-    uses: "Construction, shingles, marine pilings — virtually indestructible. Cultural importance among Iban and Kadazandusun.",
-    threats: ["Overexploitation","Extremely slow growth","Habitat loss"],
-    photos: 22, contributors: 8, lastUpdated: "Feb 2026",
-    similar: ["Cinnamomum iners"] },
-  { id: "syzygium-malaccense", sci: "Syzygium malaccense", author: "(L.) Merr. & L.M.Perry", family: "Myrtaceae", genus: "Syzygium",
-    common: ["Jambu Bol","Malay Apple","Pomerac"], iucn: "LC", mrl: "LC", endemic: false,
-    height: "12–18 m", dbh: "0.4 m", habit: "Small canopy tree",
-    distribution: ["All states"],
-    altitude: "0–1200 m", habitat: "Cultivated and wild in lowland forests",
-    phenology: "Flowers Mar–Jun; fruits Apr–Aug",
-    description: "Compact evergreen tree with a dense conical crown. Leaves opposite, elliptic-oblong, 15–30 cm, glossy dark green. Flowers showy magenta-pink, in cauliflorous clusters. Fruit a glossy red-pink drupe, pear-shaped, edible.",
-    uses: "Fruit eaten fresh; ornamental for shade and flowers. Bark used in folk medicine.",
-    threats: ["None significant"], photos: 198, contributors: 67, lastUpdated: "Apr 2026",
-    similar: ["Syzygium aqueum","Syzygium samarangense"] },
-  { id: "ficus-benjamina", sci: "Ficus benjamina", author: "L.", family: "Moraceae", genus: "Ficus",
-    common: ["Beringin","Weeping Fig"], iucn: "LC", mrl: "LC", endemic: false,
-    height: "15–25 m", dbh: "1.2 m", habit: "Canopy tree, often hemi-epiphytic",
-    distribution: ["All states"], altitude: "0–800 m", habitat: "Lowland to hill forest, also cultivated",
-    phenology: "Year-round figging",
-    description: "Familiar canopy tree with cascading drooping branches. Leaves alternate, ovate-acuminate, 6–13 cm, glossy. Begins life as an epiphyte, sending aerial roots that fuse into a trunk. Figs small, paired, ripening red.",
-    uses: "Widely planted as a street and shade tree. Important keystone species for frugivores.",
-    threats: ["None significant"], photos: 234, contributors: 89, lastUpdated: "Apr 2026",
-    similar: ["Ficus microcarpa","Ficus religiosa"] },
-];
+// ─── CONFIG ───────────────────────────────────────────────
+const SB_URL  = 'https://xrntnarchlglhllvlrnv.supabase.co';
+const SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhybnRuYXJjaGxnbGhsbHZscm52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTU4MzksImV4cCI6MjA4MDk5MTgzOX0.Q0PjW5dMU07EDoR-GGDpIjATlSC5AJxNeEdOlYaO96w';
+const TABLE   = 'dipterocarp_species_2025_12_11_02_08';
+const SB_HDR  = {'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'};
 
-const STATUS = {
-  CR: { label: "Critically Endangered", short: "CR", c: "#B91C1C", bg: "#FEE2E2" },
-  EN: { label: "Endangered", short: "EN", c: "#C2410C", bg: "#FFEDD5" },
-  VU: { label: "Vulnerable", short: "VU", c: "#A16207", bg: "#FEF3C7" },
-  NT: { label: "Near Threatened", short: "NT", c: "#65A30D", bg: "#ECFCCB" },
-  LC: { label: "Least Concern", short: "LC", c: "#047857", bg: "#D1FAE5" },
-  DD: { label: "Data Deficient", short: "DD", c: "#525252", bg: "#F4F4F4" },
-  NE: { label: "Not Evaluated", short: "NE", c: "#737373", bg: "#F4F4F4" },
+// ─── LANG ─────────────────────────────────────────────────
+const LangCtx = createContext('en');
+const useLang = () => useContext(LangCtx);
+
+const UI = {
+  en: {
+    title:'Dipterokarp Malaysia',
+    browse:'Browse',contribute:'Contribute',about:'About',
+    search:'Search scientific name, Malay name, genus…',
+    stats_sp:'Species',stats_gen:'Genera',stats_end:'Endemic',stats_thr:'Threatened',
+    featured:'Featured species',see_all:'See all',
+    recent:'Recent entries',loading:'Loading from Supabase…',
+    filters:'Filters',clear:'Clear',
+    iucn:'IUCN Status',genus:'Genus',region:'Distribution',others:'Other',
+    endemic_my:'Endemic to Malaysia',
+    sort_az:'A → Z',sort_thr:'Most threatened',
+    no_match:'No species matched',no_match_sub:'Try a broader search or clear filters.',reset:'Reset',
+    overview:'Overview',taxonomy:'Taxonomy',distribution:'Distribution',morphology:'Morphology',
+    local_names:'Local names',conservation:'Conservation status',
+    habitat:'Habitat',altitude:'Altitude',phenology:'Phenology',threats:'Threats',
+    description:'Description',ecology:'Habitat & Ecology',uses:'Economic uses',quick:'Quick facts',
+    similar:'Similar species',
+    home:'Home',
+    contribute_title:'Contribute a photo',
+    about_title:'About this database',
+    en_label:'EN',bm_label:'BM',
+  },
+  bm: {
+    title:'Dipterokarp Malaysia',
+    browse:'Layari Laman',contribute:'Kongsikan',about:'Perihal',
+    search:'Cari nama saintifik, nama Melayu, genus…',
+    stats_sp:'Spesies',stats_gen:'Genus',stats_end:'Endemik',stats_thr:'Terancam',
+    featured:'Spesies ikonik',see_all:'Lihat semua',
+    recent:'Entri terbaru',loading:'Memuatkan dari Supabase…',
+    filters:'Penapis',clear:'Kosongkan',
+    iucn:'Status IUCN',genus:'Genus',region:'Taburan',others:'Lain-lain',
+    endemic_my:'Endemik Malaysia',
+    sort_az:'A → Z',sort_thr:'Paling terancam',
+    no_match:'Tiada spesies sepadan',no_match_sub:'Cuba carian lebih luas atau kosongkan penapis.',reset:'Tetapkan semula',
+    overview:'Gambaran Keseluruhan',taxonomy:'Taksonomi',distribution:'Taburan',morphology:'Morfologi',
+    local_names:'Nama tempatan',conservation:'Status pemuliharaan',
+    habitat:'Habitat',altitude:'Ketinggian',phenology:'Fenologi',threats:'Ancaman',
+    description:'Huraian',ecology:'Habitat & Ekologi',uses:'Kepentingan ekonomi',quick:'Fakta ringkas',
+    similar:'Spesies serupa',
+    home:'Laman Utama',
+    contribute_title:'Kongsi foto',
+    about_title:'Perihal pangkalan data',
+    en_label:'EN',bm_label:'BM',
+  },
 };
 
-const STATES = ["Perlis","Kedah","Pulau Pinang","Perak","Selangor","Negeri Sembilan","Melaka","Johor","Pahang","Terengganu","Kelantan","Kuala Lumpur"];
-
-// ============ ATOMS ============
-const Icon = {
-  search: (p={}) => (<svg width={p.s||16} height={p.s||16} viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.5"/><path d="M11 11l3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>),
-  arrow: (p={}) => (<svg width={p.s||14} height={p.s||14} viewBox="0 0 14 14" style={{transform: p.dir==="left"?"rotate(180deg)":""}} fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>),
-  upload: (p={}) => (<svg width={p.s||16} height={p.s||16} viewBox="0 0 16 16" fill="none"><path d="M8 11V2M5 5l3-3 3 3M2.5 13.5h11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>),
-  filter: (p={}) => (<svg width={p.s||14} height={p.s||14} viewBox="0 0 14 14" fill="none"><path d="M1 3h12M3 7h8M5 11h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>),
-  close: (p={}) => (<svg width={p.s||14} height={p.s||14} viewBox="0 0 14 14" fill="none"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>),
-  check: (p={}) => (<svg width={p.s||12} height={p.s||12} viewBox="0 0 12 12" fill="none"><path d="M2.5 6.5l2.5 2.5 4.5-5.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>),
-  pin: (p={}) => (<svg width={p.s||12} height={p.s||14} viewBox="0 0 12 14" fill="none"><path d="M6 1c2.5 0 4.5 2 4.5 4.5C10.5 9 6 13 6 13S1.5 9 1.5 5.5C1.5 3 3.5 1 6 1z" stroke="currentColor" strokeWidth="1.4"/><circle cx="6" cy="5.5" r="1.5" fill="currentColor"/></svg>),
-  camera: (p={}) => (<svg width={p.s||16} height={p.s||16} viewBox="0 0 16 16" fill="none"><rect x="1.5" y="4" width="13" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><path d="M5.5 4l1-1.5h3l1 1.5" stroke="currentColor" strokeWidth="1.5"/><circle cx="8" cy="8.5" r="2.5" stroke="currentColor" strokeWidth="1.5"/></svg>),
-  grid: (p={}) => (<svg width={p.s||14} height={p.s||14} viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.4"/><rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.4"/><rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.4"/><rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.4"/></svg>),
-  list: (p={}) => (<svg width={p.s||14} height={p.s||14} viewBox="0 0 14 14" fill="none"><path d="M1 3.5h12M1 7h12M1 10.5h12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>),
-  leaf: (p={}) => (<svg width={p.s||16} height={p.s||16} viewBox="0 0 16 16" fill="none"><path d="M2 14C2 7 7 2 14 2C14 9 9 14 2 14Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M2 14L9 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>),
-  chev: (p={}) => (<svg width={p.s||12} height={p.s||12} viewBox="0 0 12 12" style={{transform: p.up?"rotate(180deg)":""}} fill="none"><path d="M3 4.5l3 3 3-3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>),
-  plus: (p={}) => (<svg width={p.s||14} height={p.s||14} viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>),
-};
-
-function Photo({ caption, w, h, ratio, seed=0, rounded=true }) {
-  const hue = 80 + (seed * 13) % 60;
-  return (
-    <div style={{
-      width: w||"100%", height: h, aspectRatio: ratio||(h?undefined:"4/3"),
-      background: `linear-gradient(135deg, hsl(${hue}, 18%, 88%), hsl(${hue+20}, 22%, 78%))`,
-      position: "relative", overflow: "hidden",
-      borderRadius: rounded ? "var(--radius)" : 0,
-      border: "1px solid var(--border)",
-    }}>
-      <div style={{ position:"absolute", inset:0,
-        backgroundImage:`radial-gradient(circle at 30% 70%, hsla(${hue+30},35%,55%,0.45), transparent 55%), radial-gradient(circle at 75% 35%, hsla(${hue-10},25%,75%,0.55), transparent 50%)`}}/>
-      <div style={{ position:"absolute", left: 10, bottom: 8,
-        fontFamily:"var(--mono)", fontSize: 10, color: "rgba(20,30,25,0.65)",
-        background: "rgba(255,255,255,0.7)", padding: "2px 6px", borderRadius: 4,
-        backdropFilter: "blur(4px)", letterSpacing: "0.02em",
-      }}>{caption}</div>
-    </div>
-  );
-}
-
-function Pill({ status, size }) {
-  const m = STATUS[status] || STATUS.NE;
-  const sm = size === "sm";
-  return (
-    <span style={{
-      display: "inline-flex", alignItems: "center", gap: 4,
-      padding: sm ? "1px 6px" : "2px 8px",
-      fontSize: sm ? 11 : 12, fontWeight: 500,
-      background: m.bg, color: m.c,
-      borderRadius: 999, lineHeight: 1.5,
-      border: `1px solid ${m.c}22`,
-    }}>
-      <span style={{ width: 5, height: 5, borderRadius: 999, background: m.c }}/>
-      {m.short}
-    </span>
-  );
-}
-
-function Btn({ children, variant="primary", size="md", icon, iconRight, onClick, disabled, full, type }) {
-  const variants = {
-    primary: { bg: "var(--text)", c: "var(--bg)", border: "var(--text)" },
-    secondary: { bg: "var(--surface)", c: "var(--text)", border: "var(--border-strong)" },
-    ghost: { bg: "transparent", c: "var(--text)", border: "transparent" },
-    accent: { bg: "var(--accent)", c: "white", border: "var(--accent)" },
-    danger: { bg: "transparent", c: "var(--danger)", border: "transparent" },
+// Simple BM translation for data field values
+function tval(v, lang) {
+  if (lang === 'en' || !v) return v;
+  const map = {
+    'Vulnerable':'Terancam','Endangered':'Terancam (EN)','Critically Endangered':'Terancam Kritikal',
+    'Near Threatened':'Hampir Terancam','Least Concern':'Kurang Bimbang',
+    'Data Deficient':'Data Tidak Mencukupi','Not Evaluated':'Tidak Dinilai',
+    'Lowland forest':'Hutan tanah rendah','Lowland dipterocarp forest':'Hutan dipterokarp tanah rendah',
+    'Hill dipterocarp forest':'Hutan bukit dipterokarpa','Hill forest':'Hutan bukit',
+    'Mixed dipterocarp forest':'Hutan dipterokarp campuran','Primary forest':'Hutan primer',
+    'Secondary forest':'Hutan sekunder','Peat swamp forest':'Hutan paya gambut',
+    'Riparian forest':'Hutan tepi sungai','Montane forest':'Hutan tanah tinggi',
+    'Peninsular Malaysia':'Semenanjung Malaysia',
+    'Mass flowering':'Berbunga massa','Mast flowering':'Berbunga serentak',
+    'Irregular':'Tidak teratur','Annual':'Tahunan',
+    'Logging':'Pembalakan','Forest conversion':'Penukaran hutan','Deforestation':'Penyahutanan',
+    'Fragmentation':'Fragmentasi','Agriculture':'Pertanian','Climate change':'Perubahan iklim',
+    'Emergent canopy tree':'Pokok kanopi timbul','Canopy tree':'Pokok kanopi',
+    'Sub-canopy tree':'Pokok sub-kanopi','Hardwood':'Kayu keras','Timber':'Kayu balak',
+    'Construction':'Pembinaan','Furniture':'Perabot','Plywood':'Papan lapis',
   };
-  const v = variants[variant];
-  const sizes = { sm: "6px 10px 6px 10px", md: "8px 14px", lg: "11px 18px" };
-  return (
-    <button type={type||"button"} disabled={disabled} onClick={onClick} style={{
-      display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6,
-      padding: sizes[size],
-      background: disabled ? "var(--surface-2)" : v.bg,
-      color: disabled ? "var(--text-3)" : v.c,
-      border: `1px solid ${disabled ? "var(--border)" : v.border}`,
-      borderRadius: "var(--radius-sm)",
-      fontSize: size === "sm" ? 13 : 14, fontWeight: 500,
-      cursor: disabled ? "not-allowed" : "pointer",
-      transition: "all 0.12s",
-      width: full ? "100%" : undefined,
-      whiteSpace: "nowrap",
-    }}
-    onMouseEnter={e => { if (!disabled && variant === "primary") e.currentTarget.style.opacity = "0.88"; }}
-    onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
-    >
-      {icon}{children}{iconRight}
-    </button>
-  );
+  if (map[v]) return map[v];
+  let r = v;
+  for (const [en,bm] of Object.entries(map)) {
+    r = r.replace(new RegExp('\\b'+en+'\\b','gi'), bm);
+  }
+  return r;
 }
 
-function Input({ value, onChange, placeholder, type, icon, full=true }) {
-  return (
-    <div style={{
-      display: "flex", alignItems: "center", gap: 8,
-      padding: "9px 12px",
-      background: "var(--surface)", border: "1px solid var(--border-strong)",
-      borderRadius: "var(--radius-sm)",
-      width: full ? "100%" : undefined,
-    }}>
-      {icon && <span style={{ color: "var(--text-3)", display: "flex" }}>{icon}</span>}
-      <input type={type||"text"} value={value} onChange={onChange} placeholder={placeholder}
-        style={{ flex: 1, background: "none", border: "none", outline: "none", fontSize: 14, color: "var(--text)" }}/>
+// ─── IUCN ─────────────────────────────────────────────────
+const IUCN_MAP = {
+  CR:{label:'Critically Endangered',c:'#B91C1C',bg:'#FEE2E2'},
+  EN:{label:'Endangered',c:'#C2410C',bg:'#FFEDD5'},
+  VU:{label:'Vulnerable',c:'#A16207',bg:'#FEF3C7'},
+  NT:{label:'Near Threatened',c:'#65A30D',bg:'#ECFCCB'},
+  LC:{label:'Least Concern',c:'#047857',bg:'#D1FAE5'},
+  DD:{label:'Data Deficient',c:'#525252',bg:'#F4F4F4'},
+  NE:{label:'Not Evaluated',c:'#737373',bg:'#F4F4F4'},
+};
+function parseStatus(s){
+  if(!s) return 'DD';
+  const l=s.toLowerCase();
+  if(l.includes('critically')) return 'CR';
+  if(l.includes('endangered')) return 'EN';
+  if(l.includes('vulnerable')) return 'VU';
+  if(l.includes('near')) return 'NT';
+  if(l.includes('least')) return 'LC';
+  return 'DD';
+}
+
+// ─── SUPABASE ─────────────────────────────────────────────
+async function fetchSpecies() {
+  const r = await fetch(
+    `${SB_URL}/rest/v1/${TABLE}?select=*&order=scientific_name`,
+    {headers: SB_HDR}
+  );
+  if (!r.ok) throw new Error(`Supabase error ${r.status}: ${await r.text()}`);
+  return r.json();
+}
+
+function mapRow(r){
+  const iucn = parseStatus(r.conservation_status);
+  return {
+    id: r.id,
+    sci: r.scientific_name || '',
+    genus: r.genus || '',
+    family: r.family || 'Dipterocarpaceae',
+    common: [r.local_name_malay, r.maksud_epitet].filter(Boolean),
+    iucn,
+    conservation_status: r.conservation_status || '',
+    endemic: !!r.endemic_to_malaysia,
+    height: r.height_range || '—',
+    dbh: r.trunk_diameter || '—',
+    habitat: r.habitat || '—',
+    altitude: r.elevation_range || '—',
+    phenology: r.flowering_pattern || '—',
+    bark: r.bark_description || '',
+    leaf: r.leaf_description || '',
+    flower: r.flower_description || '',
+    fruit: r.fruit_description || '',
+    ecological_notes: r.ecological_notes || '',
+    uses: r.economic_importance || '—',
+    dist: [
+      r.distribution_peninsular && 'Peninsular Malaysia',
+      r.distribution_sabah && 'Sabah',
+      r.distribution_sarawak && 'Sarawak',
+    ].filter(Boolean),
+    image_url: r.image_url || '',
+  };
+}
+
+// ─── ATOMS ────────────────────────────────────────────────
+function Pill({code,size}){
+  const m = IUCN_MAP[code] || IUCN_MAP.NE;
+  const sm = size==='sm';
+  return <span style={{display:'inline-flex',alignItems:'center',gap:4,
+    padding:sm?'1px 6px':'2px 8px',fontSize:sm?11:12,fontWeight:500,
+    background:m.bg,color:m.c,borderRadius:999,border:`1px solid ${m.c}22`}}>
+    <span style={{width:5,height:5,borderRadius:999,background:m.c}}/>
+    {code}
+  </span>;
+}
+
+function Btn({children,variant='primary',size='md',icon,onClick,disabled,full}){
+  const v={
+    primary:{bg:'var(--text)',c:'var(--bg)',b:'var(--text)'},
+    secondary:{bg:'var(--surface)',c:'var(--text)',b:'var(--border-strong)'},
+    ghost:{bg:'transparent',c:'var(--text)',b:'transparent'},
+    accent:{bg:'var(--accent)',c:'white',b:'var(--accent)'},
+  }[variant];
+  const p={sm:'6px 10px',md:'8px 14px',lg:'11px 18px'}[size];
+  return <button disabled={disabled} onClick={onClick} style={{
+    display:'inline-flex',alignItems:'center',justifyContent:'center',gap:6,padding:p,
+    background:disabled?'var(--surface-2)':v.bg,color:disabled?'var(--text-3)':v.c,
+    border:`1px solid ${disabled?'var(--border)':v.b}`,borderRadius:'var(--radius-sm)',
+    fontSize:size==='sm'?13:14,fontWeight:500,cursor:disabled?'not-allowed':'pointer',
+    transition:'opacity .12s',width:full?'100%':undefined,whiteSpace:'nowrap',
+  }}>{icon}{children}</button>;
+}
+
+function SearchBox({value,onChange,placeholder}){
+  return <div style={{display:'flex',alignItems:'center',gap:8,padding:'9px 12px',
+    background:'var(--surface)',border:'1px solid var(--border-strong)',
+    borderRadius:'var(--radius-sm)',width:'100%'}}>
+    <svg width={15} height={15} viewBox="0 0 16 16" fill="none">
+      <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.5"/>
+      <path d="M11 11l3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+    <input value={value} onChange={onChange} placeholder={placeholder}
+      style={{flex:1,background:'none',border:'none',outline:'none',fontSize:14,color:'var(--text)'}}/>
+  </div>;
+}
+
+function PlaceholderImg({seed=0,ratio='4/3',rounded=true}){
+  const hue = 80+(seed*13)%60;
+  return <div style={{width:'100%',aspectRatio:ratio,
+    background:`linear-gradient(135deg,hsl(${hue},18%,88%),hsl(${hue+20},22%,78%))`,
+    borderRadius:rounded?'var(--radius)':0,border:'1px solid var(--border)',
+    position:'relative',overflow:'hidden'}}>
+    <div style={{position:'absolute',inset:0,
+      backgroundImage:`radial-gradient(circle at 30% 70%,hsla(${hue+30},35%,55%,.4),transparent 55%),radial-gradient(circle at 75% 35%,hsla(${hue-10},25%,75%,.5),transparent 50%)`}}/>
+  </div>;
+}
+
+function SpeciesImg({src,seed,ratio,rounded}){
+  const [err,setErr]=useState(false);
+  if(src && !err) return <img src={src} onError={()=>setErr(true)}
+    style={{width:'100%',aspectRatio:ratio||'4/3',objectFit:'cover',
+      borderRadius:rounded!==false?'var(--radius)':0,border:'1px solid var(--border)',display:'block'}}/>;
+  return <PlaceholderImg seed={seed} ratio={ratio} rounded={rounded}/>;
+}
+
+// ─── CARD ─────────────────────────────────────────────────
+function Card({s,i,onClick}){
+  const [hov,setHov]=useState(false);
+  return <button onClick={onClick} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
+    style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:12,
+      padding:0,cursor:'pointer',textAlign:'left',overflow:'hidden',
+      boxShadow:hov?'var(--shadow)':'none',transform:hov?'translateY(-2px)':'none',transition:'all .15s'}}>
+    <div style={{padding:8,paddingBottom:0}}>
+      <SpeciesImg src={s.image_url} seed={i} ratio="4/3"/>
     </div>
-  );
-}
-
-// ============ TOPBAR ============
-function TopBar({ route, setRoute, query, setQuery, onSubmitSearch, lang, setLang }) {
-  const { t } = useLang();
-  const navItems = [
-    { id: "browse", label: t.browse },
-    { id: "upload", label: t.contribute },
-    { id: "about", label: t.about },
-  ];
-  return (
-    <header style={{
-      position: "sticky", top: 0, zIndex: 50,
-      background: "color-mix(in srgb, var(--bg) 92%, transparent)",
-      backdropFilter: "blur(12px)",
-      borderBottom: "1px solid var(--border)",
-    }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "12px 32px", display: "flex", alignItems: "center", gap: 24 }}>
-        <button onClick={() => setRoute("home")} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 7, background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>
-            <Icon.leaf s={16} />
-          </div>
-          <span style={{ fontWeight: 600, fontSize: 15, letterSpacing: "-0.01em" }}>Pokok PM</span>
-        </button>
-
-        <span style={{ width: 1, height: 20, background: "var(--border)" }} />
-
-        <nav style={{ display: "flex", gap: 4 }}>
-          {navItems.map(it => (
-            <button key={it.id} onClick={() => setRoute(it.id)} style={{
-              background: route === it.id ? "var(--surface-2)" : "transparent",
-              color: route === it.id ? "var(--text)" : "var(--text-2)",
-              border: "none", padding: "7px 12px", borderRadius: 6,
-              fontSize: 13, fontWeight: 500, cursor: "pointer",
-            }}>{it.label}</button>
-          ))}
-        </nav>
-
-        <div style={{ flex: 1, maxWidth: 460, marginLeft: 16 }}>
-          <form onSubmit={(e) => { e.preventDefault(); onSubmitSearch(); }}>
-            <Input
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              placeholder={t.search_placeholder}
-              icon={<Icon.search s={15} />}
-            />
-          </form>
+    <div style={{padding:16}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:8,marginBottom:8}}>
+        <span style={{fontSize:11,color:'var(--text-3)',fontFamily:'monospace'}}>{s.family}</span>
+        <div style={{display:'flex',gap:4}}>
+          <Pill code={s.iucn} size="sm"/>
+          {s.endemic&&<span style={{fontSize:11,padding:'1px 6px',background:'var(--text)',color:'var(--bg)',borderRadius:999}}>Endemik</span>}
         </div>
-
-        <div style={{ flex: 1 }} />
-
-        <LangToggle lang={lang} setLang={setLang} />
-
-        <Btn variant="accent" icon={<Icon.camera s={15} />} onClick={() => setRoute("upload")}>
-          {t.contribute_photo}
-        </Btn>
       </div>
-    </header>
-  );
-}
-
-// ============ HOME ============
-function Home({ setRoute, setSpeciesId, setQuery, doSearch }) {
-  const { t } = useLang();
-  const [heroQ, setHeroQ] = useState("");
-  const popular = ["Tualang", "Meranti", "Chengal", "Merbau", "Dipterocarpaceae", "Endemic"];
-  const recent = SPECIES.slice(0, 4);
-  const featured = [SPECIES[1], SPECIES[2], SPECIES[3]];
-
-  const submit = (q) => { setQuery(q); setRoute("browse"); };
-
-  return (
-    <div style={{ maxWidth: 1280, margin: "0 auto", padding: "64px 32px 32px" }}>
-      {/* Hero */}
-      <section style={{ textAlign: "center", maxWidth: 760, margin: "0 auto 80px" }}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 12px", background: "var(--accent-2)", color: "var(--accent)", borderRadius: 999, fontSize: 12, fontWeight: 500, marginBottom: 24 }}>
-          <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--accent)" }}/>
-          2,847 species · 18,402 photos · open data
-        </div>
-        <h1 style={{ fontSize: 56, lineHeight: 1.05, fontWeight: 600, letterSpacing: "-0.03em", margin: "0 0 20px", textWrap: "balance" }}>
-          The trees of Peninsular Malaysia, in one searchable archive.
-        </h1>
-        <p style={{ fontSize: 18, color: "var(--text-2)", lineHeight: 1.55, margin: "0 auto 32px", maxWidth: 600, textWrap: "pretty" }}>
-          Taxonomic descriptions, conservation status from IUCN and the Malaysia Red List, and photographs contributed by foresters, students, and citizens.
-        </p>
-
-        {/* Hero search */}
-        <form onSubmit={(e) => { e.preventDefault(); submit(heroQ); }} style={{ maxWidth: 580, margin: "0 auto" }}>
-          <div style={{
-            display: "flex", alignItems: "center", gap: 8,
-            padding: "8px 8px 8px 16px",
-            background: "var(--surface)", border: "1px solid var(--border-strong)",
-            borderRadius: 12, boxShadow: "var(--shadow)",
-          }}>
-            <Icon.search s={18} />
-            <input
-              value={heroQ}
-              onChange={e => setHeroQ(e.target.value)}
-              placeholder="Try: Tualang, Shorea, Dipterocarpaceae, Meranti…"
-              style={{ flex: 1, background: "none", border: "none", outline: "none", fontSize: 16, padding: "8px 0" }}
-            />
-            <Btn variant="primary" size="md" type="submit">Search</Btn>
-          </div>
-          <div style={{ display: "flex", gap: 6, justifyContent: "center", marginTop: 16, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 12, color: "var(--text-3)", marginRight: 4, alignSelf: "center" }}>Popular:</span>
-            {popular.map(p => (
-              <button key={p} onClick={() => submit(p)} style={{
-                background: "var(--surface)", border: "1px solid var(--border)",
-                borderRadius: 999, padding: "4px 10px", fontSize: 12, color: "var(--text-2)", cursor: "pointer",
-              }}>{p}</button>
-            ))}
-          </div>
-        </form>
-      </section>
-
-      {/* Stats strip */}
-      <section style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0, marginBottom: 80, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden" }}>
-        {[
-          ["2,847","Species catalogued"],
-          ["318","Endemic to peninsula"],
-          ["472","Threatened (IUCN)"],
-          ["1,143","Contributors"],
-        ].map(([n, l], i) => (
-          <div key={i} style={{ padding: "24px 28px", borderRight: i<3?"1px solid var(--border)":"none" }}>
-            <div style={{ fontSize: 32, fontWeight: 600, letterSpacing: "-0.02em", color: "var(--text)" }}>{n}</div>
-            <div style={{ fontSize: 13, color: "var(--text-2)", marginTop: 4 }}>{l}</div>
-          </div>
-        ))}
-      </section>
-
-      {/* Featured */}
-      <section style={{ marginBottom: 80 }}>
-        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 24 }}>
-          <h2 style={{ fontSize: 24, fontWeight: 600, margin: 0, letterSpacing: "-0.01em" }}>Iconic species</h2>
-          <button onClick={() => setRoute("browse")} style={{ background: "none", border: "none", color: "var(--text-2)", fontSize: 13, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4 }}>
-            View all <Icon.arrow s={12} />
-          </button>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-          {featured.map((s, i) => (
-            <Card key={s.id} s={s} i={i} onClick={() => { setSpeciesId(s.id); setRoute("detail"); }} />
-          ))}
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 80 }}>
-        {[
-          { n: "01", t: "Search & browse", d: "Find species by scientific name, genus, family, or any local name in Bahasa Malaysia, English, or Orang Asli languages." },
-          { n: "02", t: "Read the record", d: "Full taxonomy, descriptions, distribution by state, and dual conservation status — IUCN and Malaysia Red List." },
-          { n: "03", t: "Contribute a photo", d: "Anyone can submit photographs. Botanists at FRIM review submissions within 3–5 days before publishing." },
-        ].map(({n, t, d}) => (
-          <div key={n} style={{ padding: 24, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12 }}>
-            <div style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--text-3)", marginBottom: 12 }}>{n}</div>
-            <h3 style={{ fontSize: 16, fontWeight: 600, margin: "0 0 8px" }}>{t}</h3>
-            <p style={{ fontSize: 14, color: "var(--text-2)", margin: 0, lineHeight: 1.55 }}>{d}</p>
-          </div>
-        ))}
-      </section>
-
-      {/* Recent contributions */}
-      <section style={{ marginBottom: 32 }}>
-        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 20 }}>
-          <h2 style={{ fontSize: 24, fontWeight: 600, margin: 0, letterSpacing: "-0.01em" }}>Recent contributions</h2>
-          <span style={{ fontSize: 13, color: "var(--text-2)" }}>47 new this week</span>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
-          {recent.map((s, i) => (
-            <button key={s.id} onClick={() => { setSpeciesId(s.id); setRoute("detail"); }} style={{ background: "none", border: "none", padding: 0, textAlign: "left", cursor: "pointer" }}>
-              <Photo caption="In situ" seed={i+20} ratio="1/1" />
-              <div style={{ marginTop: 10, fontSize: 14, fontWeight: 500, fontStyle: "italic" }}>{s.sci}</div>
-              <div style={{ fontSize: 12, color: "var(--text-3)", marginTop: 2 }}>
-                @{["azhar","mei.ling","hafiz","priya"][i%4]} · 2 days ago
-              </div>
-            </button>
-          ))}
-        </div>
-      </section>
+      <div style={{fontSize:17,fontWeight:500,fontStyle:'italic',lineHeight:1.2,marginBottom:4}}>{s.sci}</div>
+      <div style={{fontSize:13,color:'var(--text-2)'}}>{s.common[0]||s.genus}</div>
     </div>
-  );
+  </button>;
 }
 
-function Card({ s, i, onClick }) {
-  const [hover, setHover] = useState(false);
-  return (
-    <button onClick={onClick}
-      onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
-      style={{
-        background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12,
-        padding: 0, cursor: "pointer", textAlign: "left", overflow: "hidden",
-        transition: "all 0.15s",
-        boxShadow: hover ? "var(--shadow)" : "var(--shadow-sm)",
-        transform: hover ? "translateY(-2px)" : "none",
-      }}>
-      <div style={{ padding: 8, paddingBottom: 0 }}>
-        <Photo caption={s.common[0]} seed={i+5} ratio="4/3" />
-      </div>
-      <div style={{ padding: 16 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, marginBottom: 8 }}>
-          <span style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "var(--mono)" }}>{s.family}</span>
-          <div style={{ display: "flex", gap: 4 }}>
-            <Pill status={s.iucn} size="sm" />
-            {s.endemic && <span style={{ fontSize: 11, padding: "1px 6px", background: "var(--text)", color: "var(--bg)", borderRadius: 999 }}>Endemic</span>}
-          </div>
+// ─── TOPBAR ───────────────────────────────────────────────
+function TopBar({route,setRoute,query,setQuery,onSearch,lang,setLang}){
+  const ui = UI[lang];
+  return <header style={{position:'sticky',top:0,zIndex:50,
+    background:'rgba(250,250,250,0.92)',backdropFilter:'blur(12px)',
+    borderBottom:'1px solid var(--border)'}}>
+    <div style={{maxWidth:1280,margin:'0 auto',padding:'12px 32px',display:'flex',alignItems:'center',gap:16}}>
+      <button onClick={()=>setRoute('home')} style={{background:'none',border:'none',padding:0,cursor:'pointer',
+        display:'flex',alignItems:'center',gap:10}}>
+        <div style={{width:28,height:28,borderRadius:7,background:'var(--accent)',display:'flex',
+          alignItems:'center',justifyContent:'center',color:'white',flexShrink:0}}>
+          <svg width={16} height={16} viewBox="0 0 16 16" fill="none">
+            <path d="M2 14C2 7 7 2 14 2C14 9 9 14 2 14Z" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/>
+            <path d="M2 14L9 7" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
         </div>
-        <div style={{ fontSize: 17, fontWeight: 500, fontStyle: "italic", lineHeight: 1.2, marginBottom: 4 }}>{s.sci}</div>
-        <div style={{ fontSize: 13, color: "var(--text-2)" }}>{s.common[0]}</div>
-      </div>
-    </button>
-  );
-}
-
-// ============ BROWSE ============
-function Browse({ query, setQuery, setRoute, setSpeciesId }) {
-  const { t } = useLang();
-  const [view, setView] = useState("grid");
-  const [filters, setFilters] = useState({ family: [], iucn: [], mrl: [], state: [], endemic: false });
-  const [sort, setSort] = useState("name");
-
-  const filtered = useMemo(() => {
-    let r = SPECIES;
-    if (query) {
-      const q = query.toLowerCase().trim();
-      r = r.filter(s =>
-        s.sci.toLowerCase().includes(q) ||
-        s.genus.toLowerCase().includes(q) ||
-        s.family.toLowerCase().includes(q) ||
-        s.common.some(c => c.toLowerCase().includes(q))
-      );
-    }
-    if (filters.family.length) r = r.filter(s => filters.family.includes(s.family));
-    if (filters.iucn.length) r = r.filter(s => filters.iucn.includes(s.iucn));
-    if (filters.mrl.length) r = r.filter(s => filters.mrl.includes(s.mrl));
-    if (filters.state.length) r = r.filter(s => filters.state.some(st => s.distribution.includes(st) || s.distribution.includes("All states")));
-    if (filters.endemic) r = r.filter(s => s.endemic);
-    if (sort === "name") r = [...r].sort((a,b) => a.sci.localeCompare(b.sci));
-    if (sort === "status") {
-      const order = ["CR","EN","VU","NT","LC","DD","NE"];
-      r = [...r].sort((a,b) => order.indexOf(a.iucn) - order.indexOf(b.iucn));
-    }
-    if (sort === "photos") r = [...r].sort((a,b) => b.photos - a.photos);
-    return r;
-  }, [query, filters, sort]);
-
-  const allFamilies = [...new Set(SPECIES.map(s => s.family))].sort();
-  const toggle = (k, v) => setFilters(f => ({ ...f, [k]: f[k].includes(v) ? f[k].filter(x => x !== v) : [...f[k], v] }));
-  const activeCount = filters.family.length + filters.iucn.length + filters.mrl.length + filters.state.length + (filters.endemic?1:0);
-
-  return (
-    <div style={{ maxWidth: 1280, margin: "0 auto", padding: "32px" }}>
-      {/* Page header */}
-      <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 28, fontWeight: 600, margin: 0, letterSpacing: "-0.02em" }}>Browse the catalogue</h1>
-        <p style={{ fontSize: 14, color: "var(--text-2)", margin: "6px 0 0" }}>
-          {filtered.length} {filtered.length === 1 ? "species" : "species"}
-          {query && <> matching “<span style={{ color: "var(--text)" }}>{query}</span>”</>}
-          {activeCount > 0 && <> · {activeCount} filter{activeCount>1?"s":""} applied</>}
-        </p>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 32 }}>
-        {/* Filters */}
-        <aside>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, paddingBottom: 12, borderBottom: "1px solid var(--border)" }}>
-            <span style={{ fontSize: 13, fontWeight: 600 }}>Filters</span>
-            {activeCount > 0 && (
-              <button onClick={() => setFilters({ family:[], iucn:[], mrl:[], state:[], endemic:false })}
-                style={{ background: "none", border: "none", color: "var(--accent)", fontSize: 12, cursor: "pointer" }}>Clear all</button>
-            )}
-          </div>
-
-          <FilterGroup title="IUCN Red List" defaultOpen>
-            {["CR","EN","VU","NT","LC","DD"].map(c => (
-              <Check key={c} checked={filters.iucn.includes(c)} onClick={() => toggle("iucn", c)}>
-                <Pill status={c} size="sm" />
-                <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--text-3)" }}>{SPECIES.filter(s => s.iucn === c).length}</span>
-              </Check>
-            ))}
-          </FilterGroup>
-
-          <FilterGroup title="Malaysia Red List">
-            {["CR","EN","VU","LC","DD"].map(c => (
-              <Check key={c} checked={filters.mrl.includes(c)} onClick={() => toggle("mrl", c)}>
-                <Pill status={c} size="sm" />
-                <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--text-3)" }}>{SPECIES.filter(s => s.mrl === c).length}</span>
-              </Check>
-            ))}
-          </FilterGroup>
-
-          <FilterGroup title="Family">
-            {allFamilies.map(f => (
-              <Check key={f} checked={filters.family.includes(f)} onClick={() => toggle("family", f)}>
-                <span style={{ fontSize: 13, fontStyle: "italic" }}>{f}</span>
-              </Check>
-            ))}
-          </FilterGroup>
-
-          <FilterGroup title="State">
-            {STATES.slice(0, 8).map(st => (
-              <Check key={st} checked={filters.state.includes(st)} onClick={() => toggle("state", st)}>
-                <span style={{ fontSize: 13 }}>{st}</span>
-              </Check>
-            ))}
-          </FilterGroup>
-
-          <FilterGroup title={t.other} defaultOpen>
-            <Check checked={filters.endemic} onClick={() => setFilters(f => ({ ...f, endemic: !f.endemic }))}>
-              <span style={{ fontSize: 13 }}>Endemic to peninsula</span>
-            </Check>
-          </FilterGroup>
-        </aside>
-
-        {/* Results */}
-        <main>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-            <Input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search species, genus, family, local name…" icon={<Icon.search s={15} />} />
-            <select value={sort} onChange={e => setSort(e.target.value)} style={{
-              background: "var(--surface)", border: "1px solid var(--border-strong)",
-              borderRadius: "var(--radius-sm)", padding: "9px 12px", fontSize: 13, color: "var(--text)", cursor: "pointer",
-            }}>
-              <option value="name">A → Z</option>
-              <option value="status">Most threatened</option>
-              <option value="photos">Most photographed</option>
-            </select>
-            <div style={{ display: "flex", border: "1px solid var(--border-strong)", borderRadius: "var(--radius-sm)", overflow: "hidden" }}>
-              <button onClick={() => setView("grid")} style={{
-                background: view==="grid"?"var(--text)":"var(--surface)",
-                color: view==="grid"?"var(--bg)":"var(--text-2)",
-                border: "none", padding: "9px 11px", cursor: "pointer", display: "flex", alignItems: "center",
-              }}><Icon.grid /></button>
-              <button onClick={() => setView("list")} style={{
-                background: view==="list"?"var(--text)":"var(--surface)",
-                color: view==="list"?"var(--bg)":"var(--text-2)",
-                border: "none", padding: "9px 11px", cursor: "pointer", display: "flex", alignItems: "center",
-                borderLeft: "1px solid var(--border-strong)",
-              }}><Icon.list /></button>
-            </div>
-          </div>
-
-          {/* active filter chips */}
-          {activeCount > 0 && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
-              {[...filters.family.map(v=>["family",v]), ...filters.iucn.map(v=>["iucn",v]), ...filters.mrl.map(v=>["mrl",v]), ...filters.state.map(v=>["state",v])].map(([k,v]) => (
-                <button key={k+v} onClick={() => toggle(k, v)} style={{
-                  display: "inline-flex", alignItems: "center", gap: 6,
-                  padding: "3px 4px 3px 10px", background: "var(--surface)", border: "1px solid var(--border)",
-                  borderRadius: 999, fontSize: 12, cursor: "pointer", color: "var(--text)",
-                }}>
-                  <span style={{ color: "var(--text-3)", fontSize: 11 }}>{k}:</span> {v}
-                  <span style={{ width: 18, height: 18, borderRadius: 999, background: "var(--surface-2)", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
-                    <Icon.close s={10} />
-                  </span>
-                </button>
-              ))}
-              {filters.endemic && (
-                <button onClick={() => setFilters(f => ({ ...f, endemic: false }))} style={{
-                  display: "inline-flex", alignItems: "center", gap: 6,
-                  padding: "3px 4px 3px 10px", background: "var(--surface)", border: "1px solid var(--border)",
-                  borderRadius: 999, fontSize: 12, cursor: "pointer",
-                }}>
-                  Endemic
-                  <span style={{ width: 18, height: 18, borderRadius: 999, background: "var(--surface-2)", display: "inline-flex", alignItems: "center", justifyContent: "center" }}><Icon.close s={10} /></span>
-                </button>
-              )}
-            </div>
-          )}
-
-          {filtered.length === 0 ? (
-            <div style={{ padding: 64, textAlign: "center", background: "var(--surface)", border: "1px dashed var(--border-strong)", borderRadius: 12 }}>
-              <div style={{ fontSize: 16, fontWeight: 500, marginBottom: 6 }}>No species match those filters</div>
-              <div style={{ fontSize: 13, color: "var(--text-2)", marginBottom: 16 }}>Try a broader search or clear some filters.</div>
-              <Btn variant="secondary" onClick={() => { setQuery(""); setFilters({ family:[], iucn:[], mrl:[], state:[], endemic:false }); }}>Reset all</Btn>
-            </div>
-          ) : view === "grid" ? (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-              {filtered.map((s, i) => (
-                <Card key={s.id} s={s} i={i} onClick={() => { setSpeciesId(s.id); setRoute("detail"); }} />
-              ))}
-            </div>
-          ) : (
-            <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "60px 1.4fr 1fr 0.9fr 70px 70px 70px", padding: "10px 16px", borderBottom: "1px solid var(--border)", background: "var(--surface-2)", fontSize: 11, fontWeight: 500, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-                <div></div><div>Species</div><div>Common name</div><div>Family</div><div>IUCN</div><div>MYS</div><div style={{ textAlign: "right" }}>Photos</div>
-              </div>
-              {filtered.map((s, i) => (
-                <button key={s.id} onClick={() => { setSpeciesId(s.id); setRoute("detail"); }}
-                  style={{ display: "grid", gridTemplateColumns: "60px 1.4fr 1fr 0.9fr 70px 70px 70px", padding: "12px 16px", width: "100%", background: "none", border: "none", borderTop: i>0?"1px solid var(--border)":"none", textAlign: "left", cursor: "pointer", alignItems: "center", color: "var(--text)" }}
-                  onMouseEnter={e => e.currentTarget.style.background = "var(--surface-2)"}
-                  onMouseLeave={e => e.currentTarget.style.background = "none"}>
-                  <div style={{ width: 44, height: 44, borderRadius: 6, overflow: "hidden" }}>
-                    <Photo caption="" seed={i} ratio="1/1" rounded={false} />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 14, fontStyle: "italic", fontWeight: 500 }}>{s.sci}</div>
-                    <div style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "var(--mono)" }}>{s.author}</div>
-                  </div>
-                  <div style={{ fontSize: 13 }}>{s.common[0]}</div>
-                  <div style={{ fontSize: 13, fontStyle: "italic", color: "var(--text-2)" }}>{s.family}</div>
-                  <div><Pill status={s.iucn} size="sm" /></div>
-                  <div><Pill status={s.mrl} size="sm" /></div>
-                  <div style={{ textAlign: "right", fontSize: 13, color: "var(--text-2)", fontVariantNumeric: "tabular-nums" }}>{s.photos}</div>
-                </button>
-              ))}
-            </div>
-          )}
-        </main>
-      </div>
-    </div>
-  );
-}
-
-function FilterGroup({ title, children, defaultOpen }) {
-  const [open, setOpen] = useState(defaultOpen||false);
-  return (
-    <div style={{ borderBottom: "1px solid var(--border)", padding: "12px 0" }}>
-      <button onClick={() => setOpen(o => !o)} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", background: "none", border: "none", padding: 0, cursor: "pointer", color: "var(--text)" }}>
-        <span style={{ fontSize: 13, fontWeight: 500 }}>{title}</span>
-        <Icon.chev up={open} />
+        <span style={{fontWeight:600,fontSize:15,letterSpacing:'-0.01em'}}>{ui.title}</span>
       </button>
-      {open && <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 4 }}>{children}</div>}
-    </div>
-  );
-}
-
-function Check({ checked, onClick, children }) {
-  return (
-    <button onClick={onClick} style={{
-      display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "5px 0",
-      background: "none", border: "none", cursor: "pointer", color: "var(--text)", textAlign: "left",
-    }}>
-      <span style={{
-        width: 16, height: 16, borderRadius: 4, flexShrink: 0,
-        border: "1.5px solid " + (checked ? "var(--text)" : "var(--border-strong)"),
-        background: checked ? "var(--text)" : "transparent",
-        color: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center",
-      }}>{checked && <Icon.check s={10} />}</span>
-      <span style={{ flex: 1, display: "inline-flex", alignItems: "center", gap: 6 }}>{children}</span>
-    </button>
-  );
-}
-
-// ============ DETAIL ============
-function Detail({ speciesId, setSpeciesId, setRoute, setQuery }) {
-  const { t } = useLang();
-  const s = SPECIES.find(x => x.id === speciesId) || SPECIES[0];
-  const [tab, setTab] = useState("overview");
-  const [activePhoto, setActivePhoto] = useState(0);
-
-  return (
-    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 32px 64px" }}>
-      {/* Breadcrumb */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text-3)", marginBottom: 24 }}>
-        <button onClick={() => setRoute("home")} style={{ background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", padding: 0, fontSize: 13 }}>Home</button>
-        <span>/</span>
-        <button onClick={() => setRoute("browse")} style={{ background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", padding: 0, fontSize: 13 }}>Browse</button>
-        <span>/</span>
-        <button onClick={() => { setQuery(s.family); setRoute("browse"); }} style={{ background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", padding: 0, fontSize: 13, fontStyle: "italic" }}>{s.family}</button>
-        <span>/</span>
-        <span style={{ color: "var(--text)", fontStyle: "italic" }}>{s.sci}</span>
+      <span style={{width:1,height:20,background:'var(--border)'}}/>
+      <nav style={{display:'flex',gap:4}}>
+        {[['browse',ui.browse],['contribute',ui.contribute],['about',ui.about]].map(([id,label])=>(
+          <button key={id} onClick={()=>setRoute(id)} style={{
+            background:route===id?'var(--surface-2)':'transparent',
+            color:route===id?'var(--text)':'var(--text-2)',
+            border:'none',padding:'7px 12px',borderRadius:6,fontSize:13,fontWeight:500,cursor:'pointer'}}>
+            {label}
+          </button>
+        ))}
+      </nav>
+      <div style={{flex:1,maxWidth:420}}>
+        <form onSubmit={e=>{e.preventDefault();onSearch();}}>
+          <SearchBox value={query} onChange={e=>setQuery(e.target.value)} placeholder={ui.search}/>
+        </form>
       </div>
+      <div style={{flex:1}}/>
+      {/* EN/BM toggle */}
+      <button onClick={()=>setLang(l=>l==='en'?'bm':'en')} style={{
+        display:'inline-flex',alignItems:'center',gap:4,padding:'6px 12px',
+        border:'1.5px solid var(--border-strong)',borderRadius:'var(--radius-sm)',
+        background:'var(--surface)',cursor:'pointer',fontSize:12,fontWeight:700,
+        letterSpacing:'0.06em',color:'var(--text)'}}>
+        <span style={{opacity:lang==='en'?1:0.35}}>EN</span>
+        <span style={{color:'var(--border-strong)'}}>|</span>
+        <span style={{opacity:lang==='bm'?1:0.35}}>BM</span>
+      </button>
+      <Btn variant="accent" size="sm" onClick={()=>setRoute('contribute')}>
+        {ui.contribute}
+      </Btn>
+    </div>
+  </header>;
+}
 
-      {/* Hero */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32, marginBottom: 40 }}>
-        {/* Photos */}
-        <div>
-          <Photo caption={`${s.common[0]} — ${["habit","leaf","bark","fruit"][activePhoto]}`} seed={SPECIES.indexOf(s)*7 + activePhoto*3} ratio="4/3" />
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginTop: 8 }}>
-            {[0,1,2,3].map(i => (
-              <button key={i} onClick={() => setActivePhoto(i)} style={{
-                aspectRatio: "1/1", padding: 0, cursor: "pointer", overflow: "hidden",
-                borderRadius: "var(--radius)",
-                border: "2px solid " + (activePhoto===i?"var(--text)":"transparent"),
-                background: "none",
-              }}>
-                <Photo caption={["habit","leaf","bark","fruit"][i]} seed={SPECIES.indexOf(s)*7 + i*3} ratio="1/1" rounded={false} />
+// ─── HOME ─────────────────────────────────────────────────
+function Home({species,loading,error,setRoute,setDetailId,setQuery}){
+  const lang=useLang(), ui=UI[lang];
+  const [heroQ,setHeroQ]=useState('');
+  const genera=useMemo(()=>new Set(species.map(s=>s.genus)).size,[species]);
+  const endemic=useMemo(()=>species.filter(s=>s.endemic).length,[species]);
+  const threatened=useMemo(()=>species.filter(s=>['CR','EN','VU'].includes(s.iucn)).length,[species]);
+  const featured=species.slice(0,3);
+  const recent=species.slice(3,7);
+
+  const go=q=>{setQuery(q);setRoute('browse');};
+
+  return <div style={{maxWidth:1280,margin:'0 auto',padding:'64px 32px 32px'}}>
+    {/* Hero */}
+    <section style={{textAlign:'center',maxWidth:720,margin:'0 auto 72px'}}>
+      <div style={{display:'inline-flex',alignItems:'center',gap:8,padding:'4px 12px',
+        background:'var(--accent-2)',color:'var(--accent)',borderRadius:999,fontSize:12,fontWeight:500,marginBottom:20}}>
+        <span style={{width:6,height:6,borderRadius:999,background:'var(--accent)'}}/>
+        {loading ? ui.loading : `${species.length} ${ui.stats_sp} · Dipterocarpaceae`}
+      </div>
+      <h1 style={{fontSize:52,lineHeight:1.06,fontWeight:600,letterSpacing:'-0.03em',margin:'0 0 18px'}}>
+        {lang==='en'?'Malaysia\'s Dipterocarps, in one searchable archive.':'Dipterokarp Malaysia, dalam satu arkib carian.'}
+      </h1>
+      <p style={{fontSize:17,color:'var(--text-2)',lineHeight:1.55,margin:'0 auto 28px',maxWidth:560}}>
+        {lang==='en'
+          ?'Taxonomic descriptions, IUCN conservation status, and distribution data for Dipterocarpaceae of Malaysia.'
+          :'Huraian taksonomi, status pemuliharaan IUCN, dan data taburan Dipterocarpaceae Malaysia.'}
+      </p>
+      <form onSubmit={e=>{e.preventDefault();go(heroQ);}} style={{maxWidth:520,margin:'0 auto'}}>
+        <div style={{display:'flex',alignItems:'center',gap:8,padding:'8px 8px 8px 16px',
+          background:'var(--surface)',border:'1px solid var(--border-strong)',borderRadius:12,
+          boxShadow:'var(--shadow)'}}>
+          <svg width={18} height={18} viewBox="0 0 16 16" fill="none">
+            <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.5"/>
+            <path d="M11 11l3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+          <input value={heroQ} onChange={e=>setHeroQ(e.target.value)}
+            placeholder={lang==='en'?'Try: Shorea, Meranti, Keruing, Hopea…':'Cuba: Shorea, Meranti, Keruing, Hopea…'}
+            style={{flex:1,background:'none',border:'none',outline:'none',fontSize:15,padding:'6px 0'}}/>
+          <Btn variant="primary" size="md">{lang==='en'?'Search':'Cari'}</Btn>
+        </div>
+      </form>
+    </section>
+
+    {error && <div style={{padding:24,background:'#FEE2E2',border:'1px solid #FCA5A5',borderRadius:12,marginBottom:40,
+      color:'#B91C1C',fontFamily:'monospace',fontSize:13}}>
+      Error loading from Supabase: {error}
+    </div>}
+
+    {/* Stats */}
+    <section style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',
+      background:'var(--surface)',border:'1px solid var(--border)',borderRadius:12,overflow:'hidden',marginBottom:72}}>
+      {[[loading?'…':species.length,ui.stats_sp],[loading?'…':genera,ui.stats_gen],
+        [loading?'…':endemic,ui.stats_end],[loading?'…':threatened,ui.stats_thr]].map(([n,l],i)=>(
+        <div key={i} style={{padding:'22px 26px',borderRight:i<3?'1px solid var(--border)':'none'}}>
+          <div style={{fontSize:30,fontWeight:600,letterSpacing:'-0.02em'}}>{n}</div>
+          <div style={{fontSize:13,color:'var(--text-2)',marginTop:4}}>{l}</div>
+        </div>
+      ))}
+    </section>
+
+    {/* Featured */}
+    {!loading && featured.length>0 && <section style={{marginBottom:72}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:20}}>
+        <h2 style={{fontSize:22,fontWeight:600,margin:0}}>{ui.featured}</h2>
+        <button onClick={()=>setRoute('browse')} style={{background:'none',border:'none',
+          color:'var(--text-2)',fontSize:13,cursor:'pointer'}}>{ui.see_all} →</button>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16}}>
+        {featured.map((s,i)=><Card key={s.id} s={s} i={i} onClick={()=>{setDetailId(s.id);setRoute('detail');}}/>)}
+      </div>
+    </section>}
+
+    {/* Recent */}
+    {!loading && recent.length>0 && <section>
+      <h2 style={{fontSize:22,fontWeight:600,margin:'0 0 20px'}}>{ui.recent}</h2>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:16}}>
+        {recent.map((s,i)=>(
+          <button key={s.id} onClick={()=>{setDetailId(s.id);setRoute('detail');}}
+            style={{background:'none',border:'none',padding:0,textAlign:'left',cursor:'pointer'}}>
+            <SpeciesImg src={s.image_url} seed={i+20} ratio="1/1"/>
+            <div style={{marginTop:8,fontSize:14,fontWeight:500,fontStyle:'italic'}}>{s.sci}</div>
+            <div style={{fontSize:12,color:'var(--text-3)',marginTop:2}}>{s.family}</div>
+          </button>
+        ))}
+      </div>
+    </section>}
+
+    {loading && <div style={{textAlign:'center',padding:'80px 0',color:'var(--text-3)'}}>
+      <div style={{width:32,height:32,border:'2px solid var(--border)',borderTopColor:'var(--accent)',
+        borderRadius:'50%',margin:'0 auto 16px',animation:'spin .8s linear infinite'}}/>
+      {ui.loading}
+    </div>}
+    <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+  </div>;
+}
+
+// ─── BROWSE ───────────────────────────────────────────────
+function Browse({species,query,setQuery,setRoute,setDetailId}){
+  const lang=useLang(), ui=UI[lang];
+  const [view,setView]=useState('grid');
+  const [filters,setFilters]=useState({genus:[],iucn:[],region:[],endemic:false});
+  const [sort,setSort]=useState('name');
+
+  const allGenera=useMemo(()=>[...new Set(species.map(s=>s.genus).filter(Boolean))].sort(),[species]);
+
+  const filtered=useMemo(()=>{
+    let r=[...species];
+    if(query){const q=query.toLowerCase();r=r.filter(s=>
+      s.sci.toLowerCase().includes(q)||s.genus.toLowerCase().includes(q)||
+      s.family.toLowerCase().includes(q)||s.common.some(c=>c.toLowerCase().includes(q)));}
+    if(filters.genus.length) r=r.filter(s=>filters.genus.includes(s.genus));
+    if(filters.iucn.length)  r=r.filter(s=>filters.iucn.includes(s.iucn));
+    if(filters.region.length) r=r.filter(s=>filters.region.some(rg=>s.dist.includes(rg)));
+    if(filters.endemic) r=r.filter(s=>s.endemic);
+    if(sort==='name') r.sort((a,b)=>a.sci.localeCompare(b.sci));
+    if(sort==='status'){const o=['CR','EN','VU','NT','LC','DD','NE'];r.sort((a,b)=>o.indexOf(a.iucn)-o.indexOf(b.iucn));}
+    return r;
+  },[species,query,filters,sort]);
+
+  const tog=(k,v)=>setFilters(f=>({...f,[k]:f[k].includes(v)?f[k].filter(x=>x!==v):[...f[k],v]}));
+  const active=filters.genus.length+filters.iucn.length+filters.region.length+(filters.endemic?1:0);
+
+  return <div style={{maxWidth:1280,margin:'0 auto',padding:'32px'}}>
+    <div style={{marginBottom:24}}>
+      <h1 style={{fontSize:26,fontWeight:600,margin:0}}>{ui.browse}</h1>
+      <p style={{fontSize:14,color:'var(--text-2)',margin:'6px 0 0'}}>
+        {filtered.length} {ui.stats_sp}
+        {query&&<> · "{query}"</>}
+        {active>0&&<> · {active} {ui.filters.toLowerCase()}</>}
+      </p>
+    </div>
+    <div style={{display:'grid',gridTemplateColumns:'220px 1fr',gap:32}}>
+      {/* Sidebar */}
+      <aside>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',
+          marginBottom:12,paddingBottom:12,borderBottom:'1px solid var(--border)'}}>
+          <span style={{fontSize:13,fontWeight:600}}>{ui.filters}</span>
+          {active>0&&<button onClick={()=>setFilters({genus:[],iucn:[],region:[],endemic:false})}
+            style={{background:'none',border:'none',color:'var(--accent)',fontSize:12,cursor:'pointer'}}>
+            {ui.clear}</button>}
+        </div>
+        <FGroup title={ui.iucn} open>
+          {['CR','EN','VU','NT','LC','DD'].map(c=>(
+            <Chk key={c} checked={filters.iucn.includes(c)} onClick={()=>tog('iucn',c)}>
+              <Pill code={c} size="sm"/>
+              <span style={{marginLeft:'auto',fontSize:11,color:'var(--text-3)'}}>{species.filter(s=>s.iucn===c).length}</span>
+            </Chk>
+          ))}
+        </FGroup>
+        <FGroup title={ui.genus} open>
+          {allGenera.map(g=>(
+            <Chk key={g} checked={filters.genus.includes(g)} onClick={()=>tog('genus',g)}>
+              <span style={{fontSize:13,fontStyle:'italic'}}>{g}</span>
+              <span style={{marginLeft:'auto',fontSize:11,color:'var(--text-3)'}}>{species.filter(s=>s.genus===g).length}</span>
+            </Chk>
+          ))}
+        </FGroup>
+        <FGroup title={ui.region}>
+          {['Peninsular Malaysia','Sabah','Sarawak'].map(rg=>(
+            <Chk key={rg} checked={filters.region.includes(rg)} onClick={()=>tog('region',rg)}>
+              <span style={{fontSize:13}}>{tval(rg,lang)}</span>
+            </Chk>
+          ))}
+        </FGroup>
+        <FGroup title={ui.others} open>
+          <Chk checked={filters.endemic} onClick={()=>setFilters(f=>({...f,endemic:!f.endemic}))}>
+            <span style={{fontSize:13}}>{ui.endemic_my}</span>
+          </Chk>
+        </FGroup>
+      </aside>
+      {/* Results */}
+      <main>
+        <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:16}}>
+          <div style={{flex:1}}><SearchBox value={query} onChange={e=>setQuery(e.target.value)} placeholder={ui.search}/></div>
+          <select value={sort} onChange={e=>setSort(e.target.value)} style={{
+            background:'var(--surface)',border:'1px solid var(--border-strong)',
+            borderRadius:'var(--radius-sm)',padding:'9px 12px',fontSize:13,cursor:'pointer'}}>
+            <option value="name">{ui.sort_az}</option>
+            <option value="status">{ui.sort_thr}</option>
+          </select>
+          <div style={{display:'flex',border:'1px solid var(--border-strong)',borderRadius:'var(--radius-sm)',overflow:'hidden'}}>
+            {[['grid','⊞'],['list','≡']].map(([v,ic])=>(
+              <button key={v} onClick={()=>setView(v)} style={{
+                background:view===v?'var(--text)':'var(--surface)',
+                color:view===v?'var(--bg)':'var(--text-2)',
+                border:'none',padding:'9px 12px',cursor:'pointer',fontSize:14}}>
+                {ic}
               </button>
             ))}
           </div>
-          <div style={{ marginTop: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: 12, color: "var(--text-3)" }}>{s.photos} photographs · {s.contributors} contributors</span>
-            <Btn variant="ghost" size="sm" icon={<Icon.plus s={12} />} onClick={() => setRoute("upload")}>Add photo</Btn>
-          </div>
         </div>
-
-        {/* Title block */}
-        <div>
-          <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 11, padding: "2px 8px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 999, color: "var(--text-2)", fontFamily: "var(--mono)" }}>{s.family}</span>
-            {s.endemic && <span style={{ fontSize: 11, padding: "2px 8px", background: "var(--text)", color: "var(--bg)", borderRadius: 999, fontWeight: 500 }}>Endemic to peninsula</span>}
-          </div>
-          <h1 style={{ fontSize: 40, fontWeight: 500, fontStyle: "italic", letterSpacing: "-0.025em", margin: 0, lineHeight: 1.05 }}>
-            {s.sci}
-          </h1>
-          <div style={{ fontSize: 14, color: "var(--text-3)", fontFamily: "var(--mono)", marginTop: 6 }}>{s.author}</div>
-
-          <div style={{ marginTop: 20 }}>
-            <div style={{ fontSize: 12, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>Common names</div>
-            <div style={{ fontSize: 16, color: "var(--text)" }}>
-              {s.common.map((c, i) => (<span key={c}>{c}{i<s.common.length-1 && <span style={{color:"var(--text-3)"}}> · </span>}</span>))}
+        {filtered.length===0
+          ? <div style={{padding:64,textAlign:'center',background:'var(--surface)',
+              border:'1px dashed var(--border-strong)',borderRadius:12}}>
+              <div style={{fontSize:16,fontWeight:500,marginBottom:6}}>{ui.no_match}</div>
+              <div style={{fontSize:13,color:'var(--text-2)',marginBottom:16}}>{ui.no_match_sub}</div>
+              <Btn variant="secondary" onClick={()=>{setQuery('');setFilters({genus:[],iucn:[],region:[],endemic:false});}}>{ui.reset}</Btn>
             </div>
-          </div>
-
-          <div style={{ marginTop: 24, padding: 16, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12 }}>
-            <div style={{ fontSize: 12, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Conservation status</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              <div>
-                <div style={{ fontSize: 12, color: "var(--text-2)", marginBottom: 4 }}>IUCN Red List</div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <Pill status={s.iucn} />
-                  <span style={{ fontSize: 13, color: "var(--text-2)" }}>{STATUS[s.iucn].label}</span>
-                </div>
+          : view==='grid'
+            ? <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16}}>
+                {filtered.map((s,i)=><Card key={s.id} s={s} i={i} onClick={()=>{setDetailId(s.id);setRoute('detail');}}/>)}
               </div>
-              <div>
-                <div style={{ fontSize: 12, color: "var(--text-2)", marginBottom: 4 }}>Malaysia Red List</div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <Pill status={s.mrl} />
-                  <span style={{ fontSize: 13, color: "var(--text-2)" }}>{STATUS[s.mrl].label}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-            {[["Habit", s.habit],["Height", s.height],["DBH", s.dbh]].map(([k,v]) => (
-              <div key={k}>
-                <div style={{ fontSize: 11, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>{k}</div>
-                <div style={{ fontSize: 14, color: "var(--text)" }}>{v}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div style={{ borderBottom: "1px solid var(--border)", display: "flex", gap: 24, marginBottom: 32 }}>
-        {[["overview",{t.overview}],["taxonomy",{t.taxonomy}],["distribution",{t.distribution_label}],["conservation","Conservation"]].map(([id,l]) => (
-          <button key={id} onClick={() => setTab(id)} style={{
-            background: "none", border: "none", padding: "10px 0",
-            fontSize: 14, fontWeight: 500,
-            color: tab===id?"var(--text)":"var(--text-2)",
-            borderBottom: "2px solid " + (tab===id?"var(--text)":"transparent"),
-            marginBottom: -1, cursor: "pointer",
-          }}>{l}</button>
-        ))}
-      </div>
-
-      {tab === "overview" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 280px", gap: 48 }}>
-          <div>
-            <Section title={t.description_title}>
-              <p style={{ fontSize: 15, lineHeight: 1.7, color: "var(--text)", margin: 0, textWrap: "pretty" }}>{t.t(s.description)}</p>
-            </Section>
-            <Section title="Habitat & ecology">
-              <DataPair k={t.habitat} v={s.habitat} />
-              <DataPair k={t.altitude} v={s.altitude} />
-              <DataPair k={t.phenology} v={s.phenology} />
-            </Section>
-            <Section title="Uses & ethnobotany">
-              <p style={{ fontSize: 15, lineHeight: 1.7, color: "var(--text)", margin: 0 }}>{t.t(s.uses)}</p>
-            </Section>
-          </div>
-          <aside>
-            <div style={{ padding: 16, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12 }}>
-              <div style={{ fontSize: 12, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Quick facts</div>
-              <Mini k={t.genus_label2} v={<span style={{fontStyle:"italic"}}>{s.genus}</span>} />
-              <Mini k={t.family_label} v={<span style={{fontStyle:"italic"}}>{s.family}</span>} />
-              <Mini k="Native to" v={s.distribution.length === 1 && s.distribution[0]==="All states" ? "All Peninsular states" : `${s.distribution.length} states`} />
-              <Mini k="Photos" v={`${s.photos}`} />
-              <Mini k="Updated" v={s.lastUpdated} last />
-            </div>
-            <div style={{ marginTop: 16 }}>
-              <div style={{ fontSize: 12, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>Similar species</div>
-              {s.similar.map(sim => {
-                const found = SPECIES.find(x => x.sci === sim);
-                return (
-                  <button key={sim} onClick={() => found && setSpeciesId(found.id)} style={{
-                    display: "block", padding: "8px 0", background: "none", border: "none", borderTop: "1px solid var(--border)",
-                    width: "100%", textAlign: "left", cursor: found?"pointer":"default",
-                    fontSize: 14, fontStyle: "italic", color: found?"var(--text)":"var(--text-3)",
-                  }}>{sim}</button>
-                );
-              })}
-            </div>
-          </aside>
-        </div>
-      )}
-
-      {tab === "taxonomy" && (
-        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: 24, maxWidth: 720 }}>
-          <h3 style={{ fontSize: 16, fontWeight: 600, margin: "0 0 16px" }}>Taxonomic classification</h3>
-          {[
-            ["Kingdom", "Plantae"], ["Clade", "Tracheophytes / Angiosperms"],
-            ["Order", s.family === "Dipterocarpaceae" ? "Malvales" : s.family === "Fabaceae" ? "Fabales" : s.family === "Lauraceae" ? "Laurales" : s.family === "Myrtaceae" ? "Myrtales" : "Rosales"],
-            ["Family", s.family], ["Genus", s.genus], ["Species", s.sci.split(" ")[1]],
-            ["Authority", s.author], ["Accepted name", s.sci],
-          ].map(([k,v], i, arr) => (
-            <div key={k} style={{ display: "grid", gridTemplateColumns: "180px 1fr", padding: "10px 0", borderTop: i>0?"1px solid var(--border)":"none" }}>
-              <div style={{ fontSize: 13, color: "var(--text-2)" }}>{k}</div>
-              <div style={{ fontSize: 14, fontStyle: k==="Family"||k==="Genus"||k==="Species"||k==="Accepted name"?"italic":"normal" }}>{v}</div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {tab === "distribution" && (
-        <div>
-          <h3 style={{ fontSize: 16, fontWeight: 600, margin: "0 0 16px" }}>Recorded in {s.distribution.length === 1 && s.distribution[0]==="All states" ? "all peninsular states" : `${s.distribution.length} states`}</h3>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {STATES.map(st => {
-              const present = s.distribution.includes(st) || s.distribution.includes("All states");
-              return (
-                <span key={st} style={{
-                  display: "inline-flex", alignItems: "center", gap: 6,
-                  padding: "6px 12px", borderRadius: 999,
-                  fontSize: 13,
-                  background: present ? "var(--accent-2)" : "var(--surface)",
-                  color: present ? "var(--accent)" : "var(--text-3)",
-                  border: "1px solid " + (present ? "var(--accent)" : "var(--border)"),
-                }}>
-                  <Icon.pin s={11} />
-                  {st}
-                </span>
-              );
-            })}
-          </div>
-          <div style={{ marginTop: 24, padding: 16, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12 }}>
-            <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 6 }}>Habitat</div>
-            <div style={{ fontSize: 14, color: "var(--text-2)" }}>{s.habitat}. Altitude {s.altitude}.</div>
-          </div>
-        </div>
-      )}
-
-      {tab === "conservation" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-          <div style={{ padding: 24, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12 }}>
-            <div style={{ fontSize: 12, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>IUCN Red List</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <Pill status={s.iucn} />
-              <div style={{ fontSize: 18, fontWeight: 500 }}>{STATUS[s.iucn].label}</div>
-            </div>
-            <div style={{ fontSize: 13, color: "var(--text-2)", marginTop: 8 }}>Last assessed: 2022</div>
-          </div>
-          <div style={{ padding: 24, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12 }}>
-            <div style={{ fontSize: 12, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Malaysia Red List</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <Pill status={s.mrl} />
-              <div style={{ fontSize: 18, fontWeight: 500 }}>{STATUS[s.mrl].label}</div>
-            </div>
-            <div style={{ fontSize: 13, color: "var(--text-2)", marginTop: 8 }}>Last assessed: 2024</div>
-          </div>
-          <div style={{ gridColumn: "1/-1", padding: 24, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12 }}>
-            <div style={{ fontSize: 12, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Threats</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {s.threats.map(t => (
-                <span key={t} style={{ fontSize: 13, padding: "4px 10px", background: "#FEF2F2", color: "var(--danger)", border: "1px solid #FECACA", borderRadius: 999 }}>{t}</span>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* CTA */}
-      <div style={{ marginTop: 56, padding: 28, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16 }}>
-        <div>
-          <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 4 }}>Have a photograph of <span style={{ fontStyle: "italic" }}>{s.sci}</span>?</div>
-          <div style={{ fontSize: 14, color: "var(--text-2)" }}>Contribute to the catalogue. Reviewed by botanists at FRIM, credit always given.</div>
-        </div>
-        <Btn variant="primary" icon={<Icon.upload s={15} />} onClick={() => setRoute("upload")}>Submit photo</Btn>
-      </div>
-    </div>
-  );
-}
-
-function Section({ title, children }) {
-  return (
-    <div style={{ marginBottom: 32 }}>
-      <h3 style={{ fontSize: 13, fontWeight: 600, margin: "0 0 12px", color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{title}</h3>
-      {children}
-    </div>
-  );
-}
-function DataPair({ k, v }) {
-  return (
-    <div style={{ display: "grid", gridTemplateColumns: "120px 1fr", padding: "8px 0", borderTop: "1px solid var(--border)" }}>
-      <div style={{ fontSize: 13, color: "var(--text-2)" }}>{k}</div>
-      <div style={{ fontSize: 14 }}>{v}</div>
-    </div>
-  );
-}
-function Mini({ k, v, last }) {
-  return (
-    <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: last?"none":"1px solid var(--border)" }}>
-      <span style={{ fontSize: 13, color: "var(--text-2)" }}>{k}</span>
-      <span style={{ fontSize: 13 }}>{v}</span>
-    </div>
-  );
-}
-
-// ============ UPLOAD ============
-function Upload({ setRoute }) {
-  const [step, setStep] = useState(1);
-  const [data, setData] = useState({ photo:false, photoCaption:"habit", species:"", state:"Pahang", locality:"", date:"2026-04-12", contributor:"", email:"", notes:"", license:"CC-BY 4.0", agree:false });
-  const upd = (k,v) => setData(d => ({...d, [k]:v}));
-
-  if (step === 5) return (
-    <div style={{ maxWidth: 560, margin: "80px auto", textAlign: "center", padding: 32 }}>
-      <div style={{ width: 56, height: 56, borderRadius: 999, background: "var(--accent-2)", color: "var(--accent)", margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <Icon.check s={22} />
-      </div>
-      <h1 style={{ fontSize: 28, fontWeight: 600, margin: "0 0 12px", letterSpacing: "-0.02em" }}>Submission received</h1>
-      <p style={{ fontSize: 15, color: "var(--text-2)", margin: "0 0 24px", lineHeight: 1.6 }}>
-        Reference <span style={{ fontFamily: "var(--mono)", color: "var(--text)" }}>SUB-2026-04-1147</span>. We'll email you when a botanist has reviewed it — typically within 3–5 days.
-      </p>
-      <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-        <Btn variant="primary" onClick={() => setRoute("home")}>Back to home</Btn>
-        <Btn variant="secondary" onClick={() => { setStep(1); setData({ photo:false, photoCaption:"habit", species:"", state:"Pahang", locality:"", date:"2026-04-12", contributor:"", email:"", notes:"", license:"CC-BY 4.0", agree:false }); }}>Submit another</Btn>
-      </div>
-    </div>
-  );
-
-  const steps = [
-    { n: 1, t: "Photo" }, { n: 2, t: "Identify" }, { n: 3, t: "Location" }, { n: 4, t: "Credit" },
-  ];
-
-  return (
-    <div style={{ maxWidth: 760, margin: "0 auto", padding: "32px" }}>
-      <h1 style={{ fontSize: 28, fontWeight: 600, margin: 0, letterSpacing: "-0.02em" }}>Contribute a photograph</h1>
-      <p style={{ fontSize: 14, color: "var(--text-2)", margin: "6px 0 32px", maxWidth: 540 }}>
-        Anyone may contribute. Submissions enter a moderation queue and are reviewed within 3–5 days.
-      </p>
-
-      {/* Stepper */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 32 }}>
-        {steps.map((sx, i) => (
-          <React.Fragment key={sx.n}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{
-                width: 24, height: 24, borderRadius: 999,
-                background: step >= sx.n ? "var(--text)" : "var(--surface)",
-                color: step >= sx.n ? "var(--bg)" : "var(--text-3)",
-                border: "1px solid " + (step >= sx.n ? "var(--text)" : "var(--border-strong)"),
-                display: "inline-flex", alignItems: "center", justifyContent: "center",
-                fontSize: 12, fontWeight: 600,
-              }}>{step > sx.n ? <Icon.check s={11} /> : sx.n}</span>
-              <span style={{ fontSize: 13, fontWeight: 500, color: step === sx.n ? "var(--text)" : "var(--text-2)" }}>{sx.t}</span>
-            </div>
-            {i < steps.length-1 && <div style={{ flex: 1, height: 1, background: "var(--border)" }} />}
-          </React.Fragment>
-        ))}
-      </div>
-
-      <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: 32 }}>
-        {step === 1 && (
-          <div>
-            <h2 style={{ fontSize: 17, fontWeight: 600, margin: "0 0 4px" }}>Upload your photograph</h2>
-            <p style={{ fontSize: 13, color: "var(--text-2)", margin: "0 0 20px" }}>JPG, PNG, or HEIC up to 24 MB. EXIF data will be read automatically.</p>
-            <button onClick={() => upd("photo", true)} style={{
-              width: "100%", aspectRatio: "16/9", padding: 0, cursor: "pointer",
-              background: data.photo ? "transparent" : "var(--surface-2)",
-              border: "2px dashed " + (data.photo ? "transparent" : "var(--border-strong)"),
-              borderRadius: 12, overflow: "hidden", color: "var(--text-2)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              {data.photo ? (
-                <Photo caption="merbau-canopy.jpg · 4032×3024" seed={42} ratio="16/9" rounded={false} />
-              ) : (
-                <div style={{ textAlign: "center" }}>
-                  <Icon.upload s={28} />
-                  <div style={{ fontSize: 15, fontWeight: 500, color: "var(--text)", marginTop: 12 }}>Drop a photograph here, or click to browse</div>
-                  <div style={{ fontSize: 12, color: "var(--text-3)", marginTop: 4 }}>JPG · PNG · HEIC up to 24 MB</div>
-                </div>
-              )}
-            </button>
-            <div style={{ marginTop: 24 }}>
-              <Label>What part of the tree?</Label>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginTop: 8 }}>
-                {["habit","leaf","bark","flower","fruit","seedling","seed","other"].map(p => (
-                  <Pillbtn key={p} active={data.photoCaption===p} onClick={() => upd("photoCaption", p)}>{p}</Pillbtn>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div>
-            <h2 style={{ fontSize: 17, fontWeight: 600, margin: "0 0 4px" }}>Identify the species</h2>
-            <p style={{ fontSize: 13, color: "var(--text-2)", margin: "0 0 20px" }}>Type a partial scientific or local name. Don't know? Leave blank — we'll identify it.</p>
-            <Input value={data.species} onChange={e => upd("species", e.target.value)} placeholder="e.g. Shorea curtisii, Tualang, Meranti…" icon={<Icon.search s={15} />} />
-            <div style={{ marginTop: 16 }}>
-              <Label>Suggestions</Label>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 8 }}>
-                {SPECIES.filter(s => !data.species || s.sci.toLowerCase().includes(data.species.toLowerCase()) || s.common.some(c => c.toLowerCase().includes(data.species.toLowerCase()))).slice(0,4).map(s => (
-                  <button key={s.id} onClick={() => upd("species", s.sci)} style={{
-                    display: "flex", alignItems: "center", gap: 10, padding: 10,
-                    background: data.species===s.sci?"var(--accent-2)":"var(--surface)",
-                    border: "1px solid " + (data.species===s.sci?"var(--accent)":"var(--border)"),
-                    borderRadius: 8, textAlign: "left", cursor: "pointer", color: "var(--text)",
-                  }}>
-                    <div style={{ width: 36, height: 36, borderRadius: 6, overflow: "hidden", flexShrink: 0 }}>
-                      <Photo caption="" seed={SPECIES.indexOf(s)} ratio="1/1" rounded={false} />
+            : <div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:12,overflow:'hidden'}}>
+                {filtered.map((s,i)=>(
+                  <button key={s.id} onClick={()=>{setDetailId(s.id);setRoute('detail');}}
+                    style={{display:'grid',gridTemplateColumns:'48px 1.5fr 1fr 0.8fr 60px 70px',
+                      padding:'11px 16px',width:'100%',background:'none',border:'none',
+                      borderTop:i>0?'1px solid var(--border)':'none',
+                      textAlign:'left',cursor:'pointer',alignItems:'center',color:'var(--text)'}}
+                    onMouseEnter={e=>e.currentTarget.style.background='var(--surface-2)'}
+                    onMouseLeave={e=>e.currentTarget.style.background='none'}>
+                    <div style={{width:38,height:38,borderRadius:6,overflow:'hidden'}}>
+                      <SpeciesImg src={s.image_url} seed={i} ratio="1/1" rounded={false}/>
                     </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontStyle: "italic", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.sci}</div>
-                      <div style={{ fontSize: 12, color: "var(--text-2)" }}>{s.common[0]}</div>
+                    <div>
+                      <div style={{fontSize:14,fontStyle:'italic',fontWeight:500}}>{s.sci}</div>
+                      <div style={{fontSize:11,color:'var(--text-3)',fontFamily:'monospace'}}>{s.family}</div>
                     </div>
-                    <Pill status={s.iucn} size="sm" />
+                    <div style={{fontSize:13}}>{s.common[0]||'—'}</div>
+                    <div style={{fontSize:13,fontStyle:'italic',color:'var(--text-2)'}}>{s.genus}</div>
+                    <Pill code={s.iucn} size="sm"/>
+                    <div style={{fontSize:12,color:'var(--text-3)'}}>{s.dist.map(d=>d.replace('Peninsular Malaysia','Pen.')).join(', ')||'—'}</div>
                   </button>
                 ))}
               </div>
-            </div>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div>
-            <h2 style={{ fontSize: 17, fontWeight: 600, margin: "0 0 4px" }}>Location and date</h2>
-            <p style={{ fontSize: 13, color: "var(--text-2)", margin: "0 0 20px" }}>Where and when was this photograph taken?</p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              <Field label="State">
-                <select value={data.state} onChange={e => upd("state", e.target.value)} style={selectStyle}>
-                  {STATES.map(st => <option key={st}>{st}</option>)}
-                </select>
-              </Field>
-              <Field label="Date observed">
-                <input type="date" value={data.date} onChange={e => upd("date", e.target.value)} style={inputStyle} />
-              </Field>
-              <Field label="Locality / Forest reserve" wide>
-                <input type="text" value={data.locality} onChange={e => upd("locality", e.target.value)} placeholder="e.g. Krau Wildlife Reserve, near Kuala Lompat" style={inputStyle} />
-              </Field>
-              <Field label="Field notes (optional)" wide>
-                <textarea value={data.notes} onChange={e => upd("notes", e.target.value)} rows="3" placeholder="Co-occurring species, soil type, animal interactions…" style={{...inputStyle, resize: "vertical", minHeight: 80}} />
-              </Field>
-            </div>
-            <div style={{ marginTop: 16, padding: 12, display: "flex", gap: 10, alignItems: "center", background: "var(--accent-2)", borderRadius: 8, color: "var(--accent)", fontSize: 13 }}>
-              <Icon.pin s={14} />
-              <span>GPS detected from EXIF: <strong>3.7211°N, 102.1893°E</strong> — within Krau Wildlife Reserve. Precise coordinates are masked for threatened species.</span>
-            </div>
-          </div>
-        )}
-
-        {step === 4 && (
-          <div>
-            <h2 style={{ fontSize: 17, fontWeight: 600, margin: "0 0 4px" }}>Credit and license</h2>
-            <p style={{ fontSize: 13, color: "var(--text-2)", margin: "0 0 20px" }}>How should we credit you, and how can others use this photograph?</p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              <Field label="Your name">
-                <input type="text" value={data.contributor} onChange={e => upd("contributor", e.target.value)} placeholder="How you'd like to be credited" style={inputStyle} />
-              </Field>
-              <Field label="Email (private)">
-                <input type="email" value={data.email} onChange={e => upd("email", e.target.value)} placeholder="So we can notify you" style={inputStyle} />
-              </Field>
-              <Field label="License" wide>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
-                  {[["CC-BY 4.0","Free use with attribution"],["CC-BY-NC 4.0","Non-commercial only"],["CC0","Public domain"]].map(([l,d]) => (
-                    <button key={l} onClick={() => upd("license", l)} style={{
-                      padding: 14, textAlign: "left", cursor: "pointer", borderRadius: 8,
-                      background: data.license===l?"var(--accent-2)":"var(--surface)",
-                      border: "1px solid " + (data.license===l?"var(--accent)":"var(--border-strong)"),
-                      color: "var(--text)",
-                    }}>
-                      <div style={{ fontFamily: "var(--mono)", fontSize: 12, fontWeight: 500 }}>{l}</div>
-                      <div style={{ fontSize: 12, color: "var(--text-2)", marginTop: 4 }}>{d}</div>
-                    </button>
-                  ))}
-                </div>
-              </Field>
-            </div>
-            <label style={{ display: "flex", gap: 10, marginTop: 20, padding: 14, border: "1px solid var(--border)", borderRadius: 8, cursor: "pointer", alignItems: "flex-start" }}>
-              <input type="checkbox" checked={data.agree} onChange={e => upd("agree", e.target.checked)} style={{ marginTop: 3, accentColor: "var(--accent)" }} />
-              <span style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.5 }}>
-                I confirm I am the author of this photograph (or authorised to upload it), no copyright is infringed, and I agree to license it under the terms above. Submissions are subject to FRIM moderation.
-              </span>
-            </label>
-          </div>
-        )}
-      </div>
-
-      {/* Nav */}
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 24 }}>
-        <Btn variant="secondary" icon={<Icon.arrow dir="left" s={12} />} onClick={() => step>1 ? setStep(s=>s-1) : setRoute("home")}>
-          {step > 1 ? "Previous" : "Cancel"}
-        </Btn>
-        <Btn variant="primary" iconRight={<Icon.arrow s={12} />} disabled={step===4 && !data.agree} onClick={() => setStep(s => s+1)}>
-          {step === 4 ? "Submit for review" : "Continue"}
-        </Btn>
-      </div>
-    </div>
-  );
-}
-
-function Label({ children }) {
-  return <div style={{ fontSize: 12, fontWeight: 500, color: "var(--text-2)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{children}</div>;
-}
-function Field({ label, children, wide }) {
-  return (
-    <div style={{ gridColumn: wide?"1/-1":"auto" }}>
-      <Label>{label}</Label>
-      <div style={{ marginTop: 6 }}>{children}</div>
-    </div>
-  );
-}
-function Pillbtn({ active, onClick, children }) {
-  return (
-    <button onClick={onClick} style={{
-      padding: "8px 12px", borderRadius: 8, cursor: "pointer",
-      background: active?"var(--text)":"var(--surface)",
-      color: active?"var(--bg)":"var(--text)",
-      border: "1px solid " + (active?"var(--text)":"var(--border-strong)"),
-      fontSize: 13, fontWeight: 500, textTransform: "capitalize",
-    }}>{children}</button>
-  );
-}
-const inputStyle = {
-  width: "100%", padding: "9px 12px",
-  background: "var(--surface)", border: "1px solid var(--border-strong)",
-  borderRadius: "var(--radius-sm)", fontSize: 14, color: "var(--text)", outline: "none",
-};
-const selectStyle = { ...inputStyle, cursor: "pointer" };
-
-// ============ ABOUT ============
-function About() {
-  const { t } = useLang();
-  return (
-    <div style={{ maxWidth: 760, margin: "0 auto", padding: "48px 32px" }}>
-      <h1 style={{ fontSize: 36, fontWeight: 600, letterSpacing: "-0.025em", margin: "0 0 16px" }}>A community archive of trees, in the open.</h1>
-      <p style={{ fontSize: 17, color: "var(--text-2)", lineHeight: 1.6, margin: "0 0 32px" }}>
-        Pokok PM is a public, open-data tree species database for Peninsular Malaysia. We pair authoritative taxonomy from the Forest Research Institute Malaysia (FRIM) with photographs contributed by foresters, students, and citizens.
-      </p>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32, marginTop: 40 }}>
-        <div>
-          <h3 style={{ fontSize: 15, fontWeight: 600, margin: "0 0 12px" }}>What's in the database</h3>
-          <ul style={{ fontSize: 14, color: "var(--text-2)", lineHeight: 1.7, margin: 0, paddingLeft: 18 }}>
-            <li>Accepted scientific names with authority strings, synonyms, and family/genus context</li>
-            <li>Common names in English, Bahasa Malaysia, and Orang Asli languages where recorded</li>
-            <li>Taxonomic descriptions, habit, phenology, habitat, and distribution by state</li>
-            <li>IUCN Red List and Malaysia Red List status with assessment dates</li>
-            <li>Photographs of habit, leaf, bark, flower, fruit, and seedling — contributed and licensed</li>
-          </ul>
-        </div>
-        <div>
-          <h3 style={{ fontSize: 15, fontWeight: 600, margin: "0 0 12px" }}>How contributions work</h3>
-          <ol style={{ fontSize: 14, color: "var(--text-2)", lineHeight: 1.7, margin: 0, paddingLeft: 22 }}>
-            <li>Anyone uploads a photograph and provisionally identifies the species.</li>
-            <li>FRIM-trained moderators review within 3–5 days for accuracy and image quality.</li>
-            <li>Approved submissions are credited and published under your chosen license.</li>
-            <li>Locality data for CR &amp; EN species is masked to protect populations.</li>
-          </ol>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ============ APP ============
-// ============================================================
-// TRANSLATION SYSTEM
-// ============================================================
-const T = {
-  en: {
-    // Nav
-    browse: {t.browse_crumb}, contribute: "Contribute", about: "About",
-    search_placeholder: "Search species, genus, family, or local name…",
-    contribute_photo: "Contribute photo",
-    // Home
-    hero_badge: (n) => `${n} species · Dipterocarpaceae · open data`,
-    hero_title: {t.hero_title},
-    hero_subtitle: {t.hero_subtitle},
-    search_label: "Popular:",
-    stats: t.stats,
-    featured_title: {t.featured_title},
-    see_all: {t.see_all},
-    how_title: {t.how_title},
-    how: [
-      { n:"01", t:"Search & browse", d:"Find species by scientific name, genus, family, or local name." },
-      { n:"02", t:"Read the record", d:"Full taxonomy, descriptions, state-by-state distribution, and multiple conservation ratings." },
-      { n:"03", t:"Contribute photos", d:"Submit field photographs to enrich the archive — reviewed before publishing." },
-    ],
-    recent_title: {t.recent_title},
-    loading: {t.loading},
-    // Browse
-    browse_title: {t.browse_title},
-    species_count: (n, q, f) => `${n} species${q ? ` matching "${q}"` : ""}${f > 0 ? ` · ${f} filter${f > 1 ? "s" : ""} active` : ""}`,
-    filters: {t.filters}, clear: {t.clear},
-    iucn_status: {t.iucn_status}, genus_label: "Genus", distribution_label: {t.distribution_tab}, other: "Other",
-    endemic_malaysia: {t.endemic_malaysia},
-    sort_az: {t.sort_az}, sort_threatened: {t.sort_threatened},
-    no_results: {t.no_results}, no_results_sub: {t.no_results_sub}, reset: {t.reset},
-    // Detail
-    home_crumb: {t.home_crumb}, browse_crumb: "Browse",
-    local_names: {t.local_names}, conservation: {t.conservation},
-    overview: "Overview", taxonomy: "Taxonomy", distribution_tab: "Distribution", morphology: {t.morphology},
-    description_title: "Description", habitat_ecology: {t.habitat_ecology},
-    habitat: "Habitat", altitude: "Altitude", phenology: "Phenology", threats: {t.threats},
-    uses_title: {t.uses_title},
-    quick_facts: {t.quick_facts}, genus_label2: "Genus", family_label: "Family",
-    endemic_label: "Endemic", distribution_label2: "Distribution", areas: "areas",
-    taxonomy_title: {t.taxonomy_title},
-    tax_rows: t.tax_rows,
-    distribution_title: (n) => n === 0 ? t.distribution_title(0) : `Recorded in ${n} state${n > 1 ? "s" : ""}`,
-    habitat_note: "Habitat note",
-    morph_title: {t.morph_title},
-    morph_rows: ["Height","DBH","Habit","Habitat","Distribution","Altitude","Phenology"],
-    similar: {t.similar},
-    // Upload
-    upload_title: "Contribute a photo",
-    // About
-    about_title: {t.about_title},
-    // Footer
-    footer_partner: "· in partnership with FRIM",
-    // Data translations (English = passthrough)
-    t: (v) => v,
-  },
-  bm: {
-    // Nav
-    browse: "Layari", contribute: "Sumbang", about: "Perihal",
-    search_placeholder: "Cari spesies, genus, famili, atau nama tempatan…",
-    contribute_photo: "Sumbang foto",
-    // Home
-    hero_badge: (n) => `${n} spesies · Dipterocarpaceae · data terbuka`,
-    hero_title: "Pokok Malaysia, dalam satu arkib carian.",
-    hero_subtitle: "Huraian taksonomi, status pemuliharaan IUCN, dan data taburan Dipterocarpaceae Malaysia.",
-    search_label: "Popular:",
-    stats: ["Spesies dikatalog","Genus","Endemik Malaysia","Terancam (IUCN)"],
-    featured_title: "Spesies ikonik",
-    see_all: "Lihat semua",
-    how_title: "Cara penggunaan",
-    how: [
-      { n:"01", t:"Cari & layari", d:"Cari spesies menggunakan nama saintifik, genus, famili, atau nama tempatan." },
-      { n:"02", t:"Baca rekod", d:"Taksonomi penuh, huraian, taburan mengikut negeri, dan pelbagai penilaian pemuliharaan." },
-      { n:"03", t:"Sumbang foto", d:"Hantar gambar lapangan untuk memperkayakan arkib — disemak sebelum diterbitkan." },
-    ],
-    recent_title: "Tambahan terkini",
-    loading: "Memuatkan data…",
-    // Browse
-    browse_title: "Layari katalog",
-    species_count: (n, q, f) => `${n} spesies${q ? ` sepadan "${q}"` : ""}${f > 0 ? ` · ${f} penapis aktif` : ""}`,
-    filters: "Penapis", clear: "Kosongkan",
-    iucn_status: "Status IUCN", genus_label: "Genus", distribution_label: "Taburan", other: "Lain-lain",
-    endemic_malaysia: "Endemik Malaysia",
-    sort_az: "A → Z", sort_threatened: "Paling terancam",
-    no_results: "Tiada spesies sepadan", no_results_sub: "Cuba carian lebih luas atau kosongkan penapis.", reset: "Tetapkan semula",
-    // Detail
-    home_crumb: "Laman Utama", browse_crumb: "Layari",
-    local_names: "Nama tempatan", conservation: "Status pemuliharaan",
-    overview: "Gambaran Keseluruhan", taxonomy: "Taksonomi", distribution_tab: "Taburan", morphology: "Morfologi",
-    description_title: "Huraian", habitat_ecology: "Habitat & Ekologi",
-    habitat: "Habitat", altitude: "Ketinggian", phenology: "Fenologi", threats: "Ancaman",
-    uses_title: "Kegunaan & Kepentingan",
-    quick_facts: "Fakta ringkas", genus_label2: "Genus", family_label: "Famili",
-    endemic_label: "Endemik", distribution_label2: "Taburan", areas: "kawasan",
-    taxonomy_title: "Pengelasan taksonomi",
-    tax_rows: ["Dunia","Klad","Order","Famili","Genus","Spesies","Nama diterima"],
-    distribution_title: (n) => n === 0 ? "Tiada rekod taburan" : `Direkodkan di ${n} negeri`,
-    habitat_note: "Nota habitat",
-    morph_title: "Ciri morfologi",
-    morph_rows: ["Ketinggian","DBH","Tabiat","Habitat","Taburan","Ketinggian","Fenologi"],
-    similar: "Spesies serupa",
-    // Upload
-    upload_title: "Sumbang foto",
-    // About
-    about_title: "Arkib awam pokok Malaysia.",
-    // Footer
-    footer_partner: "· dengan kerjasama FRIM",
-    // Data translations — English field values → BM
-    t: (v) => {
-      if (!v) return v;
-      const map = {
-        // Conservation status
-        "Vulnerable":"Terancam","Endangered":"Terancam (EN)","Critically Endangered":"Terancam Kritikal",
-        "Near Threatened":"Hampir Terancam","Least Concern":"Tidak Membimbangkan","Data Deficient":"Data Tidak Mencukupi",
-        "Not Evaluated":"Tidak Dinilai",
-        // Habitats
-        "Lowland forest":"Hutan tanah rendah","Lowland dipterocarp forest":"Hutan dipterokarp tanah rendah",
-        "Hill dipterocarp forest":"Hutan dipterokarp bukit","Hill forest":"Hutan bukit",
-        "Upper hill dipterocarp forest":"Hutan dipterokarp bukit atas","Montane forest":"Hutan tanah tinggi",
-        "Mixed dipterocarp forest":"Hutan dipterokarp campuran","Primary forest":"Hutan primer",
-        "Secondary forest":"Hutan sekunder","Peat swamp forest":"Hutan paya gambut",
-        "Freshwater swamp forest":"Hutan paya air tawar","Kerangas forest":"Hutan kerangas",
-        "Riparian forest":"Hutan tepi sungai","Beach forest":"Hutan pantai",
-        "Mangrove forest":"Hutan bakau","Heath forest":"Hutan kerangas",
-        // Distribution
-        "Peninsular Malaysia":"Semenanjung Malaysia","Sabah":"Sabah","Sarawak":"Sarawak",
-        // Flowering
-        "Mass flowering":"Berbunga beramai-ramai","Mast flowering":"Berbunga mast",
-        "Irregular":"Tidak teratur","Annual":"Tahunan","Biennial":"Dua tahun sekali",
-        // Threats
-        "Logging":"Pembalakan","Deforestation":"Penyahutanan","Forest conversion":"Penukaran hutan",
-        "Fragmentation":"Pemfragmenan","Urbanisation":"Perbandaran","Agriculture":"Pertanian",
-        "Fire":"Kebakaran","Climate change":"Perubahan iklim","Overharvesting":"Tuaian berlebihan",
-        // Habits
-        "Emergent canopy tree":"Pokok kanopi timbul","Canopy tree":"Pokok kanopi",
-        "Sub-canopy tree":"Pokok sub-kanopi","Understory tree":"Pokok bawah kanopi",
-        "Shrub":"Pokok renek","Liana":"Liana","Epiphyte":"Epifit",
-        // Common descriptors
-        "Endemic":"Endemik","Not endemic":"Bukan endemik",
-        "Yes":"Ya","No":"Tidak",
-        "Peninsular":"Semenanjung","Borneo":"Borneo",
-        // Morphology descriptors
-        "Fissured":"Beralur","Smooth":"Licin","Flaky":"Bersisik","Scaly":"Bersisik",
-        "Grey":"Kelabu","Brown":"Coklat","White":"Putih","Black":"Hitam",
-        "Dark":"Gelap","Light":"Cerah",
-        "Leaves":"Daun","Bark":"Kulit kayu","Fruit":"Buah","Flower":"Bunga",
-        "Simple":"Ringkas","Alternate":"Selang-seli","Opposite":"Bertentangan",
-        "Elliptic":"Eliptik","Oblong":"Memanjang","Ovate":"Bujur telur",
-        "Lanceolate":"Lanset","Cordate":"Berbentuk hati",
-        "Coriaceous":"Kulit tebal","Membranous":"Membran",
-        // Economic
-        "Timber":"Kayu balak","Hardwood":"Kayu keras","Softwood":"Kayu lembut",
-        "Resin":"Resin","Dammar":"Damar","Latex":"Getah",
-        "Construction":"Pembinaan","Furniture":"Perabot","Plywood":"Papan lapis",
-        "Ornamental":"Hiasan","Medicinal":"Perubatan","Fuel wood":"Kayu api",
-        "Poles":"Tiang","Flooring":"Lantai","Veneer":"Venir",
-      };
-      // Try exact match first
-      if (map[v]) return map[v];
-      // Try partial replacements
-      let result = v;
-      Object.entries(map).forEach(([en, bm]) => {
-        result = result.replace(new RegExp(`\b${en}\b`, 'gi'), bm);
-      });
-      return result;
-    },
-  },
-};
-
-// Context for language
-const LangContext = React.createContext({ lang: "en", t: T.en });
-const useLang = () => React.useContext(LangContext);
-
-// Language toggle button
-function LangToggle({ lang, setLang }) {
-  return (
-    <button
-      onClick={() => setLang(l => l === "en" ? "bm" : "en")}
-      style={{
-        display: "inline-flex", alignItems: "center", gap: 6,
-        padding: "6px 12px", borderRadius: "var(--radius-sm)",
-        border: "1.5px solid var(--border-strong)",
-        background: "var(--surface)", cursor: "pointer",
-        fontSize: 12, fontWeight: 700, letterSpacing: "0.06em",
-        color: "var(--text)", transition: "all 0.15s",
-      }}
-      title={lang === "en" ? "Tukar ke Bahasa Melayu" : "Switch to English"}
-    >
-      <span style={{ opacity: lang === "en" ? 1 : 0.4 }}>EN</span>
-      <span style={{ color: "var(--border-strong)" }}>|</span>
-      <span style={{ opacity: lang === "bm" ? 1 : 0.4 }}>BM</span>
-    </button>
-  );
-}
-
-function App() {
-  const [route, setRoute] = useState("home");
-  const [speciesId, setSpeciesId] = useState(SPECIES[0].id);
-  const [query, setQuery] = useState("");
-  const [lang, setLang] = useState("en");
-  const t = T[lang];
-
-  useEffect(() => { window.scrollTo({ top: 0 }); }, [route, speciesId]);
-
-  const doSearch = () => setRoute("browse");
-
-  return (
-    <LangContext.Provider value={{ lang, t }}>
-    <div data-screen-label={route === "detail" ? `Detail · ${SPECIES.find(s => s.id === speciesId)?.sci}` : route}>
-      <TopBar route={route} setRoute={setRoute} query={query} setQuery={setQuery} onSubmitSearch={doSearch} lang={lang} setLang={setLang} />
-      <main style={{ minHeight: "calc(100vh - 64px)" }}>
-        {route === "home" && <Home setRoute={setRoute} setSpeciesId={setSpeciesId} setQuery={setQuery} doSearch={doSearch} />}
-        {route === "browse" && <Browse query={query} setQuery={setQuery} setRoute={setRoute} setSpeciesId={setSpeciesId} />}
-        {route === "detail" && <Detail speciesId={speciesId} setSpeciesId={setSpeciesId} setRoute={setRoute} setQuery={setQuery} />}
-        {route === "upload" && <Upload setRoute={setRoute} />}
-        {route === "about" && <About />}
+        }
       </main>
-      <footer style={{ borderTop: "1px solid var(--border)", padding: "32px", marginTop: 48 }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 16, fontSize: 13, color: "var(--text-2)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ width: 22, height: 22, borderRadius: 6, background: "var(--accent)", display: "inline-flex", alignItems: "center", justifyContent: "center", color: "white" }}><Icon.leaf s={13} /></div>
-            <span style={{ fontWeight: 500, color: "var(--text)" }}>Pokok PM</span>
-            <span style={{ color: "var(--text-3)" }}>{t.footer_partner}</span>
-          </div>
-          <div style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--text-3)" }}>v.4.2 · CC-BY 4.0 · 2024–2026</div>
-        </div>
-      </footer>
     </div>
-    </LangContext.Provider>
-  );
+  </div>;
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+function FGroup({title,children,open:defOpen}){
+  const [open,setOpen]=useState(!!defOpen);
+  return <div style={{borderBottom:'1px solid var(--border)',padding:'12px 0'}}>
+    <button onClick={()=>setOpen(o=>!o)} style={{display:'flex',justifyContent:'space-between',
+      alignItems:'center',width:'100%',background:'none',border:'none',padding:0,
+      cursor:'pointer',color:'var(--text)'}}>
+      <span style={{fontSize:13,fontWeight:500}}>{title}</span>
+      <span style={{fontSize:10,color:'var(--text-3)'}}>{open?'▲':'▼'}</span>
+    </button>
+    {open&&<div style={{marginTop:10,display:'flex',flexDirection:'column',gap:4}}>{children}</div>}
+  </div>;
+}
+
+function Chk({checked,onClick,children}){
+  return <button onClick={onClick} style={{display:'flex',alignItems:'center',gap:8,
+    width:'100%',padding:'5px 0',background:'none',border:'none',cursor:'pointer',
+    color:'var(--text)',textAlign:'left'}}>
+    <span style={{width:16,height:16,borderRadius:4,flexShrink:0,
+      border:`1.5px solid ${checked?'var(--text)':'var(--border-strong)'}`,
+      background:checked?'var(--text)':'transparent',color:'var(--bg)',
+      display:'flex',alignItems:'center',justifyContent:'center',fontSize:10}}>
+      {checked&&'✓'}
+    </span>
+    <span style={{flex:1,display:'inline-flex',alignItems:'center',gap:6}}>{children}</span>
+  </button>;
+}
+
+// ─── DETAIL ───────────────────────────────────────────────
+function Detail({species,detailId,setRoute,setQuery}){
+  const lang=useLang(), ui=UI[lang];
+  const s=species.find(x=>x.id===detailId)||species[0];
+  const [tab,setTab]=useState('overview');
+  if(!s) return <div style={{padding:64,textAlign:'center',color:'var(--text-3)'}}>Not found.</div>;
+
+  const tv=v=>tval(v,lang);
+
+  return <div style={{maxWidth:1100,margin:'0 auto',padding:'24px 32px 64px'}}>
+    {/* Breadcrumb */}
+    <div style={{display:'flex',alignItems:'center',gap:8,fontSize:13,color:'var(--text-3)',marginBottom:24}}>
+      <button onClick={()=>setRoute('home')} style={{background:'none',border:'none',color:'var(--text-3)',cursor:'pointer',fontSize:13,padding:0}}>{ui.home}</button>
+      <span>/</span>
+      <button onClick={()=>setRoute('browse')} style={{background:'none',border:'none',color:'var(--text-3)',cursor:'pointer',fontSize:13,padding:0}}>{ui.browse}</button>
+      <span>/</span>
+      <button onClick={()=>{setQuery(s.genus);setRoute('browse');}} style={{background:'none',border:'none',color:'var(--text-3)',cursor:'pointer',fontSize:13,padding:0,fontStyle:'italic'}}>{s.genus}</button>
+      <span>/</span>
+      <span style={{color:'var(--text)',fontStyle:'italic'}}>{s.sci}</span>
+    </div>
+
+    {/* Hero grid */}
+    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:32,marginBottom:40}}>
+      <SpeciesImg src={s.image_url} seed={species.indexOf(s)} ratio="4/3"/>
+      <div>
+        <div style={{display:'flex',gap:6,marginBottom:12,flexWrap:'wrap'}}>
+          <span style={{fontSize:11,padding:'2px 8px',background:'var(--surface)',border:'1px solid var(--border)',
+            borderRadius:999,color:'var(--text-2)',fontFamily:'monospace'}}>{s.family}</span>
+          {s.endemic&&<span style={{fontSize:11,padding:'2px 8px',background:'var(--text)',color:'var(--bg)',borderRadius:999}}>Endemik</span>}
+        </div>
+        <h1 style={{fontSize:38,fontWeight:500,fontStyle:'italic',letterSpacing:'-0.025em',margin:0,lineHeight:1.1}}>{s.sci}</h1>
+        {s.common.length>0&&<div style={{marginTop:16}}>
+          <div style={{fontSize:11,color:'var(--text-3)',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:4}}>{ui.local_names}</div>
+          <div style={{fontSize:16}}>{s.common.join(' · ')}</div>
+        </div>}
+        <div style={{marginTop:20,padding:16,background:'var(--surface)',border:'1px solid var(--border)',borderRadius:12}}>
+          <div style={{fontSize:11,color:'var(--text-3)',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:10}}>{ui.conservation}</div>
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            <Pill code={s.iucn}/>
+            <span style={{fontSize:13,color:'var(--text-2)'}}>{tv(s.conservation_status)||IUCN_MAP[s.iucn]?.label}</span>
+          </div>
+        </div>
+        <div style={{marginTop:20,display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12}}>
+          {[[ui.habitat,s.habitat],[ui.altitude,s.altitude],[ui.phenology,s.phenology]].map(([k,v])=>(
+            <div key={k}>
+              <div style={{fontSize:11,color:'var(--text-3)',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:4}}>{k}</div>
+              <div style={{fontSize:13}}>{tv(v)}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    {/* Tabs */}
+    <div style={{borderBottom:'1px solid var(--border)',display:'flex',gap:24,marginBottom:32}}>
+      {[[' overview',ui.overview],['taxonomy',ui.taxonomy],['distribution',ui.distribution],['morphology',ui.morphology]].map(([id,label])=>(
+        <button key={id} onClick={()=>setTab(id.trim())} style={{background:'none',border:'none',
+          padding:'10px 0',fontSize:14,fontWeight:500,cursor:'pointer',
+          color:tab===id.trim()?'var(--text)':'var(--text-2)',
+          borderBottom:`2px solid ${tab===id.trim()?'var(--text)':'transparent'}`,marginBottom:-1}}>
+          {label}
+        </button>
+      ))}
+    </div>
+
+    {tab==='overview'&&<div style={{display:'grid',gridTemplateColumns:'1fr 260px',gap:48}}>
+      <div>
+        {(s.bark||s.leaf)&&<Sec title={ui.description}>
+          <p style={{fontSize:15,lineHeight:1.7,margin:0}}>{[s.bark,s.leaf].filter(Boolean).join(' ')}</p>
+        </Sec>}
+        <Sec title={ui.ecology}>
+          <KV k={ui.habitat} v={tv(s.habitat)}/>
+          <KV k={ui.altitude} v={s.altitude}/>
+          <KV k={ui.phenology} v={tv(s.phenology)}/>
+          {s.ecological_notes&&<KV k="Notes" v={s.ecological_notes}/>}
+        </Sec>
+        {s.uses&&s.uses!=='—'&&<Sec title={ui.uses}>
+          <p style={{fontSize:15,lineHeight:1.7,margin:0}}>{tv(s.uses)}</p>
+        </Sec>}
+      </div>
+      <aside>
+        <div style={{padding:16,background:'var(--surface)',border:'1px solid var(--border)',borderRadius:12}}>
+          <div style={{fontSize:11,color:'var(--text-3)',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:12}}>{ui.quick}</div>
+          <QF k={ui.genus} v={<span style={{fontStyle:'italic'}}>{s.genus}</span>}/>
+          <QF k="Family" v={<span style={{fontStyle:'italic'}}>{s.family}</span>}/>
+          <QF k={lang==='en'?'Endemic':'Endemik'} v={lang==='en'?(s.endemic?'Yes':'No'):(s.endemic?'Ya':'Tidak')}/>
+          <QF k={ui.region} v={s.dist.length?s.dist.map(d=>tval(d,lang)).join(', '):'—'} last/>
+        </div>
+      </aside>
+    </div>}
+
+    {tab==='taxonomy'&&<div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:12,padding:24,maxWidth:680}}>
+      <h3 style={{fontSize:16,fontWeight:600,margin:'0 0 16px'}}>{ui.taxonomy}</h3>
+      {[['Kingdom','Plantae'],['Clade','Tracheophytes / Angiosperms'],['Order','Malvales'],
+        ['Family',s.family],['Genus',s.genus],['Species',s.sci.split(' ')[1]||'—'],
+        [lang==='en'?'Accepted name':'Nama diterima',s.sci]].map(([k,v],i)=>(
+        <div key={k} style={{display:'grid',gridTemplateColumns:'180px 1fr',padding:'10px 0',borderTop:i?'1px solid var(--border)':'none'}}>
+          <div style={{fontSize:13,color:'var(--text-2)'}}>{k}</div>
+          <div style={{fontSize:14,fontStyle:['Family','Genus','Species',lang==='en'?'Accepted name':'Nama diterima'].includes(k)?'italic':'normal'}}>{v}</div>
+        </div>
+      ))}
+    </div>}
+
+    {tab==='distribution'&&<div>
+      <h3 style={{fontSize:16,fontWeight:600,margin:'0 0 16px'}}>
+        {s.dist.length===0?(lang==='en'?'No distribution records':'Tiada rekod taburan')
+          :`${lang==='en'?'Recorded in':'Direkodkan di'} ${s.dist.length} ${lang==='en'?'region':'kawasan'}`}
+      </h3>
+      <div style={{display:'flex',flexWrap:'wrap',gap:8}}>
+        {['Peninsular Malaysia','Sabah','Sarawak'].map(rg=>{
+          const present=s.dist.includes(rg);
+          return <span key={rg} style={{display:'inline-flex',alignItems:'center',gap:6,padding:'6px 14px',
+            borderRadius:999,fontSize:13,
+            background:present?'var(--accent-2)':'var(--surface)',
+            color:present?'var(--accent)':'var(--text-3)',
+            border:`1px solid ${present?'var(--accent)':'var(--border)'}`}}>
+            {tval(rg,lang)}
+          </span>;
+        })}
+      </div>
+    </div>}
+
+    {tab==='morphology'&&<div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:12,padding:24,maxWidth:680}}>
+      <h3 style={{fontSize:16,fontWeight:600,margin:'0 0 16px'}}>{ui.morphology}</h3>
+      {[[lang==='en'?'Height':'Ketinggian',s.height],
+        [lang==='en'?'Diameter':'Diameter',s.dbh],
+        [lang==='en'?'Bark':'Kulit kayu',s.bark],
+        [lang==='en'?'Leaf':'Daun',s.leaf],
+        [lang==='en'?'Flower':'Bunga',s.flower],
+        [lang==='en'?'Fruit':'Buah',s.fruit]
+      ].filter(([,v])=>v).map(([k,v],i)=>(
+        <div key={k} style={{display:'grid',gridTemplateColumns:'160px 1fr',padding:'10px 0',borderTop:i?'1px solid var(--border)':'none'}}>
+          <div style={{fontSize:13,color:'var(--text-2)'}}>{k}</div>
+          <div style={{fontSize:14}}>{v}</div>
+        </div>
+      ))}
+    </div>}
+  </div>;
+}
+
+function Sec({title,children}){
+  return <div style={{marginBottom:32}}>
+    <h3 style={{fontSize:12,fontWeight:600,margin:'0 0 12px',color:'var(--text-3)',
+      textTransform:'uppercase',letterSpacing:'0.08em'}}>{title}</h3>
+    {children}
+  </div>;
+}
+function KV({k,v}){
+  return <div style={{display:'grid',gridTemplateColumns:'140px 1fr',padding:'8px 0',borderTop:'1px solid var(--border)'}}>
+    <div style={{fontSize:13,color:'var(--text-2)'}}>{k}</div>
+    <div style={{fontSize:14}}>{v}</div>
+  </div>;
+}
+function QF({k,v,last}){
+  return <div style={{display:'flex',justifyContent:'space-between',padding:'8px 0',
+    borderBottom:last?'none':'1px solid var(--border)'}}>
+    <span style={{fontSize:13,color:'var(--text-2)'}}>{k}</span>
+    <span style={{fontSize:13}}>{v}</span>
+  </div>;
+}
+
+// ─── CONTRIBUTE ───────────────────────────────────────────
+function Contribute({species,lang}){
+  const ui=UI[lang];
+  const [done,setDone]=useState(false);
+  const [file,setFile]=useState(null);
+  const [prev,setPrev]=useState(null);
+  const [form,setForm]=useState({species_id:'',species_name:'',photo_type:'habit',
+    contributor_name:'',contributor_email:'',locality:'',state:'',notes:'',agree:false});
+  const [loading,setLoading]=useState(false);
+  const [err,setErr]=useState('');
+  const upd=(k,v)=>setForm(f=>({...f,[k]:v}));
+
+  const onFile=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    if(f.size>10*1024*1024){setErr('File too large. Max 10MB.'); return;}
+    setFile(f);
+    const r=new FileReader(); r.onload=ev=>setPrev(ev.target.result); r.readAsDataURL(f);
+  };
+
+  const submit=async()=>{
+    if(!file){setErr('Please select a photo.'); return;}
+    if(!form.species_name){setErr('Please select a species.'); return;}
+    if(!form.contributor_name){setErr('Please enter your name.'); return;}
+    if(!form.agree){setErr('Please agree to the license.'); return;}
+    setLoading(true); setErr('');
+    try{
+      const ext=file.name.split('.').pop();
+      const fname=`submissions/${Date.now()}.${ext}`;
+      const up=await fetch(`${SB_URL}/storage/v1/object/species-photos/${fname}`,
+        {method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':file.type},body:file});
+      if(!up.ok) throw new Error('Upload failed: '+(await up.text()));
+      const imgUrl=`${SB_URL}/storage/v1/object/public/species-photos/${fname}`;
+      const sub=await fetch(`${SB_URL}/rest/v1/photo_submissions`,
+        {method:'POST',headers:{...SB_HDR,'Prefer':'return=minimal'},
+         body:JSON.stringify({...form,image_url:imgUrl,status:'pending',submitted_at:new Date().toISOString()})});
+      if(!sub.ok) throw new Error('Save failed: '+(await sub.text()));
+      setDone(true);
+    }catch(e){setErr(e.message);}
+    finally{setLoading(false);}
+  };
+
+  if(done) return <div style={{maxWidth:500,margin:'80px auto',textAlign:'center',padding:32}}>
+    <div style={{fontSize:48,marginBottom:16}}>✅</div>
+    <h2 style={{fontSize:24,fontWeight:600,marginBottom:8}}>{lang==='en'?'Thank you!':'Terima kasih!'}</h2>
+    <p style={{color:'var(--text-2)',marginBottom:24}}>{lang==='en'?'Your photo has been submitted for review.':'Foto anda telah dihantar untuk semakan.'}</p>
+    <Btn variant="primary" onClick={()=>setDone(false)}>{lang==='en'?'Submit another':'Hantar lagi'}</Btn>
+  </div>;
+
+  const iStyle={width:'100%',padding:'9px 12px',background:'var(--surface)',
+    border:'1px solid var(--border-strong)',borderRadius:'var(--radius-sm)',fontSize:14,
+    color:'var(--text)',outline:'none'};
+  const STATES=['Perlis','Kedah','Pulau Pinang','Perak','Selangor','Negeri Sembilan',
+    'Melaka','Johor','Pahang','Terengganu','Kelantan','Kuala Lumpur','Sabah','Sarawak'];
+
+  return <div style={{maxWidth:720,margin:'0 auto',padding:'40px 32px 64px'}}>
+    <h1 style={{fontSize:26,fontWeight:600,margin:'0 0 8px'}}>{ui.contribute_title}</h1>
+    <p style={{fontSize:14,color:'var(--text-2)',margin:'0 0 32px'}}>{lang==='en'?'Photos are reviewed before publishing.':'Gambar disemak sebelum diterbitkan.'}</p>
+    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:24}}>
+      <div>
+        <label style={{display:'block',cursor:'pointer'}}>
+          <input type="file" accept="image/*" onChange={onFile} style={{display:'none'}}/>
+          {prev
+            ? <img src={prev} style={{width:'100%',aspectRatio:'4/3',objectFit:'cover',borderRadius:'var(--radius)',border:'2px solid var(--accent)'}}/>
+            : <div style={{aspectRatio:'4/3',border:'2px dashed var(--border-strong)',borderRadius:'var(--radius)',
+                display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',
+                gap:8,color:'var(--text-3)',background:'var(--surface)'}}>
+                <span style={{fontSize:32}}>📷</span>
+                <div style={{fontSize:14}}>{lang==='en'?'Click to select photo':'Klik untuk pilih foto'}</div>
+              </div>}
+        </label>
+      </div>
+      <div style={{display:'flex',flexDirection:'column',gap:14}}>
+        <div>
+          <div style={{fontSize:11,fontWeight:500,color:'var(--text-3)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:6}}>{lang==='en'?'Species *':'Spesies *'}</div>
+          <select style={iStyle} value={form.species_id} onChange={e=>{
+            const sel=species.find(s=>s.id===e.target.value);
+            upd('species_id',e.target.value); upd('species_name',sel?sel.sci:'');
+          }}>
+            <option value="">{lang==='en'?'-- Select species --':'-- Pilih spesies --'}</option>
+            {species.map(s=><option key={s.id} value={s.id}>{s.sci}{s.common[0]?' — '+s.common[0]:''}</option>)}
+          </select>
+        </div>
+        <div>
+          <div style={{fontSize:11,fontWeight:500,color:'var(--text-3)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:6}}>{lang==='en'?'Your name *':'Nama anda *'}</div>
+          <input style={iStyle} value={form.contributor_name} onChange={e=>upd('contributor_name',e.target.value)}/>
+        </div>
+        <div>
+          <div style={{fontSize:11,fontWeight:500,color:'var(--text-3)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:6}}>Email</div>
+          <input type="email" style={iStyle} value={form.contributor_email} onChange={e=>upd('contributor_email',e.target.value)}/>
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+          <div>
+            <div style={{fontSize:11,fontWeight:500,color:'var(--text-3)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:6}}>{lang==='en'?'State':'Negeri'}</div>
+            <select style={iStyle} value={form.state} onChange={e=>upd('state',e.target.value)}>
+              <option value="">--</option>
+              {STATES.map(s=><option key={s}>{s}</option>)}
+            </select>
+          </div>
+          <div>
+            <div style={{fontSize:11,fontWeight:500,color:'var(--text-3)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:6}}>{lang==='en'?'Locality':'Lokaliti'}</div>
+            <input style={iStyle} value={form.locality} onChange={e=>upd('locality',e.target.value)}/>
+          </div>
+        </div>
+        <label style={{display:'flex',gap:10,padding:12,border:'1px solid var(--border)',borderRadius:'var(--radius)',cursor:'pointer'}}>
+          <input type="checkbox" checked={form.agree} onChange={e=>upd('agree',e.target.checked)} style={{marginTop:2,accentColor:'var(--accent)'}}/>
+          <span style={{fontSize:12,color:'var(--text-2)',lineHeight:1.5}}>
+            {lang==='en'
+              ?'I confirm I own this photo and agree to license it under CC-BY 4.0.'
+              :'Saya mengesahkan saya pemilik gambar ini dan bersetuju dengan lesen CC-BY 4.0.'}
+          </span>
+        </label>
+        {err&&<div style={{fontSize:13,color:'var(--danger)',padding:'8px 12px',background:'#FEE2E2',borderRadius:6}}>{err}</div>}
+        <Btn variant="accent" full disabled={loading} onClick={submit}>
+          {loading?(lang==='en'?'Submitting…':'Menghantar…'):(lang==='en'?'Submit for review':'Hantar untuk semakan')}
+        </Btn>
+      </div>
+    </div>
+  </div>;
+}
+
+// ─── ABOUT ────────────────────────────────────────────────
+function About({lang}){
+  const ui=UI[lang];
+  return <div style={{maxWidth:720,margin:'0 auto',padding:'48px 32px'}}>
+    <h1 style={{fontSize:32,fontWeight:600,letterSpacing:'-0.025em',margin:'0 0 16px'}}>{ui.about_title}</h1>
+    <p style={{fontSize:16,color:'var(--text-2)',lineHeight:1.6,margin:'0 0 32px'}}>
+      {lang==='en'
+        ?'A public, open-data database of Dipterocarpaceae species in Malaysia. Taxonomic data, conservation status, distribution, and morphology — all in one searchable archive.'
+        :'Pangkalan data awam spesies Dipterocarpaceae Malaysia. Data taksonomi, status pemuliharaan, taburan, dan morfologi — semuanya dalam satu arkib carian.'}
+    </p>
+    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:24}}>
+      <div style={{padding:20,background:'var(--surface)',border:'1px solid var(--border)',borderRadius:12}}>
+        <h3 style={{fontSize:15,fontWeight:600,margin:'0 0 10px'}}>{lang==='en'?'Database contents':'Kandungan pangkalan data'}</h3>
+        <ul style={{fontSize:14,color:'var(--text-2)',lineHeight:1.7,margin:0,paddingLeft:18}}>
+          <li>{lang==='en'?'Scientific names, genera, families':'Nama saintifik, genus, famili'}</li>
+          <li>{lang==='en'?'Malay local names':'Nama Melayu tempatan'}</li>
+          <li>{lang==='en'?'IUCN conservation status':'Status pemuliharaan IUCN'}</li>
+          <li>{lang==='en'?'State-level distribution':'Taburan mengikut negeri'}</li>
+          <li>{lang==='en'?'Morphological descriptions':'Huraian morfologi'}</li>
+        </ul>
+      </div>
+      <div style={{padding:20,background:'var(--surface)',border:'1px solid var(--border)',borderRadius:12}}>
+        <h3 style={{fontSize:15,fontWeight:600,margin:'0 0 10px'}}>Dipterocarpaceae</h3>
+        <p style={{fontSize:14,color:'var(--text-2)',lineHeight:1.7,margin:0}}>
+          {lang==='en'
+            ?'The dominant family of Southeast Asian rainforests. In Malaysia, this includes meranti, keruing, resak, balau, and more — the foundation of forest ecosystems and the timber industry.'
+            :'Famili pokok yang mendominasi hutan hujan Asia Tenggara. Di Malaysia, ini termasuk meranti, keruing, resak, balau, dan banyak lagi.'}
+        </p>
+      </div>
+    </div>
+    <div style={{marginTop:24,padding:20,background:'var(--accent-2)',border:'1px solid var(--accent)',borderRadius:12}}>
+      <div style={{fontSize:13,fontWeight:500,color:'var(--accent)',marginBottom:4}}>
+        {lang==='en'?'Data source':'Sumber data'}
+      </div>
+      <div style={{fontSize:14,color:'var(--text-2)'}}>
+        Supabase · Table: <code style={{fontFamily:'monospace',fontSize:12}}>{TABLE}</code>
+      </div>
+    </div>
+  </div>;
+}
+
+// ─── APP ──────────────────────────────────────────────────
+function App(){
+  const [route,setRoute]=useState('home');
+  const [detailId,setDetailId]=useState(null);
+  const [query,setQuery]=useState('');
+  const [species,setSpecies]=useState([]);
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState('');
+  const [lang,setLang]=useState('en');
+
+  useEffect(()=>{
+    fetchSpecies()
+      .then(rows=>{ setSpecies(rows.map(mapRow)); setLoading(false); })
+      .catch(e=>{ setError(e.message); setLoading(false); });
+  },[]);
+
+  useEffect(()=>{ window.scrollTo({top:0}); },[route,detailId]);
+
+  const onSearch=()=>setRoute('browse');
+
+  return <LangCtx.Provider value={lang}>
+    <TopBar route={route} setRoute={setRoute} query={query} setQuery={setQuery} onSearch={onSearch} lang={lang} setLang={setLang}/>
+    <main style={{minHeight:'calc(100vh - 64px)'}}>
+      {route==='home'    && <Home species={species} loading={loading} error={error} setRoute={setRoute} setDetailId={setDetailId} setQuery={setQuery}/>}
+      {route==='browse'  && <Browse species={species} query={query} setQuery={setQuery} setRoute={setRoute} setDetailId={setDetailId}/>}
+      {route==='detail'  && <Detail species={species} detailId={detailId} setRoute={setRoute} setQuery={setQuery}/>}
+      {route==='contribute' && <Contribute species={species} lang={lang}/>}
+      {route==='about'   && <About lang={lang}/>}
+    </main>
+    <footer style={{borderTop:'1px solid var(--border)',padding:'28px 32px',marginTop:48}}>
+      <div style={{maxWidth:1280,margin:'0 auto',display:'flex',justifyContent:'space-between',
+        flexWrap:'wrap',gap:16,fontSize:13,color:'var(--text-2)'}}>
+        <div style={{display:'flex',alignItems:'center',gap:8}}>
+          <div style={{width:22,height:22,borderRadius:6,background:'var(--accent)',display:'inline-flex',
+            alignItems:'center',justifyContent:'center',color:'white',fontSize:12}}>🌿</div>
+          <span style={{fontWeight:500,color:'var(--text)'}}>Dipterokarp Malaysia</span>
+          <span>· Dipterocarpaceae Database</span>
+        </div>
+        <div style={{fontFamily:'monospace',fontSize:12}}>v2.0 · CC-BY 4.0 · 2025–2026</div>
+      </div>
+    </footer>
+  </LangCtx.Provider>;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
 </html>
