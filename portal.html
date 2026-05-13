@@ -3,772 +3,338 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trees of Malaysia · M. Nazre Saleh</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Trees of Malaysia · Portal Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --forest: #1A3D1E;
-  --green:  #2C5A30;
-  --mid:    #3A7040;
-  --sage:   #6BAB82;
-  --mist:   #A8C9B3;
-  --cream:  #F7F3ED;
-  --warm:   #FDFAF6;
-  --parch:  #EDE8DF;
-  --gold:   #C9862A;
-  --gold-lt:#F0B861;
-  --txt:    #1C1A17;
-  --txt2:   #4A4640;
-  --txt3:   #8A8278;
-  --border: #DDD7CE;
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { scroll-behavior: smooth; }
-
-body {
-  font-family: 'Outfit', sans-serif;
-  background: var(--forest);
-  color: var(--txt);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* ── ANIMATED BACKGROUND ── */
-.bg-canvas {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  background:
-    radial-gradient(ellipse at 15% 25%, rgba(107,171,130,.12) 0%, transparent 50%),
-    radial-gradient(ellipse at 85% 70%, rgba(201,134,42,.08) 0%, transparent 45%),
-    radial-gradient(ellipse at 50% 100%, rgba(44,90,48,.4) 0%, transparent 60%),
-    linear-gradient(160deg, #0F2411 0%, #1A3D1E 40%, #1E4A24 70%, #152E18 100%);
-}
-
-/* Subtle leaf pattern overlay */
-.bg-canvas::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  opacity: 0.04;
-  background-image:
-    repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(168,201,179,.5) 40px, rgba(168,201,179,.5) 41px),
-    repeating-linear-gradient(-45deg, transparent, transparent 40px, rgba(168,201,179,.3) 40px, rgba(168,201,179,.3) 41px);
-}
-
-/* ── WRAPPER ── */
-.wrap {
-  position: relative;
-  z-index: 1;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* ── TOPBAR ── */
-.topbar {
-  padding: 20px 48px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid rgba(168,201,179,.1);
-  animation: fadeDown .6s ease both;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo-mark {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--mid), var(--sage));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 12px rgba(107,171,130,.3);
-}
-
-.logo-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 17px;
-  font-weight: 500;
-  color: rgba(255,255,255,.9);
-  letter-spacing: .01em;
-}
-
-.logo-text em { font-style: italic; color: var(--gold-lt); }
-
-.topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.lang-toggle {
-  display: flex;
-  border: 1px solid rgba(168,201,179,.25);
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.lang-btn {
-  padding: 5px 12px;
-  background: none;
-  border: none;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: .06em;
-  color: rgba(168,201,179,.5);
-  cursor: pointer;
-  transition: all .15s;
-  font-family: 'Outfit', sans-serif;
-}
-
-.lang-btn.on { background: rgba(168,201,179,.15); color: var(--mist); }
-
-/* ── HERO ── */
-.hero {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 48px 60px;
-  text-align: center;
-}
-
-.hero-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 16px;
-  border-radius: 999px;
-  background: rgba(168,201,179,.1);
-  border: 1px solid rgba(168,201,179,.2);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--mist);
-  margin-bottom: 28px;
-  animation: fadeUp .7s .1s ease both;
-}
-
-.hero-dot {
-  width: 6px; height: 6px;
-  border-radius: 999px;
-  background: var(--gold-lt);
-  animation: pulse 2s ease infinite;
-}
-
-@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
-
-.hero-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(44px, 7vw, 80px);
-  font-weight: 400;
-  color: white;
-  line-height: 1.0;
-  letter-spacing: -.02em;
-  margin-bottom: 12px;
-  animation: fadeUp .7s .2s ease both;
-}
-
-.hero-title em {
-  font-style: italic;
-  color: var(--gold-lt);
-  display: block;
-}
-
-.hero-subtitle {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(16px, 2.5vw, 22px);
-  font-weight: 300;
-  font-style: italic;
-  color: rgba(255,255,255,.55);
-  margin-bottom: 16px;
-  animation: fadeUp .7s .25s ease both;
-}
-
-.hero-desc {
-  font-size: 14px;
-  font-weight: 300;
-  color: rgba(255,255,255,.5);
-  max-width: 520px;
-  line-height: 1.7;
-  margin-bottom: 64px;
-  animation: fadeUp .7s .3s ease both;
-}
-
-/* ── CARDS ── */
-.cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  max-width: 980px;
-  width: 100%;
-  animation: fadeUp .7s .4s ease both;
-}
-
-.site-card {
-  position: relative;
-  border-radius: 16px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform .2s ease, box-shadow .2s ease;
-  text-decoration: none;
-}
-
-.site-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 24px 60px rgba(0,0,0,.4);
-}
-
-/* FREE card */
-.card-free {
-  background: linear-gradient(160deg, rgba(247,243,237,.97) 0%, rgba(237,232,223,.97) 100%);
-  border: 1px solid rgba(255,255,255,.3);
-}
-
-/* PAID card */
-.card-paid {
-  background: linear-gradient(160deg, rgba(26,61,30,.98) 0%, rgba(20,48,24,.98) 100%);
-  border: 1px solid rgba(168,201,179,.2);
-}
-
-.card-inner { padding: 36px 36px 32px; }
-
-.card-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  margin-bottom: 24px;
-}
-
-.badge-free {
-  background: rgba(61,122,87,.12);
-  color: var(--mid);
-  border: 1px solid rgba(61,122,87,.25);
-}
-
-.badge-paid {
-  background: rgba(201,134,42,.15);
-  color: var(--gold-lt);
-  border: 1px solid rgba(201,134,42,.3);
-}
-
-.card-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.icon-free  { background: linear-gradient(135deg, var(--mid), var(--sage)); }
-.icon-paid  { background: linear-gradient(135deg, var(--gold), var(--gold-lt)); }
-
-.card-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 26px;
-  font-weight: 500;
-  line-height: 1.2;
-  margin-bottom: 6px;
-}
-
-.card-title-free { color: var(--forest); }
-.card-title-paid { color: white; }
-
-.card-title-sub {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 14px;
-  font-style: italic;
-  margin-bottom: 18px;
-}
-
-.sub-free { color: var(--txt3); }
-.sub-paid { color: rgba(168,201,179,.7); }
-
-.card-divider {
-  height: 1px;
-  margin-bottom: 18px;
-}
-
-.div-free { background: var(--border); }
-.div-paid { background: rgba(168,201,179,.15); }
-
-.card-desc {
-  font-size: 13.5px;
-  font-weight: 300;
-  line-height: 1.72;
-  margin-bottom: 24px;
-}
-
-.desc-free { color: var(--txt2); }
-.desc-paid { color: rgba(255,255,255,.65); }
-
-/* Feature list */
-.feat-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 32px;
-}
-
-.feat-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 12.5px;
-  font-weight: 400;
-  line-height: 1.5;
-}
-
-.feat-free { color: var(--txt2); }
-.feat-paid { color: rgba(255,255,255,.7); }
-
-.feat-dot {
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: 1px;
-  font-size: 10px;
-}
-
-.dot-free { background: rgba(61,122,87,.12); color: var(--mid); }
-.dot-paid { background: rgba(201,134,42,.15); color: var(--gold-lt); }
-
-/* CTA button */
-.card-cta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 20px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: .02em;
-  text-decoration: none;
-  transition: all .15s;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-}
-
-.cta-free {
-  background: var(--forest);
-  color: white;
-}
-
-.cta-free:hover { background: var(--mid); }
-
-.cta-paid {
-  background: linear-gradient(90deg, var(--gold), var(--gold-lt));
-  color: var(--forest);
-}
-
-.cta-paid:hover { opacity: .9; }
-
-.cta-arrow {
-  font-size: 16px;
-  transition: transform .15s;
-}
-
-.site-card:hover .cta-arrow { transform: translateX(4px); }
-
-/* Price tag */
-.price-tag {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  padding: 5px 12px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.price-free {
-  background: rgba(61,122,87,.15);
-  color: var(--mid);
-  border: 1px solid rgba(61,122,87,.3);
-}
-
-.price-paid {
-  background: rgba(201,134,42,.15);
-  color: var(--gold-lt);
-  border: 1px solid rgba(201,134,42,.25);
-}
-
-/* ── BOTTOM NOTE ── */
-.bottom-note {
-  text-align: center;
-  padding: 32px 48px 48px;
-  animation: fadeUp .7s .5s ease both;
-}
-
-.note-line {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  color: rgba(255,255,255,.3);
-  font-size: 12px;
-  font-weight: 300;
-  letter-spacing: .04em;
-  margin-bottom: 10px;
-}
-
-.note-sep { width: 40px; height: 1px; background: rgba(255,255,255,.15); }
-
-.note-author {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 14px;
-  font-style: italic;
-  color: rgba(255,255,255,.4);
-}
-
-/* ── SHARED DATA NOTE ── */
-.shared-note {
-  max-width: 980px;
-  width: 100%;
-  margin: 0 auto 32px;
-  padding: 14px 20px;
-  background: rgba(168,201,179,.07);
-  border: 1px solid rgba(168,201,179,.15);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  animation: fadeUp .7s .45s ease both;
-}
-
-.shared-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgba(168,201,179,.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.shared-txt {
-  font-size: 12px;
-  font-weight: 300;
-  color: rgba(255,255,255,.5);
-  line-height: 1.6;
-}
-
-.shared-txt strong { color: var(--mist); font-weight: 500; }
-
-/* ── ANIMATIONS ── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── RESPONSIVE ── */
-@media (max-width: 720px) {
-  .topbar { padding: 16px 24px; }
-  .hero { padding: 60px 24px 40px; }
-  .cards { grid-template-columns: 1fr; }
-  .card-inner { padding: 28px 24px 24px; }
-  .bottom-note { padding: 24px 24px 36px; }
-  .shared-note { margin: 0 24px 24px; width: auto; }
-}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#0F2411;min-height:100vh;}
+
+/* TOPBAR */
+.topbar{padding:13px 36px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(168,201,179,.1);background:rgba(15,36,17,.88);backdrop-filter:blur(16px);position:sticky;top:0;z-index:50;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#2C5A30,#6BAB82);display:flex;align-items:center;justify-content:center;}
+.logo-text{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:500;color:rgba(255,255,255,.9);}
+.logo-text em{font-style:italic;color:#F0B861;}
+.lang-toggle{display:flex;border:1px solid rgba(168,201,179,.2);border-radius:7px;overflow:hidden;}
+.lang-btn{padding:5px 13px;background:none;border:none;cursor:pointer;font-size:11px;font-weight:600;letter-spacing:.06em;color:rgba(168,201,179,.4);text-transform:uppercase;transition:all .15s;font-family:'DM Sans',sans-serif;}
+.lang-btn.on{background:rgba(168,201,179,.15);color:#A8C9B3;}
+
+/* HERO */
+.hero{padding:56px 36px 44px;text-align:center;background:linear-gradient(160deg,#0F2411 0%,#1A3D1E 40%,#1E4A24 70%,#152E18 100%);}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;background:rgba(168,201,179,.08);border:1px solid rgba(168,201,179,.18);font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#A8C9B3;margin-bottom:22px;}
+.eyebrow-dot{width:6px;height:6px;border-radius:999px;background:#F0B861;}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:400;color:white;line-height:1.0;letter-spacing:-.025em;margin-bottom:10px;}
+.hero-title em{font-style:italic;color:#F0B861;}
+.hero-sub{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:300;font-style:italic;color:rgba(255,255,255,.38);margin-bottom:8px;}
+.hero-desc{font-size:13px;color:rgba(255,255,255,.38);max-width:460px;margin:0 auto 44px;line-height:1.75;}
+
+/* CARDS CONTAINER */
+.cards-wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:14px;}
+
+/* MAIN CARD */
+.main-card{background:linear-gradient(150deg,#1E4A24 0%,#163318 100%);border-radius:16px;border:1px solid rgba(198,166,48,.25);overflow:hidden;cursor:pointer;transition:all .2s ease;position:relative;box-shadow:0 8px 32px rgba(0,0,0,.3);}
+.main-card:hover{transform:translateY(-3px);border-color:#F0B861;box-shadow:0 20px 60px rgba(0,0,0,.45);}
+.main-card-top-bar{height:3px;background:linear-gradient(90deg,#C9862A,#F0B861,#C9862A);}
+.main-card-badge{position:absolute;top:18px;right:18px;padding:4px 12px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.1em;background:rgba(201,134,42,.15);color:#F0B861;border:1px solid rgba(201,134,42,.3);text-transform:uppercase;}
+.main-card-inner{padding:30px 34px;display:grid;grid-template-columns:1fr 1fr;gap:40px;}
+.mc-icon-row{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+.mc-icon{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#C9862A,#F0B861);display:flex;align-items:center;justify-content:center;}
+.mc-icon-label{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#F0B861;margin-bottom:2px;}
+.mc-icon-sub{font-size:10px;color:rgba(168,201,179,.5);}
+.mc-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;color:white;line-height:1.2;margin-bottom:6px;}
+.mc-divider{height:1px;background:rgba(198,166,48,.2);margin:14px 0;}
+.mc-desc{font-size:12.5px;color:rgba(255,255,255,.6);line-height:1.75;margin-bottom:20px;}
+.pricing-box{padding:13px 15px;background:rgba(0,0,0,.25);border-radius:10px;border:1px solid rgba(198,166,48,.15);margin-bottom:20px;}
+.pricing-title{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(240,184,97,.55);margin-bottom:9px;}
+.pricing-row{display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,.55);margin-bottom:5px;}
+.pricing-row span:last-child{color:#F0B861;font-weight:600;}
+.mc-cta{display:flex;align-items:center;justify-content:space-between;padding:12px 17px;background:linear-gradient(90deg,#C9862A,#F0B861);border-radius:9px;font-weight:600;font-size:13px;color:#1A3D1E;cursor:pointer;}
+.mc-features-title{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(168,201,179,.45);margin-bottom:13px;padding-top:4px;}
+.feat-list{display:flex;flex-direction:column;gap:10px;}
+.feat-item{display:flex;align-items:flex-start;gap:10px;font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;}
+.feat-dot-gold{width:16px;height:16px;flex-shrink:0;margin-top:1px;}
+
+/* SUB CARDS */
+.sub-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.sub-card{border-radius:14px;overflow:hidden;cursor:pointer;transition:all .2s ease;display:flex;flex-direction:column;box-shadow:0 4px 16px rgba(0,0,0,.06);}
+.sub-card:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,0,0,.12);}
+.sub-card-accent{height:2px;}
+.sub-card-inner{padding:22px 24px;flex:1;display:flex;flex-direction:column;}
+.sc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sc-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.sc-badge{padding:3px 9px;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:rgba(61,122,87,.1);color:#2C5A30;border:1px solid rgba(61,122,87,.2);}
+.sc-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:500;color:#1C1A17;line-height:1.2;margin-bottom:4px;}
+.sc-subtitle{font-size:11px;color:#8A8278;margin-bottom:10px;font-style:italic;}
+.sc-divider{height:1px;background:#DDD7CE;margin-bottom:12px;}
+.sc-desc{font-size:12px;color:#4A4640;line-height:1.7;margin-bottom:14px;}
+.sc-feat-list{display:flex;flex-direction:column;gap:7px;flex:1;}
+.sc-feat{display:flex;align-items:flex-start;gap:8px;font-size:11.5px;color:#4A4640;line-height:1.5;}
+.sc-nofeat{display:flex;align-items:flex-start;gap:8px;font-size:11.5px;color:#bbb;line-height:1.5;}
+.sc-feat-icon{width:14px;height:14px;flex-shrink:0;margin-top:1px;}
+.sc-cta{margin-top:16px;display:flex;align-items:center;justify-content:space-between;padding:10px 15px;border-radius:8px;font-weight:600;font-size:12px;cursor:pointer;}
+
+/* SHARED NOTE */
+.shared-note{max-width:980px;margin:14px auto 0;padding:11px 18px;background:rgba(168,201,179,.06);border:1px solid rgba(168,201,179,.12);border-radius:10px;display:flex;align-items:center;gap:12px;font-size:11.5px;color:rgba(255,255,255,.38);line-height:1.65;}
+.shared-note strong{color:#A8C9B3;}
+
+/* FOOTER */
+.footer{text-align:center;padding:18px 36px 32px;}
+.footer-line1{font-size:10.5px;color:rgba(255,255,255,.2);letter-spacing:.04em;}
+.footer-line2{font-family:'Cormorant Garamond',serif;font-size:12px;font-style:italic;color:rgba(255,255,255,.26);margin-top:5px;}
+
+/* SVG helpers inline */
+svg{display:block;}
 </style>
 </head>
 <body>
 
-<div class="bg-canvas"></div>
-
-<div class="wrap">
-
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <div class="logo">
-      <div class="logo-mark">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <path d="M3 15C3 8 8 3 15 3C15 10 10 15 3 15Z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/>
-          <path d="M3 15L10 8" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <span class="logo-text">Trees of <em>Malaysia</em></span>
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-mark">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 14C2 7 7 2 14 2C14 9 9 14 2 14Z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/><path d="M2 14L9 7" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
     </div>
-    <div class="topbar-right">
-      <div class="lang-toggle">
-        <button class="lang-btn on" id="lb-en" onclick="setLang('en')">EN</button>
-        <button class="lang-btn" id="lb-bm" onclick="setLang('bm')">BM</button>
-      </div>
-    </div>
+    <span class="logo-text">Trees of <em>Malaysia</em></span>
   </div>
+  <div class="lang-toggle">
+    <button class="lang-btn on" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('bm')">BM</button>
+  </div>
+</div>
 
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-eyebrow">
-      <div class="hero-dot"></div>
-      <span id="eyebrow-txt">Malaysian Forest Botany · M. Nazre Saleh · UPM</span>
+<!-- HERO -->
+<div class="hero">
+  <div class="eyebrow">
+    <div class="eyebrow-dot"></div>
+    <span id="txt-eyebrow">Malaysian Forest Botany · M. Nazre Saleh · UPM</span>
+  </div>
+  <h1 class="hero-title" id="txt-title">Trees of<br><em>Malaysia</em></h1>
+  <p class="hero-sub" id="txt-sub">Three platforms. One shared database.</p>
+  <p class="hero-desc" id="txt-desc">A botanical initiative by M. Nazre Saleh, Universiti Putra Malaysia — exploring the trees of Malaysia through research, community, and open data.</p>
+
+  <div class="cards-wrap">
+
+    <!-- MAIN CARD -->
+    <div class="main-card">
+      <div class="main-card-top-bar"></div>
+      <div class="main-card-badge" id="txt-badge-paid">PAID · Licence Required</div>
+      <div class="main-card-inner">
+        <!-- LEFT -->
+        <div>
+          <div class="mc-icon-row">
+            <div class="mc-icon">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="#1A3D1E" stroke-width="1.5" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="#1A3D1E" stroke-width="1.5" stroke-linecap="round"/><path d="M9 7h7M9 11h5" stroke="#1A3D1E" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div class="mc-icon-label" id="txt-badge2">Academic Reference</div>
+              <div class="mc-icon-sub">Series I — Dipterocarpaceae</div>
+            </div>
+          </div>
+          <div class="mc-title" id="txt-card2-title">Trees of Peninsular Malaysia</div>
+          <div class="mc-divider"></div>
+          <p class="mc-desc" id="txt-card2-desc">A structured interactive botanical reference for forestry students and researchers. Family → Genus → Species with full taxonomic descriptions, diagnostic characters, and POWO 2026 nomenclature.</p>
+          <div class="pricing-box">
+            <div class="pricing-title" id="txt-tiers">Access Tiers</div>
+            <div class="pricing-row"><span id="txt-t1">Student (6 months)</span><span>RM 30–50</span></div>
+            <div class="pricing-row"><span id="txt-t2">Individual (1 year)</span><span>RM 80–120</span></div>
+            <div class="pricing-row" style="margin-bottom:0"><span id="txt-t3">Institutional (1 year)</span><span>RM 500–1,000</span></div>
+          </div>
+          <div class="mc-cta">
+            <span id="txt-cta2">Access Interactive Reference</span>
+            <span style="font-size:16px;">→</span>
+          </div>
+        </div>
+        <!-- RIGHT -->
+        <div>
+          <div class="mc-features-title" id="txt-included">What's included</div>
+          <div class="feat-list" id="feat-list-paid"></div>
+        </div>
+      </div>
     </div>
 
-    <h1 class="hero-title">
-      <span id="title-line1">Trees of</span>
-      <em id="title-line2">Malaysia</em>
-    </h1>
+    <!-- SUB CARDS -->
+    <div class="sub-cards">
 
-    <div class="hero-subtitle" id="hero-subtitle">Two platforms. One shared database.</div>
-
-    <p class="hero-desc" id="hero-desc">
-      A botanical initiative by M. Nazre Saleh, Universiti Putra Malaysia.
-      Explore the Dipterocarpaceae of Peninsular Malaysia through two complementary platforms —
-      one open to the public, one a structured academic reference.
-    </p>
-
-    <!-- CARDS -->
-    <div class="cards">
-
-      <!-- FREE: Dipterokarp Malaysia -->
-      <a class="site-card card-free" href="https://2abetterment.github.io/dipterocarp-of-Malaysia/" target="_blank" target="_blank">
-        <div class="price-tag price-free" id="badge-free-txt">FREE · Open Access</div>
-        <div class="card-inner">
-          <div class="card-badge badge-free">
-            <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1.3"/></svg>
-            <span id="badge1-txt">Community Platform</span>
+      <!-- Dipterokarp Malaysia -->
+      <div class="sub-card" style="background:#F7F3ED;border:1px solid #DDD7CE;">
+        <div class="sub-card-accent" style="background:#2C5A30;"></div>
+        <div class="sub-card-inner">
+          <div class="sc-header">
+            <div class="sc-icon" style="background:linear-gradient(135deg,#2C5A30,#6BAB82);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.5"/><path d="M2 12h20M12 3a15 15 0 014 9 15 15 0 01-4 9 15 15 0 01-4-9 15 15 0 014-9z" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <span class="sc-badge" id="txt-badge1">FREE · Open Access</span>
           </div>
-          <div class="card-icon icon-free">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="white" stroke-width="1.5"/>
-              <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="card-title card-title-free" id="card1-title">Dipterokarp Malaysia</div>
-          <div class="card-title-sub sub-free" id="card1-sub">Open community database</div>
-          <div class="card-divider div-free"></div>
-          <p class="card-desc desc-free" id="card1-desc">
-            A free, publicly accessible database of Malaysian Dipterocarps.
-            Browse species, view field photographs contributed by the community,
-            and explore IUCN conservation status and distribution records.
-            Available in English and Bahasa Malaysia.
-          </p>
-          <ul class="feat-list">
-            <li class="feat-item feat-free"><span class="feat-dot dot-free">✓</span><span id="f1-1">Browse all 160+ species with photos</span></li>
-            <li class="feat-item feat-free"><span class="feat-dot dot-free">✓</span><span id="f1-2">IUCN status · state-level distribution</span></li>
-            <li class="feat-item feat-free"><span class="feat-dot dot-free">✓</span><span id="f1-3">Filter by genus, IUCN, endemism</span></li>
-            <li class="feat-item feat-free"><span class="feat-dot dot-free">✓</span><span id="f1-4">Contribute your own field photographs</span></li>
-            <li class="feat-item feat-free"><span class="feat-dot dot-free">✓</span><span id="f1-5">English & Bahasa Malaysia interface</span></li>
-            <li class="feat-item feat-free"><span class="feat-dot dot-free">✗</span><span id="f1-6" style="color:#bbb;">Full taxonomic descriptions</span></li>
-            <li class="feat-item feat-free"><span class="feat-dot dot-free">✗</span><span id="f1-7" style="color:#bbb;">Diagnostic keys & morphological data</span></li>
-          </ul>
-          <div class="card-cta cta-free">
-            <span id="cta1-txt">Open Dipterokarp Malaysia</span>
-            <span class="cta-arrow">→</span>
+          <div class="sc-title" id="txt-card1-title">Dipterokarp Malaysia</div>
+          <div class="sc-subtitle" id="txt-card1-sub">Community database · Dipterocarpaceae</div>
+          <div class="sc-divider"></div>
+          <p class="sc-desc" id="txt-card1-desc">Free, publicly accessible database of Malaysian Dipterocarps. Browse species, view community field photographs, IUCN status and distribution records.</p>
+          <div class="sc-feat-list" id="feat-list-dip"></div>
+          <div class="sc-cta" style="background:#1A3D1E;color:white;">
+            <span id="txt-cta1">Open Dipterokarp Malaysia</span><span>→</span>
           </div>
         </div>
-      </a>
+      </div>
 
-      <!-- PAID: Trees of Peninsular Malaysia -->
-      <a class="site-card card-paid" href="./trees_peninsular_malaysia_webapp.html" target="_blank" target="_blank">
-        <div class="price-tag price-paid" id="badge-paid-txt">PAID · Licence Required</div>
-        <div class="card-inner">
-          <div class="card-badge badge-paid">
-            <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M5 1l1.2 2.4L9 3.9 7 5.8l.5 2.7L5 7.2 2.5 8.5 3 5.8 1 3.9l2.8-.5L5 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
-            <span id="badge2-txt">Academic Reference</span>
+      <!-- Non-Dipterocarp Trees -->
+      <div class="sub-card" style="background:#F0F6FA;border:1px solid #C5D8E8;">
+        <div class="sub-card-accent" style="background:#2E6B8A;"></div>
+        <div class="sub-card-inner">
+          <div class="sc-header">
+            <div class="sc-icon" style="background:linear-gradient(135deg,#1A3D5C,#2E6B8A);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 22V13M12 13C10 11 7 9 5 6M12 13C14 11 17 9 19 6" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M5 6C6 4 9 2 12 2C15 2 18 4 19 6" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <span class="sc-badge" style="background:rgba(46,107,138,.1);color:#2E6B8A;border-color:rgba(46,107,138,.2);" id="txt-badge3">FREE · Open Access</span>
           </div>
-          <div class="card-icon icon-paid">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="var(--forest)" stroke-width="1.5" stroke-linecap="round"/>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="var(--forest)" stroke-width="1.5" stroke-linecap="round"/>
-              <path d="M9 7h7M9 11h5" stroke="var(--forest)" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="card-title card-title-paid" id="card2-title">Trees of Peninsular Malaysia</div>
-          <div class="card-title-sub sub-paid" id="card2-sub">Series I — Dipterocarpaceae</div>
-          <div class="card-divider div-paid"></div>
-          <p class="card-desc desc-paid" id="card2-desc">
-            A structured interactive botanical reference for forestry students and researchers.
-            Organised by Family → Genus → Species with full taxonomic descriptions,
-            diagnostic characters, synonymy, and distribution — all following POWO 2026
-            and APG IV classification. Access requires a valid licence key.
-          </p>
-          <ul class="feat-list">
-            <li class="feat-item feat-paid"><span class="feat-dot dot-paid">✓</span><span id="f2-1">Full taxonomic & morphological descriptions</span></li>
-            <li class="feat-item feat-paid"><span class="feat-dot dot-paid">✓</span><span id="f2-2">Diagnostic characters & identification keys</span></li>
-            <li class="feat-item feat-paid"><span class="feat-dot dot-paid">✓</span><span id="f2-3">POWO 2026 accepted nomenclature</span></li>
-            <li class="feat-item feat-paid"><span class="feat-dot dot-paid">✓</span><span id="f2-4">Etymology of genus & species epithets</span></li>
-            <li class="feat-item feat-paid"><span class="feat-dot dot-paid">✓</span><span id="f2-5">Synonym history with publications</span></li>
-            <li class="feat-item feat-paid"><span class="feat-dot dot-paid">✓</span><span id="f2-6">Family → Genus → Species hierarchy</span></li>
-            <li class="feat-item feat-paid"><span class="feat-dot dot-paid">✓</span><span id="f2-7">Time-limited access — renew annually</span></li>
-          </ul>
-          <div class="card-cta cta-paid">
-            <span id="cta2-txt">Access Interactive Reference</span>
-            <span class="cta-arrow">→</span>
+          <div class="sc-title" id="txt-card3-title">Non-Dipterocarp Trees</div>
+          <div class="sc-subtitle" id="txt-card3-sub">Community database · 141+ families</div>
+          <div class="sc-divider" style="background:#C5D8E8;"></div>
+          <p class="sc-desc" id="txt-card3-desc">Free community database covering non-dipterocarp trees of Malaysia — Leguminosae, Moraceae, Myrtaceae, Lauraceae and 137+ more families.</p>
+          <div class="sc-feat-list" id="feat-list-nondip"></div>
+          <div class="sc-cta" style="background:#1A3D5C;color:white;">
+            <span id="txt-cta3">Open Non-Dipterocarp Database</span><span>→</span>
           </div>
         </div>
-      </a>
+      </div>
 
-    </div><!-- /cards -->
+    </div><!-- /sub-cards -->
 
-    <!-- SHARED DATABASE NOTE -->
+    <!-- SHARED NOTE -->
     <div class="shared-note">
-      <div class="shared-icon">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="6" stroke="var(--mist)" stroke-width="1.3"/>
-          <path d="M8 5v3l2 2" stroke="var(--mist)" stroke-width="1.3" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div class="shared-txt" id="shared-note-txt">
-        <strong>Shared database:</strong> Both platforms draw from the same Supabase database.
-        Field photographs approved in Dipterokarp Malaysia automatically appear in the interactive reference.
-        Species data is updated in real time across both platforms.
-      </div>
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="6.5" stroke="#A8C9B3" stroke-width="1.2"/><path d="M8 5v3l2 2" stroke="#A8C9B3" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <p id="txt-shared"><strong>Shared database:</strong> All three platforms draw from the same Supabase database. Photos approved in either community site automatically update across all platforms in real time.</p>
     </div>
 
-  </div><!-- /hero -->
+  </div><!-- /cards-wrap -->
+</div><!-- /hero -->
 
-  <!-- BOTTOM NOTE -->
-  <div class="bottom-note">
-    <div class="note-line">
-      <div class="note-sep"></div>
-      <span id="note-line-txt">Dipterocarpaceae of Peninsular Malaysia · POWO 2026 · APG IV · CC-BY 4.0</span>
-      <div class="note-sep"></div>
-    </div>
-    <div class="note-author">M. Nazre Saleh · Universiti Putra Malaysia · 2025–2026</div>
-  </div>
-
-</div><!-- /wrap -->
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-line1" id="txt-footer1">Dipterocarpaceae of Peninsular Malaysia · POWO 2026 · APG IV · CC-BY 4.0</div>
+  <div class="footer-line2">M. Nazre Saleh · Universiti Putra Malaysia · 2025–2026</div>
+</div>
 
 <script>
 const content = {
   en: {
-    eyebrow:    'Malaysian Forest Botany · M. Nazre Saleh · UPM',
-    title1:     'Trees of',
-    title2:     'Malaysia',
-    subtitle:   'Two platforms. One shared database.',
-    desc:       'A botanical initiative by M. Nazre Saleh, Universiti Putra Malaysia. Explore the Dipterocarpaceae of Peninsular Malaysia through two complementary platforms — one open to the public, one a structured academic reference.',
-    badgeFree:  'FREE · Open Access',
-    badgePaid:  'PAID · Licence Required',
-    badge1:     'Community Platform',
-    badge2:     'Academic Reference',
-    card1title: 'Dipterokarp Malaysia',
-    card1sub:   'Open community database',
-    card1desc:  'A free, publicly accessible database of Malaysian Dipterocarps. Browse species, view field photographs contributed by the community, and explore IUCN conservation status and distribution records. Available in English and Bahasa Malaysia.',
-    card2title: 'Trees of Peninsular Malaysia',
-    card2sub:   'Series I — Dipterocarpaceae',
-    card2desc:  'A structured interactive botanical reference for forestry students and researchers. Organised by Family → Genus → Species with full taxonomic descriptions, diagnostic characters, synonymy, and distribution — all following POWO 2026 and APG IV classification. Access requires a valid licence key.',
-    f11: 'Browse all 160+ species with photos',
-    f12: 'IUCN status · state-level distribution',
-    f13: 'Filter by genus, IUCN, endemism',
-    f14: 'Contribute your own field photographs',
-    f15: 'English & Bahasa Malaysia interface',
-    f16: 'Full taxonomic descriptions',
-    f17: 'Diagnostic keys & morphological data',
-    f21: 'Full taxonomic & morphological descriptions',
-    f22: 'Diagnostic characters & identification keys',
-    f23: 'POWO 2026 accepted nomenclature',
-    f24: 'Etymology of genus & species epithets',
-    f25: 'Synonym history with publications',
-    f26: 'Family → Genus → Species hierarchy',
-    f27: 'Time-limited access — renew annually',
-    cta1: 'Open Dipterokarp Malaysia',
-    cta2: 'Access Interactive Reference',
-    shared: '<strong>Shared database:</strong> Both platforms draw from the same Supabase database. Field photographs approved in Dipterokarp Malaysia automatically appear in the interactive reference. Species data is updated in real time across both platforms.',
-    note: 'Dipterocarpaceae of Peninsular Malaysia · POWO 2026 · APG IV · CC-BY 4.0',
+    eyebrow:    "Malaysian Forest Botany · M. Nazre Saleh · UPM",
+    title:      "Trees of<br><em>Malaysia</em>",
+    sub:        "Three platforms. One shared database.",
+    desc:       "A botanical initiative by M. Nazre Saleh, Universiti Putra Malaysia — exploring the trees of Malaysia through research, community, and open data.",
+    badgePaid:  "PAID · Licence Required",
+    badge2:     "Academic Reference",
+    card2title: "Trees of Peninsular Malaysia",
+    card2desc:  "A structured interactive botanical reference for forestry students and researchers. Family → Genus → Species with full taxonomic descriptions, diagnostic characters, and POWO 2026 nomenclature.",
+    tiers:      "Access Tiers",
+    t1: "Student (6 months)", t2: "Individual (1 year)", t3: "Institutional (1 year)",
+    cta2:       "Access Interactive Reference",
+    included:   "What's included",
+    paidFeats:  ["Full taxonomic & morphological descriptions","Diagnostic characters & identification keys","POWO 2026 accepted nomenclature","Etymology of genus & species epithets","Synonym history with full publications","Family → Genus → Species hierarchy","Time-limited access — renew annually"],
+    badge1: "FREE · Open Access",
+    card1title: "Dipterokarp Malaysia",
+    card1sub:   "Community database · Dipterocarpaceae",
+    card1desc:  "Free, publicly accessible database of Malaysian Dipterocarps. Browse species, view community field photographs, IUCN status and distribution records.",
+    cta1:       "Open Dipterokarp Malaysia",
+    dip_feats:  ["Browse 160+ species with field photos","IUCN status · state-level distribution","Filter by genus, IUCN, endemism","Contribute field photographs","English & Bahasa Malaysia"],
+    dip_no:     ["Full taxonomic descriptions","Diagnostic keys"],
+    badge3: "FREE · Open Access",
+    card3title: "Non-Dipterocarp Trees",
+    card3sub:   "Community database · 141+ families",
+    card3desc:  "Free community database covering non-dipterocarp trees of Malaysia — Leguminosae, Moraceae, Myrtaceae, Lauraceae and 137+ more families.",
+    cta3:       "Open Non-Dipterocarp Database",
+    nondip_feats: ["Browse 141+ tree families with photos","IUCN status · state-level distribution","Filter by family, genus, endemism","Contribute field photographs","English & Bahasa Malaysia"],
+    nondip_no:  ["Full taxonomic descriptions","Diagnostic keys"],
+    shared:     "<strong>Shared database:</strong> All three platforms draw from the same Supabase database. Photos approved in either community site automatically update across all platforms in real time.",
+    footer1:    "Dipterocarpaceae of Peninsular Malaysia · POWO 2026 · APG IV · CC-BY 4.0",
   },
   bm: {
-    eyebrow:    'Botani Hutan Malaysia · M. Nazre Saleh · UPM',
-    title1:     'Pokok',
-    title2:     'Malaysia',
-    subtitle:   'Dua platform. Satu pangkalan data.',
-    desc:       'Sebuah inisiatif botani oleh M. Nazre Saleh, Universiti Putra Malaysia. Terokai Dipterocarpaceae Semenanjung Malaysia melalui dua platform yang saling melengkapi — satu terbuka kepada awam, satu rujukan akademik berstruktur.',
-    badgeFree:  'PERCUMA · Akses Terbuka',
-    badgePaid:  'BERBAYAR · Lesen Diperlukan',
-    badge1:     'Platform Komuniti',
-    badge2:     'Rujukan Akademik',
-    card1title: 'Dipterokarp Malaysia',
-    card1sub:   'Pangkalan data komuniti terbuka',
-    card1desc:  'Pangkalan data percuma dan boleh diakses awam untuk Dipterokarp Malaysia. Layari spesies, lihat gambar lapangan yang disumbang oleh komuniti, dan terokai status pemuliharaan IUCN serta rekod taburan. Tersedia dalam Bahasa Malaysia dan Bahasa Inggeris.',
-    card2title: 'Pokok Semenanjung Malaysia',
-    card2sub:   'Siri I — Dipterocarpaceae',
-    card2desc:  'Rujukan botani interaktif berstruktur untuk pelajar dan penyelidik perhutanan. Disusun mengikut Famili → Genus → Spesies dengan huraian taksonomi penuh, ciri diagnostik, sinonim, dan taburan — mengikut POWO 2026 dan klasifikasi APG IV. Akses memerlukan kunci lesen yang sah.',
-    f11: 'Layari 160+ spesies dengan foto',
-    f12: 'Status IUCN · taburan mengikut negeri',
-    f13: 'Tapis mengikut genus, IUCN, endemisma',
-    f14: 'Sumbang gambar lapangan anda sendiri',
-    f15: 'Antara muka Bahasa Malaysia & Inggeris',
-    f16: 'Huraian taksonomi penuh',
-    f17: 'Kunci diagnostik & data morfologi',
-    f21: 'Huraian taksonomi & morfologi penuh',
-    f22: 'Ciri diagnostik & kunci pengenalpastian',
-    f23: 'Tatanama diterima POWO 2026',
-    f24: 'Etimologi epitet genus & spesies',
-    f25: 'Sejarah sinonim dengan penerbitan',
-    f26: 'Hierarki Famili → Genus → Spesies',
-    f27: 'Akses terhad masa — perbaharui setiap tahun',
-    cta1: 'Buka Dipterokarp Malaysia',
-    cta2: 'Akses Rujukan Interaktif',
-    shared: '<strong>Pangkalan data dikongsi:</strong> Kedua-dua platform menggunakan pangkalan data Supabase yang sama. Gambar lapangan yang diluluskan dalam Dipterokarp Malaysia akan muncul secara automatik dalam rujukan interaktif. Data spesies dikemas kini masa nyata merentasi kedua-dua platform.',
-    note: 'Dipterocarpaceae Semenanjung Malaysia · POWO 2026 · APG IV · CC-BY 4.0',
+    eyebrow:    "Botani Hutan Malaysia · M. Nazre Saleh · UPM",
+    title:      "Pokok<br><em>Malaysia</em>",
+    sub:        "Tiga platform. Satu pangkalan data.",
+    desc:       "Inisiatif botani oleh M. Nazre Saleh, UPM — meneroka pokok Malaysia melalui penyelidikan, komuniti, dan data terbuka.",
+    badgePaid:  "BERBAYAR · Lesen Diperlukan",
+    badge2:     "Rujukan Akademik",
+    card2title: "Pokok Semenanjung Malaysia",
+    card2desc:  "Rujukan botani interaktif berstruktur untuk pelajar dan penyelidik perhutanan. Famili → Genus → Spesies dengan huraian taksonomi penuh dan tatanama POWO 2026.",
+    tiers:      "Peringkat Akses",
+    t1: "Pelajar (6 bulan)", t2: "Individu (1 tahun)", t3: "Institusi (1 tahun)",
+    cta2:       "Akses Rujukan Interaktif",
+    included:   "Yang disertakan",
+    paidFeats:  ["Huraian taksonomi & morfologi penuh","Ciri diagnostik & kunci pengenalpastian","Tatanama diterima POWO 2026","Etimologi epitet genus & spesies","Sejarah sinonim dengan penerbitan penuh","Hierarki Famili → Genus → Spesies","Akses terhad masa — perbaharui setiap tahun"],
+    badge1: "PERCUMA · Akses Terbuka",
+    card1title: "Dipterokarp Malaysia",
+    card1sub:   "Pangkalan data komuniti · Dipterocarpaceae",
+    card1desc:  "Pangkalan data percuma Dipterokarp Malaysia. Layari spesies, lihat gambar lapangan komuniti, status IUCN dan rekod taburan.",
+    cta1:       "Buka Dipterokarp Malaysia",
+    dip_feats:  ["Layari 160+ spesies dengan gambar","Status IUCN · taburan mengikut negeri","Tapis mengikut genus, IUCN, endemisma","Sumbang gambar lapangan","Bahasa Malaysia & Inggeris"],
+    dip_no:     ["Huraian taksonomi penuh","Kunci diagnostik"],
+    badge3: "PERCUMA · Akses Terbuka",
+    card3title: "Pokok Bukan Dipterokarp",
+    card3sub:   "Pangkalan data komuniti · 141+ famili",
+    card3desc:  "Pangkalan data komuniti percuma merangkumi pokok bukan dipterocarp Malaysia — Leguminosae, Moraceae, Myrtaceae dan 137+ famili lagi.",
+    cta3:       "Buka Pangkalan Data Bukan Dipterokarp",
+    nondip_feats: ["Layari 141+ famili pokok dengan gambar","Status IUCN · taburan mengikut negeri","Tapis mengikut famili, genus, endemisma","Sumbang gambar lapangan","Bahasa Malaysia & Inggeris"],
+    nondip_no:  ["Huraian taksonomi penuh","Kunci diagnostik"],
+    shared:     "<strong>Pangkalan data dikongsi:</strong> Ketiga-tiga platform menggunakan pangkalan data Supabase yang sama. Gambar yang diluluskan dikemas kini secara automatik merentasi semua platform.",
+    footer1:    "Dipterocarpaceae Semenanjung Malaysia · POWO 2026 · APG IV · CC-BY 4.0",
   }
 };
+
+function checkSVG(color){ return `<svg class="sc-feat-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="${color}" stroke-width="1"/><path d="M4 7l2 2 4-4" stroke="${color}" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`; }
+function crossSVG(){ return `<svg class="sc-feat-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="#ccc" stroke-width="1"/><path d="M5 5l4 4M9 5l-4 4" stroke="#ccc" stroke-width="1.4" stroke-linecap="round"/></svg>`; }
 
 let currentLang = 'en';
 
 function setLang(lang) {
   currentLang = lang;
-  document.getElementById('lb-en').classList.toggle('on', lang === 'en');
-  document.getElementById('lb-bm').classList.toggle('on', lang === 'bm');
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.textContent.toLowerCase() === lang));
   const c = content[lang];
-  document.getElementById('eyebrow-txt').textContent    = c.eyebrow;
-  document.getElementById('title-line1').textContent    = c.title1;
-  document.getElementById('title-line2').textContent    = c.title2;
-  document.getElementById('hero-subtitle').textContent  = c.subtitle;
-  document.getElementById('hero-desc').textContent      = c.desc;
-  document.getElementById('badge-free-txt').textContent = c.badgeFree;
-  document.getElementById('badge-paid-txt').textContent = c.badgePaid;
-  document.getElementById('badge1-txt').textContent     = c.badge1;
-  document.getElementById('badge2-txt').textContent     = c.badge2;
-  document.getElementById('card1-title').textContent    = c.card1title;
-  document.getElementById('card1-sub').textContent      = c.card1sub;
-  document.getElementById('card1-desc').textContent     = c.card1desc;
-  document.getElementById('card2-title').textContent    = c.card2title;
-  document.getElementById('card2-sub').textContent      = c.card2sub;
-  document.getElementById('card2-desc').textContent     = c.card2desc;
-  ['f11','f12','f13','f14','f15','f16','f17',
-   'f21','f22','f23','f24','f25','f26','f27',
-   'cta1-txt','cta2-txt'].forEach(id => {
-    const key = id.replace('-txt','').replace('cta1','cta1').replace('cta2','cta2');
-    const el = document.getElementById(id);
-    if (el) el.textContent = c[id.replace('-txt','')];
-  });
-  document.getElementById('cta1-txt').textContent       = c.cta1;
-  document.getElementById('cta2-txt').textContent       = c.cta2;
-  document.getElementById('shared-note-txt').innerHTML  = c.shared;
-  document.getElementById('note-line-txt').textContent  = c.note;
+
+  document.getElementById('txt-eyebrow').textContent   = c.eyebrow;
+  document.getElementById('txt-title').innerHTML        = c.title;
+  document.getElementById('txt-sub').textContent        = c.sub;
+  document.getElementById('txt-desc').textContent       = c.desc;
+  document.getElementById('txt-badge-paid').textContent = c.badgePaid;
+  document.getElementById('txt-badge2').textContent     = c.badge2;
+  document.getElementById('txt-card2-title').textContent= c.card2title;
+  document.getElementById('txt-card2-desc').textContent = c.card2desc;
+  document.getElementById('txt-tiers').textContent      = c.tiers;
+  document.getElementById('txt-t1').textContent         = c.t1;
+  document.getElementById('txt-t2').textContent         = c.t2;
+  document.getElementById('txt-t3').textContent         = c.t3;
+  document.getElementById('txt-cta2').textContent       = c.cta2;
+  document.getElementById('txt-included').textContent   = c.included;
+  document.getElementById('txt-badge1').textContent     = c.badge1;
+  document.getElementById('txt-card1-title').textContent= c.card1title;
+  document.getElementById('txt-card1-sub').textContent  = c.card1sub;
+  document.getElementById('txt-card1-desc').textContent = c.card1desc;
+  document.getElementById('txt-cta1').textContent       = c.cta1;
+  document.getElementById('txt-badge3').textContent     = c.badge3;
+  document.getElementById('txt-card3-title').textContent= c.card3title;
+  document.getElementById('txt-card3-sub').textContent  = c.card3sub;
+  document.getElementById('txt-card3-desc').textContent = c.card3desc;
+  document.getElementById('txt-cta3').textContent       = c.cta3;
+  document.getElementById('txt-shared').innerHTML       = c.shared;
+  document.getElementById('txt-footer1').textContent    = c.footer1;
+
+  // Paid features
+  document.getElementById('feat-list-paid').innerHTML = c.paidFeats.map(f =>
+    `<div class="feat-item">${checkSVG('#F0B861')}<span>${f}</span></div>`
+  ).join('');
+
+  // Dipterocarp features
+  document.getElementById('feat-list-dip').innerHTML =
+    c.dip_feats.map(f => `<div class="sc-feat">${checkSVG('#2C5A30')}<span>${f}</span></div>`).join('') +
+    c.dip_no.map(f => `<div class="sc-nofeat">${crossSVG()}<span>${f}</span></div>`).join('');
+
+  // Non-dip features
+  document.getElementById('feat-list-nondip').innerHTML =
+    c.nondip_feats.map(f => `<div class="sc-feat">${checkSVG('#2E6B8A')}<span>${f}</span></div>`).join('') +
+    c.nondip_no.map(f => `<div class="sc-nofeat">${crossSVG()}<span>${f}</span></div>`).join('');
 }
+
+// Init
+setLang('en');
 </script>
 </body>
 </html>
