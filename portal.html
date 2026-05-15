@@ -84,6 +84,15 @@ body{font-family:'DM Sans',sans-serif;background:#0F2411;min-height:100vh;}
 
 /* SVG helpers inline */
 svg{display:block;}
+  .live-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #2E6B8A; flex-shrink: 0;
+    animation: livepulse 2s ease-in-out infinite;
+  }
+  @keyframes livepulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%      { opacity:.4; transform:scale(1.3); }
+  }
 </style>
 </head>
 <body>
@@ -115,7 +124,7 @@ svg{display:block;}
   <div class="cards-wrap">
 
     <!-- MAIN CARD -->
-    <a href="https://2abetterment.github.io/dipterocarp-of-Malaysia/trees_peninsular_malaysia_webapp.html" target="_blank" style="text-decoration:none;display:block;" class="main-card">
+    <a href="trees_peninsular_malaysia_webapp.html" target="_blank" style="text-decoration:none;display:block;" class="main-card">
       <div class="main-card-top-bar"></div>
       <div class="main-card-badge" id="txt-badge-paid">PAID · Licence Required</div>
       <div class="main-card-inner">
@@ -156,7 +165,7 @@ svg{display:block;}
     <div class="sub-cards">
 
       <!-- Dipterokarp Malaysia -->
-      <a href="https://2abetterment.github.io/dipterocarp-of-Malaysia/" target="_blank" class="sub-card" style="text-decoration:none;display:flex;flex-direction:column;background:#F7F3ED;border:1px solid #DDD7CE;">
+      <a href="index.html" target="_blank" class="sub-card" style="text-decoration:none;display:flex;flex-direction:column;background:#F7F3ED;border:1px solid #DDD7CE;">
         <div class="sub-card-accent" style="background:#2C5A30;"></div>
         <div class="sub-card-inner">
           <div class="sc-header">
@@ -177,7 +186,7 @@ svg{display:block;}
       </a>
 
       <!-- Non-Dipterocarp Trees -->
-      <a href="https://2abetterment.github.io/dipterocarp-of-Malaysia/non_dipterocarp_trees_malaysia.html" target="_blank" class="sub-card" style="text-decoration:none;display:flex;flex-direction:column;background:#F0F6FA;border:1px solid #C5D8E8;">
+      <a href="non_dipterocarp_trees_malaysia.html" target="_blank" class="sub-card" style="text-decoration:none;display:flex;flex-direction:column;background:#F0F6FA;border:1px solid #C5D8E8;">
         <div class="sub-card-accent" style="background:#2E6B8A;"></div>
         <div class="sub-card-inner">
           <div class="sc-header">
@@ -191,6 +200,8 @@ svg{display:block;}
           <div class="sc-divider" style="background:#C5D8E8;"></div>
           <p class="sc-desc" id="txt-card3-desc">Free community database covering non-dipterocarp trees of Malaysia — Leguminosae, Moraceae, Myrtaceae, Lauraceae and 137+ more families.</p>
           <div class="sc-feat-list" id="feat-list-nondip"></div>
+          <!-- Live database stats pill -->
+          <div id="nondip-live-stats" style="display:none;align-items:center;gap:6px;font-size:11.5px;color:#2E6B8A;background:rgba(46,107,138,.08);border:1px solid rgba(46,107,138,.18);border-radius:20px;padding:5px 12px;margin:8px 0 4px;font-weight:500;"></div>
           <div class="sc-cta" style="background:#1A3D5C;color:white;">
             <span id="txt-cta3">Open Non-Dipterocarp Database</span><span>→</span>
           </div>
@@ -337,6 +348,78 @@ function setLang(lang) {
 
 // Init
 setLang('en');
+
+// ── Live stats from Supabase ──────────────────────────────────────────────
+(function loadNonDipStats() {
+  const SUPA_URL  = 'https://xrntnarchlglhllvlrnv.supabase.co';
+  const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhybnRuYXJjaGxnbGhsbHZscm52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTU4MzksImV4cCI6MjA4MDk5MTgzOX0.Q0PjW5dMU07EDoR-GGDpIjATlSC5AJxNeEdOlYaO96w';
+  const headers   = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY };
+
+  // Fetch all three counts in parallel
+  Promise.all([
+    fetch(SUPA_URL + '/rest/v1/non_dipterocarp_species?select=count', { headers }).then(r => r.json()),
+    fetch(SUPA_URL + '/rest/v1/non_dipterocarp_families?select=count', { headers }).then(r => r.json()),
+    fetch(SUPA_URL + '/rest/v1/non_dipterocarp_genera?select=count',   { headers }).then(r => r.json()),
+  ])
+  .then(([speciesRes, familiesRes, generaRes]) => {
+    // Supabase returns [{count:"N"}] when using ?select=count with Prefer:count header
+    // Simpler: use head=true to get the count from Content-Range header instead
+    // But easiest: just count the rows returned (with limit override)
+    // Use the exact count approach via RPC or header
+    return Promise.all([
+      fetch(SUPA_URL + '/rest/v1/non_dipterocarp_species?select=id', {
+        headers: { ...headers, 'Prefer': 'count=exact', 'Range': '0-0' }
+      }),
+      fetch(SUPA_URL + '/rest/v1/non_dipterocarp_families?select=id', {
+        headers: { ...headers, 'Prefer': 'count=exact', 'Range': '0-0' }
+      }),
+      fetch(SUPA_URL + '/rest/v1/non_dipterocarp_genera?select=id', {
+        headers: { ...headers, 'Prefer': 'count=exact', 'Range': '0-0' }
+      }),
+    ]);
+  })
+  .then(([speciesResp, familiesResp, generaResp]) => {
+    // Content-Range: 0-0/3601
+    const parseCount = resp => {
+      const cr = resp.headers.get('Content-Range') || '';
+      const m  = cr.match(/\/(\d+)$/);
+      return m ? parseInt(m[1], 10) : null;
+    };
+    const nSpecies  = parseCount(speciesResp);
+    const nFamilies = parseCount(familiesResp);
+    const nGenera   = parseCount(generaResp);
+
+    if (!nSpecies) return; // fetch failed silently
+
+    // Update the subtitle stat badge
+    const sub3 = document.getElementById('txt-card3-sub');
+    if (sub3) {
+      const isBM = (typeof currentLang !== 'undefined' && currentLang === 'bm');
+      sub3.textContent = isBM
+        ? `Pangkalan data komuniti · ${nFamilies} famili · ${nGenera} genera · ${nSpecies.toLocaleString()} spesies`
+        : `Community database · ${nFamilies} families · ${nGenera} genera · ${nSpecies.toLocaleString()} species`;
+    }
+
+    // Inject a live-count pill into the card
+    const statsEl = document.getElementById('nondip-live-stats');
+    if (statsEl) {
+      statsEl.innerHTML =
+        `<span class="live-dot"></span>` +
+        `<strong>${nSpecies.toLocaleString()}</strong> species &nbsp;·&nbsp; ` +
+        `<strong>${nGenera}</strong> genera &nbsp;·&nbsp; ` +
+        `<strong>${nFamilies}</strong> families`;
+      statsEl.style.display = 'flex';
+    }
+
+    // Also patch the bilingual content so setLang() keeps correct numbers
+    const fmt = n => n.toLocaleString();
+    if (typeof content !== 'undefined') {
+      content.en.card3sub = `Community database · ${nFamilies} families · ${nGenera} genera · ${fmt(nSpecies)} species`;
+      content.bm.card3sub = `Pangkalan data komuniti · ${nFamilies} famili · ${nGenera} genera · ${fmt(nSpecies)} spesies`;
+    }
+  })
+  .catch(() => { /* fail silently — static fallback text stays visible */ });
+})();
 </script>
 </body>
 </html>
