@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trees of Peninsular Malaysia · Series I — Dipterocarpaceae</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --dark:   #1A3D1E;
+  --green:  #2C5A30;
+  --mid:    #3A7040;
+  --accent: #7CBF7E;
+  --pale:   #A8D5A2;
+  --cream:  #F4FFF4;
+  --gold:   #C6A630;
+  --light:  #F4FAF4;
+  --txt:    #1C1C1C;
+  --border: #C8DFC8;
+  --bg:     #EDF3ED;
+  --red:    #B71C1C;
+  --white:  #FFFFFF;
+  /* New Level-4 additions */
+  --ochre:      #C4882A;
+  --ochre-lt:   #E8B84A;
+  --ochre-pale: #FDF3DC;
+  --parch:      #FAF6ED;
+  --parch-2:    #F2EAD8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--txt); min-height: 100vh; }
+
+/* ── SCREENS ─────────────────────────────────────────────────────── */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ══ LOGIN ══════════════════════════════════════════════════════════ */
+#screen-login {
+  background: var(--dark);
+  align-items: center; justify-content: center;
+  padding: 24px; position: relative; overflow: hidden;
+}
+#screen-login::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(44,90,48,0.6) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(26,61,30,0.8) 0%, transparent 50%);
+  pointer-events: none;
+}
+.login-card {
+  background: rgba(244,255,244,0.04);
+  border: 0.5px solid rgba(168,213,162,0.2);
+  border-radius: 12px; width: 100%; max-width: 420px;
+  padding: 40px 36px 36px; position: relative; z-index: 1;
+  backdrop-filter: blur(8px);
+}
+.login-brand { text-align: center; margin-bottom: 32px; }
+.login-series { font-family:'DM Sans',sans-serif; font-size:9px; font-weight:400; letter-spacing:0.22em; text-transform:uppercase; color:var(--pale); margin-bottom:10px; }
+.login-title { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:300; color:var(--cream); line-height:1.2; margin-bottom:4px; }
+.login-title em { font-style:italic; color:var(--accent); }
+.login-sub { font-size:11px; font-weight:300; color:var(--pale); letter-spacing:0.06em; }
+.login-divider { height:0.5px; background:rgba(168,213,162,0.2); margin:24px 0; }
+.login-label { font-size:9px; font-weight:500; letter-spacing:0.14em; text-transform:uppercase; color:var(--pale); display:block; margin-bottom:6px; }
+.login-input { width:100%; padding:11px 14px; background:rgba(244,255,244,0.06); border:0.5px solid rgba(168,213,162,0.25); border-radius:6px; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--cream); outline:none; margin-bottom:14px; transition:border-color 0.15s; }
+.login-input::placeholder { color:rgba(168,213,162,0.4); }
+.login-input:focus { border-color:var(--accent); background:rgba(244,255,244,0.09); }
+.login-btn { width:100%; padding:12px; background:var(--accent); border:none; border-radius:6px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--dark); cursor:pointer; transition:background 0.15s; margin-top:4px; }
+.login-btn:hover { background:var(--pale); }
+.login-btn:disabled { opacity:0.5; cursor:not-allowed; }
+.login-error { font-size:11px; color:#EF9A9A; text-align:center; margin-top:10px; min-height:16px; }
+.login-free { text-align:center; margin-top:20px; font-size:11px; color:var(--pale); }
+.login-free a { color:var(--accent); text-decoration:underline; cursor:pointer; }
+
+/* ══ EXPIRED ════════════════════════════════════════════════════════ */
+#screen-expired { background:var(--dark); align-items:center; justify-content:center; padding:24px; }
+.expired-card { background:rgba(244,255,244,0.04); border:0.5px solid rgba(198,166,48,0.4); border-radius:12px; max-width:400px; width:100%; padding:40px 32px; text-align:center; }
+.expired-icon { font-size:40px; margin-bottom:16px; }
+.expired-title { font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--gold); margin-bottom:8px; }
+.expired-msg { font-size:12px; color:var(--pale); line-height:1.7; margin-bottom:24px; }
+.expired-btn { display:inline-block; padding:10px 28px; background:var(--gold); color:var(--dark); border-radius:4px; font-size:11px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; border:none; }
+.expired-logout { font-size:10px; color:var(--pale); margin-top:14px; cursor:pointer; text-decoration:underline; }
+
+/* ══ MAIN APP ═══════════════════════════════════════════════════════ */
+#screen-app { background:var(--bg); flex-direction:row; min-height:100vh; }
+
+/* SIDEBAR */
+.sidebar { width:268px; min-width:268px; background:var(--dark); display:flex; flex-direction:column; height:100vh; position:sticky; top:0; overflow-y:auto; }
+.sidebar-brand { padding:20px 18px 16px; border-bottom:0.5px solid rgba(168,213,162,0.15); }
+.sb-series { font-size:8px; font-weight:400; letter-spacing:0.2em; text-transform:uppercase; color:var(--pale); margin-bottom:5px; }
+.sb-title { font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:400; color:var(--cream); line-height:1.3; }
+.sb-title em { font-style:italic; color:var(--accent); }
+.sb-user { padding:12px 18px; border-bottom:0.5px solid rgba(168,213,162,0.1); background:rgba(0,0,0,0.15); }
+.sb-user-name { font-size:11px; font-weight:500; color:var(--cream); margin-bottom:2px; }
+.sb-user-tier { font-size:9px; color:var(--pale); letter-spacing:0.06em; }
+.sb-expiry { font-size:9px; color:var(--gold); margin-top:2px; }
+.sb-nav { padding:12px 0; flex:1; }
+.sb-section-hd { font-size:8px; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; color:rgba(168,213,162,0.5); padding:8px 18px 4px; }
+.sb-item { padding:8px 18px; font-size:12px; font-weight:400; color:rgba(168,213,162,0.7); cursor:pointer; display:flex; justify-content:space-between; align-items:center; transition:all 0.1s; border-left:2px solid transparent; }
+.sb-item:hover { background:rgba(168,213,162,0.08); color:var(--cream); }
+.sb-item.active { background:rgba(168,213,162,0.12); color:var(--cream); border-left-color:var(--accent); }
+.sb-count { font-size:9px; background:rgba(168,213,162,0.15); padding:1px 6px; border-radius:10px; color:var(--pale); }
+.sb-genus-list { padding-left:12px; border-left:0.5px solid rgba(168,213,162,0.1); margin:0 18px; }
+.sb-genus-item { padding:5px 8px; font-size:11px; font-style:italic; color:rgba(168,213,162,0.6); cursor:pointer; border-radius:3px; transition:all 0.1s; display:flex; justify-content:space-between; }
+.sb-genus-item:hover { background:rgba(168,213,162,0.08); color:var(--cream); }
+.sb-genus-item.active { color:var(--accent); }
+
+/* ── NEW: Sidebar filter chips ──────────────────────────── */
+.sb-filter-chips { padding:6px 18px 10px; display:flex; flex-direction:column; gap:4px; }
+.sb-chip { display:flex; align-items:center; gap:8px; padding:4px 8px; border-radius:4px; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:10.5px; color:rgba(168,213,162,0.55); border:1px solid transparent; transition:all 0.15s; }
+.sb-chip:hover { background:rgba(168,213,162,0.06); }
+.sb-chip.active { background:rgba(124,191,126,0.12); border-color:rgba(124,191,126,0.3); color:var(--accent); }
+.sb-chip-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+.sb-logout { padding:14px 18px; border-top:0.5px solid rgba(168,213,162,0.1); font-size:11px; color:rgba(168,213,162,0.4); cursor:pointer; transition:color 0.1s; }
+.sb-logout:hover { color:var(--pale); }
+
+/* MAIN CONTENT */
+.main-content { flex:1; overflow-y:auto; min-height:100vh; }
+
+/* TOP BAR — now with lang toggle */
+.main-topbar { background:white; border-bottom:0.5px solid var(--border); padding:10px 24px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:50; gap:16px; }
+.search-wrap { position:relative; flex:1; max-width:380px; }
+.search-wrap input { width:100%; padding:8px 14px 8px 34px; border:0.5px solid var(--border); border-radius:20px; font-family:'DM Sans',sans-serif; font-size:12px; outline:none; background:var(--bg); transition:border-color 0.12s; }
+.search-wrap input:focus { border-color:var(--accent); background:white; }
+.search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--accent); font-size:14px; pointer-events:none; }
+/* Search results dropdown */
+.search-dropdown { position:absolute; top:calc(100% + 6px); left:0; right:0; background:white; border:0.5px solid var(--border); border-radius:8px; box-shadow:0 8px 24px rgba(44,90,48,0.12); z-index:200; display:none; max-height:280px; overflow-y:auto; }
+.search-dropdown.open { display:block; }
+.sd-item { padding:9px 16px; cursor:pointer; border-bottom:0.5px solid var(--border); display:flex; align-items:center; gap:12px; transition:background 0.1s; }
+.sd-item:hover { background:var(--bg); }
+.sd-item:last-child { border-bottom:none; }
+.sd-type { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:1.5px; text-transform:uppercase; color:#888; background:#F0F0F0; padding:2px 6px; border-radius:6px; flex-shrink:0; }
+.sd-name { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:14px; color:var(--dark); }
+.sd-sub { font-size:10px; color:#888; }
+
+.topbar-right { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.expiry-badge { font-size:10px; font-weight:500; padding:4px 10px; border-radius:20px; background:#FFF8E1; color:#F57F17; border:0.5px solid #FFE082; white-space:nowrap; }
+
+/* ── NEW: Language toggle ────────────────────────────────── */
+.lang-pill { display:flex; border:0.5px solid var(--border); border-radius:14px; overflow:hidden; }
+.lang-btn { background:transparent; border:none; color:#888; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:1px; padding:4px 12px; cursor:pointer; transition:all 0.2s; }
+.lang-btn.active { background:var(--green); color:var(--cream); }
+
+/* PAGES */
+.page { display:none; padding:28px; }
+.page.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.page.active { animation:fadeIn 0.18s ease; }
+
+/* ENTITY HEADER */
+.entity-header { background:var(--green); border-radius:8px; padding:20px 24px 18px; margin-bottom:20px; display:grid; grid-template-columns:1fr auto; gap:16px; align-items:start; }
+.eh-rank { font-size:8.5px; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; color:var(--pale); margin-bottom:6px; }
+.eh-name { font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:400; font-style:italic; color:var(--cream); line-height:1.1; margin-bottom:3px; }
+.eh-authority { font-size:12px; font-weight:300; color:var(--pale); margin-bottom:3px; }
+.eh-publication { font-family:'Cormorant Garamond',serif; font-size:11px; font-style:italic; color:rgba(168,213,162,0.8); margin-bottom:6px; }
+.eh-etymology { font-family:'Cormorant Garamond',serif; font-size:12px; font-style:italic; color:#D4EED4; line-height:1.5; margin-bottom:10px; }
+.eh-pills { display:flex; flex-wrap:wrap; gap:5px; }
+.eh-pill { font-size:10px; font-weight:300; padding:3px 10px; border-radius:20px; border:0.5px solid rgba(124,191,126,0.5); color:#D4EED4; }
+.eh-pill.malay { background:rgba(124,191,126,0.15); border-color:var(--accent); }
+.eh-stats { display:flex; flex-direction:column; gap:6px; }
+.eh-stat { background:rgba(0,0,0,0.2); border:0.5px solid rgba(198,166,48,0.3); border-radius:5px; padding:8px 14px; text-align:center; min-width:90px; }
+.eh-stat-num { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:500; color:var(--gold); line-height:1; margin-bottom:2px; }
+.eh-stat-lbl { font-size:8px; letter-spacing:0.1em; text-transform:uppercase; color:var(--pale); }
+
+/* SECTION LABELS */
+.sec-tab { background:var(--green); color:var(--cream); font-size:9px; font-weight:500; letter-spacing:0.14em; text-transform:uppercase; padding:6px 14px; border-radius:3px; margin:20px 0 10px; }
+.sec-lbl { font-size:9px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:var(--green); padding-bottom:5px; border-bottom:0.5px solid var(--border); margin:16px 0 10px; }
+
+/* FEATURE GRID */
+.feat-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:16px; }
+.feat-cell { padding:9px 12px; background:var(--light); border-left:2px solid var(--accent); border-radius:0 3px 3px 0; }
+.feat-k { font-size:8.5px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#4A7A4C; margin-bottom:3px; }
+.feat-v { font-size:12.5px; font-weight:400; color:var(--txt); font-family:'Cormorant Garamond',serif; line-height:1.4; }
+.feat-v.empty { color:#bbb; font-style:italic; font-size:11px; }
+
+/* BODY TEXT */
+.body-txt { font-family:'Cormorant Garamond',serif; font-size:14px; font-weight:400; line-height:1.8; color:var(--txt); margin-bottom:14px; }
+.body-txt.empty { color:#aaa; font-style:italic; font-size:12px; }
+
+/* SPECIES CARDS GRID */
+.species-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:10px; margin-top:14px; }
+.spp-card { background:white; border:0.5px solid var(--border); border-radius:6px; overflow:hidden; cursor:pointer; transition:all 0.12s; box-shadow:0 1px 3px rgba(44,90,48,0.05); }
+.spp-card:hover { border-color:var(--accent); box-shadow:0 3px 10px rgba(44,90,48,0.12); transform:translateY(-1px); }
+.spp-card-header { background:var(--green); padding:10px 12px 8px; }
+.spp-card-name { font-family:'Cormorant Garamond',serif; font-size:14px; font-style:italic; font-weight:400; color:var(--cream); line-height:1.2; margin-bottom:2px; }
+.spp-card-auth { font-size:9px; font-weight:300; color:var(--pale); }
+.spp-card-body { padding:9px 12px; }
+.spp-card-local { font-size:11px; color:#4A7A4C; margin-bottom:4px; }
+.spp-card-tags { display:flex; gap:4px; flex-wrap:wrap; }
+.tag { font-size:9px; padding:2px 7px; border-radius:20px; font-weight:500; }
+.tag-green { background:#E8F5E9; color:#1B5E20; }
+.tag-amber { background:#FFF3E0; color:#E65100; }
+.tag-red { background:#FFEBEE; color:#B71C1C; }
+.tag-blue { background:#E3F2FD; color:#0D47A1; }
+.tag-grey { background:#F5F5F5; color:#757575; }
+
+/* BREADCRUMB */
+.spp-breadcrumb { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--mid); margin-bottom:16px; }
+.spp-breadcrumb span { cursor:pointer; }
+.spp-breadcrumb span:hover { text-decoration:underline; color:var(--green); }
+.spp-breadcrumb .sep { color:#ccc; }
+.spp-breadcrumb .current { color:var(--txt); font-style:italic; cursor:default; }
+.spp-breadcrumb .current:hover { text-decoration:none; }
+
+/* SYNONYM BOX */
+.synonym-box { background:#FFFDE7; border:0.5px solid #FFE082; border-radius:4px; padding:10px 14px; font-family:'Cormorant Garamond',serif; font-size:13px; font-style:italic; color:#5D4037; line-height:1.6; margin-bottom:4px; }
+
+/* GENERA GRID */
+.genera-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; margin-top:14px; }
+.genus-card { background:white; border:0.5px solid var(--border); border-radius:6px; overflow:hidden; cursor:pointer; transition:all 0.12s; }
+.genus-card:hover { border-color:var(--accent); transform:translateY(-1px); box-shadow:0 3px 10px rgba(44,90,48,0.1); }
+.genus-card-hd { background:var(--green); padding:10px 12px 8px; }
+.gc-name { font-family:'Cormorant Garamond',serif; font-size:16px; font-style:italic; color:var(--cream); }
+.gc-auth { font-size:9px; color:var(--pale); margin-top:2px; }
+.genus-card-bd { padding:9px 12px; }
+.gc-spp { font-size:11px; color:var(--mid); margin-bottom:3px; }
+.gc-desc { font-size:11px; font-style:italic; color:#666; line-height:1.4; }
+
+/* PAGE FOOTER */
+.page-footer { border-top:0.5px solid var(--border); padding-top:12px; margin-top:24px; }
+
+/* ── NEW: Species detail tabs ────────────────────────────── */
+.sp-tabs { display:flex; border-bottom:1px solid var(--border); margin-bottom:20px; gap:0; background:white; border-radius:6px 6px 0 0; overflow:hidden; }
+.sp-tab { padding:10px 20px; font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:#888; cursor:pointer; border-bottom:2px solid transparent; transition:all 0.18s; white-space:nowrap; }
+.sp-tab:hover { color:var(--green); background:var(--bg); }
+.sp-tab.active { color:var(--green); border-bottom-color:var(--accent); background:var(--light); font-weight:500; }
+.sp-panel { display:none; }
+.sp-panel.active { display:block; }
+
+/* ── NEW: Diagnostic timeline panel ─────────────────────── */
+.diag-timeline { position:relative; padding-left:30px; }
+.diag-timeline::before { content:''; position:absolute; left:10px; top:8px; bottom:8px; width:1.5px; background:linear-gradient(180deg,var(--accent),var(--mid),transparent); }
+.dt-entry { position:relative; margin-bottom:14px; background:var(--light); border:0.5px solid var(--border); border-radius:6px; padding:12px 16px; transition:border-color 0.2s; }
+.dt-entry:hover { border-color:var(--accent); }
+.dt-entry::before { content:''; position:absolute; left:-22px; top:16px; width:11px; height:11px; border-radius:50%; background:var(--accent); border:2px solid white; }
+.dte-icon { font-size:18px; margin-bottom:4px; }
+.dte-label { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:2px; text-transform:uppercase; color:#4A7A4C; margin-bottom:4px; }
+.dte-text { font-family:'Cormorant Garamond',serif; font-size:14px; line-height:1.6; color:var(--txt); }
+
+/* ── NEW: Distribution panel ─────────────────────────────── */
+.dist-layout { display:grid; grid-template-columns:1fr 260px; gap:24px; align-items:start; }
+.state-grid-pm { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-bottom:16px; }
+.state-pill { display:flex; align-items:center; gap:7px; padding:6px 10px; border-radius:20px; border:0.5px solid var(--border); font-family:'Cormorant Garamond',serif; font-size:12.5px; color:#888; background:white; transition:all 0.2s; }
+.state-pill.present { background:var(--ochre-pale); border-color:var(--ochre); color:#6B4010; font-weight:600; }
+.state-dot-pm { width:8px; height:8px; border-radius:50%; background:#E0E0E0; flex-shrink:0; }
+.state-pill.present .state-dot-pm { background:var(--ochre); }
+.pm-map-svg { width:100%; border-radius:6px; background:var(--parch-2); }
+.dist-legend { display:flex; gap:16px; margin-top:10px; }
+.dist-leg-item { display:flex; align-items:center; gap:6px; font-size:10px; color:#888; }
+.dist-leg-dot { width:9px; height:9px; border-radius:50%; }
+
+/* ── NEW: Bilingual panel ─────────────────────────────────── */
+.bilingual-layout { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.bil-col { border-radius:6px; padding:18px 20px; }
+.bil-col.en-col { background:var(--light); border:0.5px solid var(--border); }
+.bil-col.bm-col { background:linear-gradient(135deg,#FBF5E8 0%,#F5EDD8 100%); border:0.5px solid var(--ochre); }
+.bil-badge { display:inline-block; font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; padding:3px 10px; border-radius:10px; margin-bottom:14px; }
+.bil-badge.en { background:var(--dark); color:var(--cream); }
+.bil-badge.bm { background:var(--ochre); color:white; }
+.bil-field { margin-bottom:13px; }
+.bil-label { font-family:'DM Mono',monospace; font-size:7.5px; letter-spacing:2px; text-transform:uppercase; color:#888; margin-bottom:4px; }
+.bil-text { font-family:'Cormorant Garamond',serif; font-size:13.5px; line-height:1.65; color:var(--txt); }
+.bil-text.bm { font-style:italic; color:#5A3010; }
+
+/* MISC */
+.empty-state { text-align:center; padding:48px 24px; color:#aaa; }
+.empty-icon { font-size:36px; margin-bottom:12px; }
+.empty-msg { font-size:13px; font-style:italic; }
+.loading { text-align:center; padding:40px; color:var(--mid); font-style:italic; font-size:13px; }
+.toast { position:fixed; bottom:20px; right:20px; padding:11px 20px; border-radius:6px; font-size:12px; font-weight:500; z-index:999; display:none; }
+.toast.success { background:var(--green); color:var(--cream); }
+.toast.error { background:var(--red); color:white; }
+
+/* ══ RESPONSIVE ══════════════════════════════════════════════════════
+   Desktop : > 900px  (default — sidebar always visible)
+   Tablet+Mobile : ≤ 900px — sidebar becomes slide-over panel
+═══════════════════════════════════════════════════════════════════ */
+
+/* Hamburger button — hidden on desktop */
+.menu-btn {
+  display:none; background:none; border:none;
+  color:var(--accent); font-size:24px; cursor:pointer;
+  padding:0 2px; line-height:1; flex-shrink:0;
+}
+/* Dark overlay behind open sidebar */
+.sidebar-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.55); z-index:90;
+}
+.sidebar-overlay.open { display:block; }
+
+@media (max-width:900px) {
+  /* Sidebar: fixed slide-over, hidden off-screen by default */
+  .sidebar {
+    position:fixed; top:0; left:0;
+    width:280px; height:100vh;
+    z-index:100; overflow-y:auto;
+    transform:translateX(-100%);
+    transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);
+  }
+  .sidebar.open { transform:translateX(0); }
+
+  /* Main content fills full width */
+  #screen-app { flex-direction:column; }
+  .main-content { width:100%; }
+
+  /* Show hamburger */
+  .menu-btn { display:block; }
+
+  /* Top bar */
+  .main-topbar { padding:8px 12px; gap:8px; }
+  .search-wrap { flex:1; max-width:unset; }
+  .expiry-badge { display:none; }
+
+  /* Pages */
+  .page { padding:16px; }
+
+  /* Entity header — single column */
+  .entity-header { grid-template-columns:1fr; gap:10px; padding:16px; }
+  .eh-name { font-size:22px; }
+  .eh-stats { flex-direction:row; flex-wrap:wrap; gap:8px; }
+  .eh-stat { min-width:70px; }
+
+  /* Grids */
+  .feat-grid { grid-template-columns:1fr 1fr; }
+  .genera-grid { grid-template-columns:repeat(2,1fr); }
+  .species-grid { grid-template-columns:repeat(2,1fr); }
+  .bilingual-layout { grid-template-columns:1fr; }
+  .dist-layout { grid-template-columns:1fr; }
+  .state-grid-pm { grid-template-columns:repeat(3,1fr); }
+  .pm-map-svg { display:none; }
+
+  /* Tabs */
+  .sp-tabs { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .sp-tab { padding:10px 14px; font-size:8.5px; }
+}
+
+@media (max-width:600px) {
+  .login-card { padding:28px 20px; }
+  .login-title { font-size:22px; }
+  .main-topbar { padding:8px 10px; }
+  .lang-pill .lang-btn { padding:4px 9px; font-size:9px; }
+  .page { padding:12px; }
+  .entity-header { padding:12px; }
+  .eh-name { font-size:19px; }
+  .eh-etymology { display:none; }
+  .eh-stat { min-width:60px; padding:5px 8px; }
+  .eh-stat-num { font-size:15px; }
+  .eh-stat-lbl { font-size:7px; }
+  .feat-grid { grid-template-columns:1fr; }
+  .genera-grid { grid-template-columns:1fr 1fr; }
+  .species-grid { grid-template-columns:1fr; }
+  .state-grid-pm { grid-template-columns:repeat(2,1fr); }
+  .sp-tab { padding:9px 10px; font-size:8px; letter-spacing:0.5px; }
+  .body-txt { font-size:13px; }
+  .feat-v { font-size:12px; }
+  .feat-k { font-size:8px; }
+  .bil-col { padding:14px 16px; }
+  .bil-text { font-size:13px; }
+  .diag-timeline { padding-left:22px; }
+  .dte-text { font-size:13px; }
+  .spp-breadcrumb { font-size:10px; flex-wrap:wrap; }
+  .sec-tab { font-size:8px; padding:5px 10px; }
+  #page-genera h2, #page-all-species h2 { font-size:18px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ═══════════════════════════════════════════════════════════ -->
+<div class="screen active" id="screen-login">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="login-series">Series I · Dipterocarpaceae</div>
+      <div class="login-title">Trees of<br><em>Peninsular Malaysia</em></div>
+      <div class="login-sub">M. Nazre Saleh · Universiti Putra Malaysia</div>
+    </div>
+    <div class="login-divider"></div>
+    <label class="login-label">Email Address</label>
+    <input type="email" class="login-input" id="login-email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')loginWithKey()">
+    <label class="login-label">Licence Key</label>
+    <input type="text" class="login-input" id="login-key" placeholder="XXXX-XXXX-XXXX" onkeydown="if(event.key==='Enter')loginWithKey()">
+    <button class="login-btn" onclick="loginWithKey()" id="login-btn">Access Now</button>
+    <div class="login-error" id="login-error"></div>
+    <div class="login-free">Student? <a onclick="downloadFree()">Download free preview edition →</a></div>
+  </div>
+</div>
+
+<!-- ══ EXPIRED ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-expired">
+  <div class="expired-card">
+    <div class="expired-icon">🌿</div>
+    <div class="expired-title">Access Expired</div>
+    <div class="expired-msg">Your access to <em>Trees of Peninsular Malaysia</em> has expired.<br>Renew to continue accessing the complete species database.</div>
+    <button class="expired-btn" onclick="window.open('mailto:nazre@upm.edu.my?subject=Renewal Request','_blank')">Request Renewal</button>
+    <div class="expired-logout" onclick="logout()">Sign out</div>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ═════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sb-series">Series I · Dipterocarpaceae</div>
+      <div class="sb-title">Trees of<br><em>Peninsular Malaysia</em></div>
+    </div>
+    <div class="sb-user">
+      <div class="sb-user-name" id="sb-name">—</div>
+      <div class="sb-user-tier" id="sb-tier">—</div>
+      <div class="sb-expiry" id="sb-expiry">—</div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-section-hd">Navigate</div>
+      <div class="sb-item active" onclick="showPage('family',this)" id="nav-family">Dipterocarpaceae <span class="sb-count">Family</span></div>
+      <div class="sb-item" onclick="showPage('genera',this)" id="nav-genera">All Genera <span class="sb-count" id="nav-genera-count">13</span></div>
+      <div class="sb-item" onclick="showPage('all-species',this)" id="nav-all-species">All Species <span class="sb-count" id="nav-spp-count">160</span></div>
+      <div class="sb-section-hd" style="margin-top:8px">Genera</div>
+      <div class="sb-genus-list" id="sb-genus-list"><div style="font-size:10px;color:#555;padding:6px 0">Loading…</div></div>
+      <!-- NEW: Conservation filter -->
+      <div class="sb-section-hd" style="margin-top:8px">Filter by Status</div>
+      <div class="sb-filter-chips">
+        <div class="sb-chip active" data-status="all" onclick="setStatusFilter('all',this)"><span class="sb-chip-dot" style="background:var(--accent)"></span>All species</div>
+        <div class="sb-chip" data-status="EN" onclick="setStatusFilter('EN',this)"><span class="sb-chip-dot" style="background:#E07070"></span>Endangered</div>
+        <div class="sb-chip" data-status="VU" onclick="setStatusFilter('VU',this)"><span class="sb-chip-dot" style="background:#D4A820"></span>Vulnerable</div>
+        <div class="sb-chip" data-status="NT" onclick="setStatusFilter('NT',this)"><span class="sb-chip-dot" style="background:#6090C0"></span>Near Threatened</div>
+        <div class="sb-chip" data-status="LC" onclick="setStatusFilter('LC',this)"><span class="sb-chip-dot" style="background:#60A870"></span>Least Concern</div>
+      </div>
+    </div>
+    <div class="sb-logout" onclick="logout()">← Sign out</div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <!-- TOP BAR -->
+    <!-- Sidebar overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <div class="main-topbar">
+      <button class="menu-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="text" id="global-search" placeholder="Search species, genus, local name…" oninput="globalSearch(this.value)" onkeydown="if(event.key==='Escape')closeSearch()" autocomplete="off">
+        <div class="search-dropdown" id="search-dropdown"></div>
+      </div>
+      <div class="topbar-right">
+        <!-- NEW: Language toggle -->
+        <div class="lang-pill">
+          <button class="lang-btn active" id="btnEN" onclick="setLang('en')">EN</button>
+          <button class="lang-btn" id="btnBM" onclick="setLang('bm')">BM</button>
+        </div>
+        <span class="expiry-badge" id="topbar-expiry">—</span>
+      </div>
+    </div>
+
+    <!-- FAMILY PAGE -->
+    <div class="page active" id="page-family">
+      <div class="entity-header">
+        <div>
+          <div class="eh-rank">Family</div>
+          <div class="eh-name">Dipterocarpaceae</div>
+          <div class="eh-authority">Blume</div>
+          <div class="eh-publication">[Carl Ludwig von Blume in Bijdragen tot de flora van Nederlandsch Indië, Vol. 13 (1825) p. 222]</div>
+          <div class="eh-etymology">Dipterocarpaceae — from Greek <em>di-</em> (two) + <em>pteron</em> (wing) + <em>karpos</em> (fruit); referring to the characteristic winged fruits</div>
+          <div class="eh-pills">
+            <span class="eh-pill malay">Keluarga Meranti</span>
+            <span class="eh-pill">Two-wing Fruit Family</span>
+            <span class="eh-pill">Dipterocarp Family</span>
+          </div>
+        </div>
+        <div class="eh-stats">
+          <div class="eh-stat"><div class="eh-stat-num" id="fam-genera-count">13</div><div class="eh-stat-lbl">Genera in PM</div></div>
+          <div class="eh-stat"><div class="eh-stat-num" id="fam-spp-count">160</div><div class="eh-stat-lbl">Species in PM</div></div>
+        </div>
+      </div>
+      <div class="sec-tab">Description</div>
+      <div class="body-txt" id="fam-desc-en">The Dipterocarpaceae are the most ecologically dominant family of trees in the lowland and hill rainforests of Peninsular Malaysia, forming a conspicuous emergent layer 40–70 m above the forest floor. The family comprises approximately 680–700 species worldwide, the great majority concentrated in the Malesian region.</div>
+      <div class="body-txt" id="fam-desc-bm" style="display:none">Dipterocarpaceae merupakan keluarga pokok yang paling dominan secara ekologi di hutan hujan tanah rendah dan bukit Semenanjung Malaysia, membentuk lapisan emergent yang ketara 40–70 m di atas lantai hutan. Keluarga ini merangkumi kira-kira 680–700 spesies di seluruh dunia, majoriti tertumpu di rantau Malesia.</div>
+      <div class="sec-lbl">Diagnostic Characters</div>
+      <div class="body-txt" id="fam-diag-en">Trees, rarely shrubs; resin canals present in bark and wood. Leaves simple, alternate, stipules caducous. Flowers bisexual, actinomorphic, 5-merous; petals contorted in bud; stamens 5–150; ovary superior, 3-locular. Fruit a 1-seeded indehiscent nut with 2–5 enlarged persistent calyx wings.</div>
+      <div class="body-txt" id="fam-diag-bm" style="display:none">Pokok, jarang belukar; saluran resin terdapat pada kulit kayu dan kayu. Daun tunggal, berselang-seli, stipul luruh. Bunga biseksual, aktinomorfik, 5-merous; helai mahkota terpintal dalam kuncup; benang sari 5–150; bakal buah superior, 3-lokular. Buah nut 1-biji dengan 2–5 sayap kelopak yang membesar dan kekal.</div>
+      <div class="feat-grid">
+        <div class="feat-cell"><div class="feat-k">Order / Order</div><div class="feat-v">Malvales</div></div>
+        <div class="feat-cell"><div class="feat-k">Genera in PM / Genus di SM</div><div class="feat-v" id="fc-genera">13</div></div>
+        <div class="feat-cell"><div class="feat-k">Species in PM / Spesies di SM</div><div class="feat-v" id="fc-spp">160</div></div>
+        <div class="feat-cell"><div class="feat-k">Fruit type / Jenis buah</div><div class="feat-v">Winged nut / Nut bersayap (2–5 wings)</div></div>
+        <div class="feat-cell"><div class="feat-k">Resin</div><div class="feat-v">Present in bark & wood</div></div>
+        <div class="feat-cell"><div class="feat-k">Leaves / Daun</div><div class="feat-v">Simple, alternate / Tunggal, berselang-seli</div></div>
+      </div>
+      <div class="sec-tab" id="fam-dist-tab">Distribution and Habitat</div>
+      <div class="body-txt" id="fam-dist-en">Dipterocarps dominate Mixed Dipterocarp Forest (MDF) from sea level to 1,200 m. The family exhibits supra-annual community-level mast flowering triggered by El Niño drought, occurring every 3–7 years. Seeds are recalcitrant with very short viability.</div>
+      <div class="body-txt" id="fam-dist-bm" style="display:none">Dipterokarp mendominasi Hutan Dipterokarp Campuran (MDF) dari paras laut hingga 1,200 m. Keluarga ini mempamerkan pembungaan mast peringkat komuniti supra-tahunan yang dicetuskan oleh kemarau El Niño, berlaku setiap 3–7 tahun. Biji benih bersifat rekalsitran dengan viabiliti yang sangat singkat.</div>
+      <div class="sec-tab">Genera of Peninsular Malaysia</div>
+      <div class="genera-grid" id="family-genera-grid"><div class="loading">Loading genera…</div></div>
+      <div class="page-footer">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:11px;font-style:italic;color:#888">
+          Blume (1825), Bijdr. fl. Ned. Ind. 13: 222. — Ashton (1982), Fl. Males. 9(2). — Symington (1943), Foresters Manual of Dipterocarps. — POWO (2026).
+        </div>
+      </div>
+    </div>
+
+    <!-- GENERA LIST PAGE -->
+    <div class="page" id="page-genera">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--green);margin-bottom:4px">Genera of Peninsular Malaysia</h2>
+      <p style="font-size:12px;color:#888;margin-bottom:4px">13 genera · Dipterocarpaceae</p>
+      <div class="genera-grid" id="genera-list-grid"><div class="loading">Loading…</div></div>
+    </div>
+
+    <!-- ALL SPECIES PAGE -->
+    <div class="page" id="page-all-species">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--green);margin-bottom:4px">All Species</h2>
+      <p style="font-size:12px;color:#888;margin-bottom:16px" id="all-spp-subtitle">Loading…</p>
+      <div class="species-grid" id="all-species-grid"><div class="loading">Loading…</div></div>
+    </div>
+
+    <!-- GENUS DETAIL PAGE -->
+    <div class="page" id="page-genus">
+      <div class="entity-header" id="genus-header-block">
+        <div>
+          <div class="eh-rank" id="genus-rank">Genus</div>
+          <div class="eh-name" id="genus-name">—</div>
+          <div class="eh-authority" id="genus-auth">—</div>
+          <div class="eh-etymology" id="genus-etymology"></div>
+          <div class="eh-pills" id="genus-pills"></div>
+        </div>
+        <div class="eh-stats" id="genus-stats"></div>
+      </div>
+      <div class="sec-tab" id="genus-desc-tab">Description</div>
+      <div class="body-txt" id="genus-desc">—</div>
+      <div class="sec-lbl" id="genus-chars-lbl">Key Characters</div>
+      <div class="feat-grid" id="genus-feat-grid"></div>
+      <div class="sec-tab" id="genus-spp-tab">Species</div>
+      <div class="species-grid" id="genus-species-grid"><div class="loading">Loading…</div></div>
+    </div>
+
+    <!-- SPECIES DETAIL PAGE -->
+    <div class="page" id="page-species">
+      <div class="spp-breadcrumb" id="spp-breadcrumb"></div>
+      <div class="entity-header" id="spp-header-block">
+        <div>
+          <div class="eh-rank" id="spp-rank">Species</div>
+          <div class="eh-name" id="spp-name">—</div>
+          <div class="eh-authority" id="spp-auth">—</div>
+          <div class="eh-publication" id="spp-publication"></div>
+          <div class="eh-pills" id="spp-pills"></div>
+        </div>
+        <div class="eh-stats" id="spp-stats"></div>
+      </div>
+
+      <!-- NEW: Tab bar -->
+      <div class="sp-tabs">
+        <div class="sp-tab active" data-tab="description" onclick="switchSpTab('description')">Description</div>
+        <div class="sp-tab" data-tab="diagnostic" onclick="switchSpTab('diagnostic')">Diagnostic</div>
+        <div class="sp-tab" data-tab="distribution" onclick="switchSpTab('distribution')">Distribution</div>
+        <div class="sp-tab" data-tab="bilingual" onclick="switchSpTab('bilingual')">EN / BM</div>
+      </div>
+
+      <!-- Panel: Description (original layout preserved) -->
+      <div class="sp-panel active" id="spanel-description">
+        <div id="spp-synonym-wrap"></div>
+        <div class="feat-grid" id="spp-feat-grid"></div>
+        <div class="sec-lbl" id="spp-desc-lbl">Description</div>
+        <div class="body-txt" id="spp-description">—</div>
+        <div class="sec-lbl" id="spp-eco-lbl">Ecological Notes</div>
+        <div class="body-txt" id="spp-ecological">—</div>
+        <div class="sec-lbl" id="spp-econ-lbl">Economic Importance</div>
+        <div class="body-txt" id="spp-economic">—</div>
+      </div>
+
+      <!-- Panel: Diagnostic (NEW) -->
+      <div class="sp-panel" id="spanel-diagnostic">
+        <div class="diag-timeline" id="diag-timeline-content"></div>
+      </div>
+
+      <!-- Panel: Distribution (NEW) -->
+      <div class="sp-panel" id="spanel-distribution">
+        <div class="dist-layout" id="dist-layout-content">
+          <div>
+            <div class="sec-lbl">Distribution — Peninsular Malaysia</div>
+            <div class="state-grid-pm" id="state-grid-pm"></div>
+            <div class="dist-legend">
+              <div class="dist-leg-item"><span class="dist-leg-dot" style="background:var(--ochre)"></span>Present</div>
+              <div class="dist-leg-item"><span class="dist-leg-dot" style="background:#E0E0E0"></span>Not recorded</div>
+            </div>
+            <div style="margin-top:16px">
+              <div class="sec-lbl">Habitat</div>
+              <div class="body-txt" id="dist-habitat-text">—</div>
+            </div>
+          </div>
+          <div>
+            <svg class="pm-map-svg" viewBox="0 0 240 310" xmlns="http://www.w3.org/2000/svg" id="pm-map-svg"></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel: Bilingual EN/BM (NEW) -->
+      <div class="sp-panel" id="spanel-bilingual">
+        <div class="bilingual-layout" id="bilingual-content"></div>
+      </div>
+    </div>
+
+    <!-- SEARCH RESULTS PAGE -->
+    <div class="page" id="page-search">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--green);margin-bottom:16px" id="search-results-title">Search Results</h2>
+      <div class="species-grid" id="search-results-grid"></div>
+    </div>
+  </div><!-- /main-content -->
+</div><!-- /screen-app -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ SUPABASE CONFIG ════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://xrntnarchlglhllvlrnv.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhybnRuYXJjaGxnbGhsbHZscm52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTU4MzksImV4cCI6MjA4MDk5MTgzOX0.Q0PjW5dMU07EDoR-GGDpIjATlSC5AJxNeEdOlYaO96w';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+const TBL_SPECIES  = 'dipterocarp_species_2025_12_11_02_08';
+const TBL_GENERA   = 'dipterocarp_genera_2025_12_11_02_08';
+const TBL_SYNONYMS = 'dipterocarp_synonyms_2025_12_13_08_35';
+const TBL_DIST     = 'distribution_details_2025_12_11_02_08';
+const TBL_ACCESS   = 'user_access';
+
+// ══ STATE ══════════════════════════════════════════════════════════════
+let lang          = 'en';
+let statusFilter  = 'all';
+let currentGenus  = null;
+let currentSpp    = null;
+let allSpecies    = [];
+let allGenera     = [];
+let userData      = null;
+
+const PM_STATES = ['Perlis','Kedah','Penang','Perak','Kelantan','Terengganu','Pahang','Selangor','KL','N.Sembilan','Melaka','Johor'];
+
+// ══ LANGUAGE ═══════════════════════════════════════════════════════════
+function setLang(l) {
+  lang = l;
+  document.getElementById('btnEN').classList.toggle('active', l==='en');
+  document.getElementById('btnBM').classList.toggle('active', l==='bm');
+  // Toggle family page bilingual elements
+  ['fam-desc-en','fam-diag-en','fam-dist-en'].forEach(id => {
+    document.getElementById(id).style.display = l==='en' ? '' : 'none';
+  });
+  ['fam-desc-bm','fam-diag-bm','fam-dist-bm'].forEach(id => {
+    document.getElementById(id).style.display = l==='bm' ? '' : 'none';
+  });
+  // Refresh active genus/species if open
+  const activePage = document.querySelector('.page.active')?.id;
+  if (activePage === 'page-genus' && currentGenus) renderGenusPage(currentGenus);
+  if (activePage === 'page-species' && currentSpp) renderSpeciesPage(currentSpp);
+}
+
+// ══ LOGIN ══════════════════════════════════════════════════════════════
+async function loginWithKey() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const key   = document.getElementById('login-key').value.trim();
+  const btn   = document.getElementById('login-btn');
+  const err   = document.getElementById('login-error');
+  if (!email || !key) { err.textContent = 'Please enter your email and licence key.'; return; }
+  btn.disabled = true; btn.textContent = 'Checking…'; err.textContent = '';
+  try {
+    const { data, error } = await sb.from(TBL_ACCESS)
+      .select('*').eq('email', email).eq('licence_key', key).eq('is_active', true).single();
+    if (error || !data) { err.textContent = 'Invalid email or licence key. Please try again.'; return; }
+    const expiry = new Date(data.access_expiry);
+    if (expiry < new Date()) { userData = data; showScreen('screen-expired'); return; }
+    userData = data;
+    sessionStorage.setItem('tpm_user', JSON.stringify(data));
+    launchApp(data);
+  } catch(e) { err.textContent = 'Connection error. Please try again.'; }
+  finally { btn.disabled = false; btn.textContent = 'Access Now'; }
+}
+
+function downloadFree() {
+  alert('Free preview edition download link will open here.');
+}
+
+function logout() {
+  sessionStorage.removeItem('tpm_user');
+  userData = null; allSpecies = []; allGenera = [];
+  showScreen('screen-login');
+}
+
+// ══ SCREENS ════════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+async function launchApp(user) {
+  // Populate user info in sidebar
+  document.getElementById('sb-name').textContent = user.full_name || user.email;
+  document.getElementById('sb-tier').textContent = (user.access_tier || '').toUpperCase();
+  const expDate = new Date(user.access_expiry);
+  const daysLeft = Math.ceil((expDate - new Date()) / 86400000);
+  const expiryTxt = `Expires ${expDate.toLocaleDateString('en-MY')} · ${daysLeft}d left`;
+  document.getElementById('sb-expiry').textContent = expiryTxt;
+  document.getElementById('topbar-expiry').textContent = expiryTxt;
+  showScreen('screen-app');
+  await Promise.all([loadGenera(), loadSpecies()]);
+}
+
+// ══ DATA LOADING ═══════════════════════════════════════════════════════
+async function loadGenera() {
+  const { data } = await sb.from(TBL_GENERA).select('*').order('genus_name');
+  if (!data) return;
+  allGenera = data;
+  document.getElementById('nav-genera-count').textContent = data.length;
+  document.getElementById('fam-genera-count').textContent = data.length;
+  document.getElementById('fc-genera').textContent = data.length;
+  // Sidebar genus list
+  document.getElementById('sb-genus-list').innerHTML = data.map(g =>
+    `<div class="sb-genus-item" id="sb-g-${g.id}" onclick="loadGenusPage('${g.id}')">${g.genus_name}<span style="font-size:9px;color:rgba(168,213,162,0.4);font-style:normal">${g.species_count_peninsular||'—'}</span></div>`
+  ).join('');
+  // Family genera grid
+  document.getElementById('family-genera-grid').innerHTML = data.map(g =>
+    `<div class="genus-card" onclick="loadGenusPage('${g.id}')">
+      <div class="genus-card-hd"><div class="gc-name">${g.genus_name}</div><div class="gc-auth">${g.authority||''}</div></div>
+      <div class="genus-card-bd">
+        <div class="gc-spp">${g.species_count_peninsular||'—'} spp. · ${g.local_names||''}</div>
+        <div class="gc-desc">${(g.description||'').substring(0,80)}…</div>
+      </div>
+    </div>`
+  ).join('');
+  // Genera list page
+  document.getElementById('genera-list-grid').innerHTML = document.getElementById('family-genera-grid').innerHTML;
+}
+
+async function loadSpecies() {
+  const { data } = await sb.from(TBL_SPECIES).select('*').order('scientific_name');
+  if (!data) return;
+  allSpecies = data;
+  const pm = data.filter(s => s.distribution_peninsular);
+  document.getElementById('nav-spp-count').textContent = data.length;
+  document.getElementById('fam-spp-count').textContent = data.length;
+  document.getElementById('fc-spp').textContent = data.length;
+  document.getElementById('all-spp-subtitle').textContent = `${data.length} species · Dipterocarpaceae`;
+  renderSpeciesGrid(document.getElementById('all-species-grid'), data);
+}
+
+function renderSpeciesGrid(container, data) {
+  const filtered = statusFilter === 'all' ? data : data.filter(s => s.conservation_status === statusFilter || s.my_redlist_status === statusFilter);
+  if (!filtered.length) { container.innerHTML = `<div class="empty-state"><div class="empty-icon">🌿</div><div class="empty-msg">No species match this filter.</div></div>`; return; }
+  container.innerHTML = filtered.map(s => {
+    const status = s.my_redlist_status || s.conservation_status || '';
+    const tagClass = {EN:'tag-red',VU:'tag-amber',NT:'tag-blue',LC:'tag-green'}[status] || 'tag-grey';
+    const localName = lang === 'bm' ? (s.local_name_malay || s['local_name_malay'] || '') : (s.local_name_malay || '');
+    return `<div class="spp-card" onclick="loadSpeciesPage('${s.id}')">
+      <div class="spp-card-header">
+        <div class="spp-card-name">${s.scientific_name}</div>
+        <div class="spp-card-auth">${s.authority||''}</div>
+      </div>
+      <div class="spp-card-body">
+        <div class="spp-card-local">${localName}</div>
+        <div class="spp-card-tags">
+          ${status ? `<span class="tag ${tagClass}">${status}</span>` : ''}
+          ${s.forest_type ? `<span class="tag tag-grey">${s.forest_type}</span>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══ GENUS PAGE ═════════════════════════════════════════════════════════
+async function loadGenusPage(genusId) {
+  const genus = allGenera.find(g => g.id === genusId);
+  if (!genus) return;
+  currentGenus = genus;
+  document.querySelectorAll('.sb-genus-item').forEach(el => el.classList.remove('active'));
+  document.getElementById(`sb-g-${genusId}`)?.classList.add('active');
+  await renderGenusPage(genus);
+  showPage('genus');
+}
+
+function renderGenusPage(genus) {
+  document.getElementById('genus-name').textContent = genus.genus_name;
+  document.getElementById('genus-auth').textContent = genus.authority || '';
+  document.getElementById('genus-etymology').textContent = genus.etymology || '';
+  document.getElementById('genus-desc').textContent = (lang === 'bm' && genus.description_bm) ? genus.description_bm : (genus.description || '— No description available.');
+  const pills = [
+    genus.local_names ? `<span class="eh-pill malay">${genus.local_names}</span>` : '',
+    genus.species_count_peninsular ? `<span class="eh-pill">${genus.species_count_peninsular} spp. PM</span>` : '',
+    genus.distribution ? `<span class="eh-pill">${genus.distribution.substring(0,40)}</span>` : '',
+  ].join('');
+  document.getElementById('genus-pills').innerHTML = pills;
+  document.getElementById('genus-stats').innerHTML = `
+    <div class="eh-stat"><div class="eh-stat-num">${genus.species_count_peninsular||'—'}</div><div class="eh-stat-lbl">Spp. in PM</div></div>
+    <div class="eh-stat"><div class="eh-stat-num">${genus.species_count_malaysia||'—'}</div><div class="eh-stat-lbl">Spp. Malaysia</div></div>`;
+  document.getElementById('genus-feat-grid').innerHTML = [
+    ['Local name / Nama tempatan', genus.local_names],
+    ['Habit', genus.habit],
+    ['Forest type / Jenis hutan', genus.forest_type],
+    ['Bark / Kulit kayu', genus.bark],
+    ['Economic importance', genus.economic_importance],
+    ['Conservation', genus.conservation_notes],
+  ].filter(([,v]) => v).map(([k,v]) =>
+    `<div class="feat-cell"><div class="feat-k">${k}</div><div class="feat-v">${v}</div></div>`
+  ).join('');
+  // Load species for this genus
+  const genusSpecies = allSpecies.filter(s => s.genus === genus.genus_name || (s.scientific_name||'').startsWith(genus.genus_name+' '));
+  const grid = document.getElementById('genus-species-grid');
+  if (!genusSpecies.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🌿</div><div class="empty-msg">No species records yet.</div></div>`;
+  } else {
+    renderSpeciesGrid(grid, genusSpecies);
+  }
+}
+
+// ══ SPECIES PAGE ════════════════════════════════════════════════════════
+async function loadSpeciesPage(spId) {
+  const sp = allSpecies.find(s => s.id === spId);
+  if (!sp) return;
+  currentSpp = sp;
+  renderSpeciesPage(sp);
+  showPage('species');
+  switchSpTab('description');
+}
+
+function renderSpeciesPage(sp) {
+  // Breadcrumb
+  const genus = allGenera.find(g => g.genus_name === sp.genus || (sp.scientific_name||'').startsWith(g.genus_name+' '));
+  document.getElementById('spp-breadcrumb').innerHTML = `
+    <span onclick="showPage('family')">Dipterocarpaceae</span>
+    <span class="sep">›</span>
+    ${genus ? `<span onclick="loadGenusPage('${genus.id}')">${genus.genus_name}</span><span class="sep">›</span>` : ''}
+    <span class="current"><em>${sp.scientific_name}</em></span>`;
+
+  // Header
+  document.getElementById('spp-name').textContent = sp.scientific_name;
+  document.getElementById('spp-auth').textContent = sp.authority || '';
+  document.getElementById('spp-publication').textContent = sp.publication || '';
+  const status = sp.my_redlist_status || sp.conservation_status || '';
+  const tagClass = {EN:'tag-red',VU:'tag-amber',NT:'tag-blue',LC:'tag-green'}[status]||'tag-grey';
+  document.getElementById('spp-pills').innerHTML = [
+    sp.local_name_malay ? `<span class="eh-pill malay">${sp.local_name_malay}</span>` : '',
+    status ? `<span class="eh-pill"><span class="tag ${tagClass}" style="font-size:9px">${status}</span></span>` : '',
+    sp.forest_type ? `<span class="eh-pill">${sp.forest_type}</span>` : '',
+  ].join('');
+  document.getElementById('spp-stats').innerHTML = `
+    <div class="eh-stat"><div class="eh-stat-num">${sp.height_range||'—'}</div><div class="eh-stat-lbl">Height</div></div>
+    ${status ? `<div class="eh-stat"><div class="eh-stat-num" style="font-size:14px">${status}</div><div class="eh-stat-lbl">IUCN Status</div></div>` : ''}`;
+
+  // ── Description tab ──
+  document.getElementById('spp-synonym-wrap').innerHTML = '';
+  loadSynonyms(sp.id);
+  document.getElementById('spp-feat-grid').innerHTML = [
+    ['Bark / Kulit kayu', sp.bark_description],
+    ['Leaves / Daun', sp.leaf_description],
+    ['Flowers / Bunga', sp.flower_description],
+    ['Fruit / Buah', sp.fruit_description],
+    ['Height / Tinggi', sp.height_range],
+    ['Elevation / Ketinggian', sp.elevation_range],
+    ['Flowering / Pembungaan', sp.flowering_pattern],
+    ['Forest type / Jenis hutan', sp.forest_type],
+  ].filter(([,v])=>v).map(([k,v])=>
+    `<div class="feat-cell"><div class="feat-k">${k}</div><div class="feat-v">${v}</div></div>`
+  ).join('');
+  document.getElementById('spp-description').textContent = sp.taxonomic_description || sp.diagnostic_characters || '— No description available.';
+  document.getElementById('spp-ecological').textContent = sp.ecological_notes || '— No ecological notes available.';
+  document.getElementById('spp-economic').textContent = sp.economic_importance || '— No economic data available.';
+
+  // ── Diagnostic tab ──
+  document.getElementById('diag-timeline-content').innerHTML = [
+    {icon:'🌳', label:'Bark / Kulit Kayu', val: sp.bark_description},
+    {icon:'🍃', label:'Leaves / Daun', val: sp.leaf_description},
+    {icon:'🌸', label:'Flowers / Bunga', val: sp.flower_description},
+    {icon:'🍂', label:'Fruit / Buah', val: sp.fruit_description},
+    {icon:'🏕️', label:'Habitat', val: sp.habitat},
+    {icon:'🔬', label:'Diagnostic Characters', val: sp.diagnostic_characters},
+    {icon:'📋', label:'Taxonomic Description', val: sp.taxonomic_description},
+  ].filter(d=>d.val).map(d=>`
+    <div class="dt-entry">
+      <div class="dte-icon">${d.icon}</div>
+      <div class="dte-label">${d.label}</div>
+      <div class="dte-text">${d.val}</div>
+    </div>`).join('') || '<div class="empty-state"><div class="empty-icon">🔬</div><div class="empty-msg">Diagnostic data not yet available for this species.</div></div>';
+
+  // ── Distribution tab ──
+  loadDistribution(sp);
+
+  // ── Bilingual tab ──
+  renderBilingualPanel(sp);
+}
+
+async function loadSynonyms(spId) {
+  const { data } = await sb.from(TBL_SYNONYMS).select('*').eq('species_id', spId);
+  if (data && data.length) {
+    document.getElementById('spp-synonym-wrap').innerHTML = `
+      <div class="sec-lbl">Synonyms</div>
+      <div class="synonym-box">${data.map(s => s.synonym_name || s.full_synonym || '').filter(Boolean).join('<br>')}</div>`;
+  }
+}
+
+async function loadDistribution(sp) {
+  // State pills
+  const presentStates = [];
+  ['distribution_peninsular','distribution_sabah','distribution_sarawak'].forEach(f => {
+    if (sp[f]) presentStates.push(...sp[f].split(/[,;]+/).map(s=>s.trim()));
+  });
+  // Try distribution_pm field too
+  if (sp.distribution_pm) presentStates.push(...sp.distribution_pm.split(/[,;]+/).map(s=>s.trim()));
+  // Also query distribution_details table
+  const { data: distData } = await sb.from(TBL_DIST).select('*').eq('species_id', sp.id);
+  if (distData) distData.forEach(d => { if (d.state_name) presentStates.push(d.state_name); });
+
+  document.getElementById('state-grid-pm').innerHTML = PM_STATES.map(st => {
+    const present = presentStates.some(p => p.toLowerCase().includes(st.toLowerCase()) || st.toLowerCase().includes(p.toLowerCase()));
+    return `<div class="state-pill ${present?'present':''}"><span class="state-dot-pm"></span>${st}</div>`;
+  }).join('');
+
+  document.getElementById('dist-habitat-text').textContent = sp.habitat || sp.distribution_peninsular || '— Distribution data not yet available.';
+
+  // SVG map
+  renderPMMap(presentStates);
+}
+
+function renderPMMap(presentStates) {
+  const shapes = [
+    {n:'Perlis', cx:58,cy:26,rx:16,ry:10}, {n:'Kedah', cx:72,cy:54,rx:26,ry:20},
+    {n:'Penang', cx:40,cy:62,rx:13,ry:9},  {n:'Perak', cx:78,cy:105,rx:30,ry:36},
+    {n:'Kelantan', cx:155,cy:65,rx:36,ry:28}, {n:'Terengganu', cx:178,cy:125,rx:26,ry:36},
+    {n:'Pahang', cx:145,cy:178,rx:50,ry:50},  {n:'Selangor', cx:70,cy:178,rx:26,ry:26},
+    {n:'KL', cx:80,cy:190,rx:7,ry:7},
+    {n:'N.Sembilan', cx:82,cy:228,rx:24,ry:18}, {n:'Melaka', cx:82,cy:258,rx:16,ry:12},
+    {n:'Johor', cx:115,cy:288,rx:52,ry:32},
+  ];
+  const svg = document.getElementById('pm-map-svg');
+  svg.innerHTML = `<rect width="240" height="310" fill="#F2EAD8" rx="6"/>` +
+    shapes.map(s => {
+      const present = presentStates.some(p => p.toLowerCase().includes(s.n.toLowerCase()) || s.n.toLowerCase().includes(p.toLowerCase()));
+      return `<ellipse cx="${s.cx}" cy="${s.cy}" rx="${s.rx}" ry="${s.ry}"
+        fill="${present?'#C4882A':'#E0D4C0'}" stroke="${present?'#9B6520':'#C8B898'}"
+        stroke-width="0.8" opacity="${present?'0.9':'0.55'}"/>
+        <text x="${s.cx}" y="${s.cy+3.5}" text-anchor="middle"
+          font-family="DM Sans,sans-serif" font-size="${s.n==='KL'?5:6.5}"
+          fill="${present?'#FAF6ED':'#8B7060'}">${s.n}</text>`;
+    }).join('') +
+    `<text x="120" y="304" text-anchor="middle" font-family="DM Mono,monospace" font-size="6.5" fill="#A09080" letter-spacing="1">PENINSULAR MALAYSIA</text>`;
+}
+
+function renderBilingualPanel(sp) {
+  const fields = [
+    { en: 'Bark', bm: 'Kulit Kayu', val_en: sp.bark_description, val_bm: sp.bark_description },
+    { en: 'Leaves', bm: 'Daun', val_en: sp.leaf_description, val_bm: sp.leaf_description },
+    { en: 'Fruit', bm: 'Buah', val_en: sp.fruit_description, val_bm: sp.fruit_description },
+    { en: 'Habitat', bm: 'Habitat', val_en: sp.habitat, val_bm: sp.habitat },
+    { en: 'Description', bm: 'Penerangan', val_en: sp.taxonomic_description || sp.diagnostic_characters, val_bm: sp.taxonomic_description || sp.diagnostic_characters },
+    { en: 'Economic Use', bm: 'Kegunaan Ekonomi', val_en: sp.economic_importance, val_bm: sp.economic_importance },
+  ].filter(f => f.val_en || f.val_bm);
+
+  document.getElementById('bilingual-content').innerHTML = `
+    <div class="bil-col en-col">
+      <span class="bil-badge en">English</span>
+      ${fields.map(f => f.val_en ? `<div class="bil-field"><div class="bil-label">${f.en}</div><div class="bil-text">${f.val_en}</div></div>` : '').join('')}
+      ${!fields.length ? '<p style="color:#aaa;font-style:italic;font-size:13px">Content not yet available.</p>' : ''}
+    </div>
+    <div class="bil-col bm-col">
+      <span class="bil-badge bm">Bahasa Malaysia</span>
+      ${fields.map(f => f.val_bm ? `<div class="bil-field"><div class="bil-label">${f.bm}</div><div class="bil-text bm">${f.val_bm}</div></div>` : '').join('')}
+      <div style="margin-top:16px;padding:10px;background:rgba(196,136,42,0.08);border-radius:4px;font-family:'Cormorant Garamond',serif;font-size:12px;font-style:italic;color:#8B6020">
+        Terjemahan BM terperinci akan tersedia apabila pangkalan data dikemaskini.<br>
+        <em>Full BM translations available when database is populated.</em>
+      </div>
+    </div>`;
+}
+
+// ══ TAB SWITCHING ══════════════════════════════════════════════════════
+function switchSpTab(tabId) {
+  document.querySelectorAll('.sp-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabId));
+  document.querySelectorAll('.sp-panel').forEach(p => p.classList.toggle('active', p.id === `spanel-${tabId}`));
+}
+
+// ══ PAGE NAVIGATION ════════════════════════════════════════════════════
+function showPage(pageId, navEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(`page-${pageId}`).classList.add('active');
+  if (navEl) {
+    document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+    navEl.classList.add('active');
+  }
+}
+
+// ══ STATUS FILTER ══════════════════════════════════════════════════════
+function setStatusFilter(status, el) {
+  statusFilter = status;
+  document.querySelectorAll('.sb-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  // Refresh visible grids
+  const activePage = document.querySelector('.page.active')?.id;
+  if (activePage === 'page-all-species') renderSpeciesGrid(document.getElementById('all-species-grid'), allSpecies);
+  if (activePage === 'page-genus' && currentGenus) {
+    const genusSpecies = allSpecies.filter(s => s.genus === currentGenus.genus_name || (s.scientific_name||'').startsWith(currentGenus.genus_name+' '));
+    renderSpeciesGrid(document.getElementById('genus-species-grid'), genusSpecies);
+  }
+}
+
+// ══ SEARCH ══════════════════════════════════════════════════════════════
+function globalSearch(q) {
+  const dd = document.getElementById('search-dropdown');
+  if (!q || q.length < 2) { dd.classList.remove('open'); return; }
+  const ql = q.toLowerCase();
+  const results = [];
+  allGenera.forEach(g => {
+    if (g.genus_name.toLowerCase().includes(ql) || (g.local_names||'').toLowerCase().includes(ql)) {
+      results.push({ type:'Genus', name: g.genus_name, sub: g.local_names||'', action: ()=>loadGenusPage(g.id) });
+    }
+  });
+  allSpecies.forEach(s => {
+    if ((s.scientific_name||'').toLowerCase().includes(ql) || (s.local_name_malay||'').toLowerCase().includes(ql) || (s.bark_description||'').toLowerCase().includes(ql)) {
+      results.push({ type:'Species', name: s.scientific_name, sub: s.local_name_malay||'', action: ()=>loadSpeciesPage(s.id) });
+    }
+  });
+  if (!results.length) { dd.innerHTML = `<div class="sd-item"><span style="color:#aaa;font-style:italic;font-size:13px">No results found.</span></div>`; }
+  else {
+    dd.innerHTML = results.slice(0,10).map((r,i) =>
+      `<div class="sd-item" id="sd-${i}" onclick="(${r.action.toString()})();closeSearch()">
+        <span class="sd-type">${r.type}</span>
+        <div><div class="sd-name"><em>${r.name}</em></div><div class="sd-sub">${r.sub}</div></div>
+      </div>`).join('');
+  }
+  dd.classList.add('open');
+}
+
+function closeSearch() {
+  document.getElementById('search-dropdown').classList.remove('open');
+  document.getElementById('global-search').value = '';
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.search-wrap')) closeSearch();
+});
+
+// ══ KEYBOARD SHORTCUTS ═════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeSearch();
+});
+
+// ══ TOAST ══════════════════════════════════════════════════════════════
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type}`;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2800);
+}
+
+// ══ SIDEBAR TOGGLE (mobile/tablet) ════════════════════════════════
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+// Close sidebar when any nav item clicked on mobile
+document.addEventListener('click', e => {
+  if (window.innerWidth <= 900 && (e.target.closest('.sb-item') || e.target.closest('.sb-genus-item'))) {
+    closeSidebar();
+  }
+});
+
+// ══ SESSION RESTORE ════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  const stored = sessionStorage.getItem('tpm_user');
+  if (stored) {
+    try {
+      const u = JSON.parse(stored);
+      if (new Date(u.access_expiry) >= new Date()) { userData = u; launchApp(u); return; }
+    } catch(e) {}
+  }
+  showScreen('screen-login');
+});
+</script>
+</body>
+</html>
