@@ -292,6 +292,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .grid-toolbar {
   display:flex; justify-content:space-between; align-items:center;
   margin-bottom:12px; gap:10px; flex-wrap:wrap;
+  grid-column: 1 / -1;   /* span full width inside CSS grid */
 }
 .gt-count {
   font-size:11px; color:#888; font-style:italic;
@@ -821,7 +822,7 @@ function renderGeneraGrid() {
 
   let inner = '';
   if (viewMode === 'list') {
-    inner = toolbar + `<div class="list-view">` + data.map(g => `
+    inner = toolbar + `<div class="list-view" style="grid-column:1/-1">` + data.map(g => `
       <div class="list-row">
         <div class="lr-name"><em>${g.genus_name}</em></div>
         <div class="lr-local">${g.local_names||''}</div>
@@ -832,7 +833,7 @@ function renderGeneraGrid() {
         </div>
       </div>`).join('') + `</div>`;
   } else {
-    inner = toolbar + `<div class="genera-grid">` + data.map(g => `
+    inner = toolbar + data.map(g => `
       <div class="genus-card" onclick="loadGenusPage('${g.id}')">
         <div class="card-actions">
           <button class="ca-btn" onclick="event.stopPropagation();loadGenusPage('${g.id}',true)" title="Open in new tab">↗ New tab</button>
@@ -842,7 +843,7 @@ function renderGeneraGrid() {
           <div class="gc-spp">${g.species_count_peninsular||'—'} spp. · ${g.local_names||''}</div>
           <div class="gc-desc">${(g.description||'').substring(0,80)}…</div>
         </div>
-      </div>`).join('') + `</div>`;
+      </div>`).join('');
   }
 
   document.getElementById('family-genera-grid').innerHTML = inner;
@@ -875,7 +876,7 @@ function renderSpeciesGrid(container, data, showToolbar=true) {
     </div>` : '';
 
   if (viewMode === 'list') {
-    container.innerHTML = toolbar + `<div class="list-view">` + filtered.map(s => {
+    container.innerHTML = toolbar + `<div class="list-view" style="grid-column:1/-1">` + filtered.map(s => {
       const status = s.my_redlist_status || s.conservation_status || '';
       const tagClass = {EN:'tag-red',VU:'tag-amber',NT:'tag-blue',LC:'tag-green'}[status]||'tag-grey';
       const local = s.local_name_malay || '';
@@ -890,7 +891,7 @@ function renderSpeciesGrid(container, data, showToolbar=true) {
       </div>`;
     }).join('') + `</div>`;
   } else {
-    container.innerHTML = toolbar + `<div class="species-grid">` + filtered.map(s => {
+    container.innerHTML = toolbar + filtered.map(s => {
       const status = s.my_redlist_status || s.conservation_status || '';
       const tagClass = {EN:'tag-red',VU:'tag-amber',NT:'tag-blue',LC:'tag-green'}[status]||'tag-grey';
       const local = s.local_name_malay || '';
@@ -910,7 +911,7 @@ function renderSpeciesGrid(container, data, showToolbar=true) {
           </div>
         </div>
       </div>`;
-    }).join('') + `</div>`;
+    }).join('');
   }
 }
 
