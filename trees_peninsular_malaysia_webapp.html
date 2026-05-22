@@ -274,6 +274,81 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .toast.success { background:var(--green); color:var(--cream); }
 .toast.error { background:var(--red); color:white; }
 
+
+/* ── View toggle (card / list) ───────────────────────────── */
+.view-toggle {
+  display:flex; gap:0; border:0.5px solid var(--border);
+  border-radius:6px; overflow:hidden; flex-shrink:0;
+}
+.vt-btn {
+  background:white; border:none; padding:6px 11px;
+  cursor:pointer; color:#aaa; font-size:14px;
+  transition:all 0.15s; line-height:1;
+}
+.vt-btn.active { background:var(--green); color:white; }
+.vt-btn:hover:not(.active) { background:var(--bg); color:var(--green); }
+
+/* ── Toolbar above grids ─────────────────────────────────── */
+.grid-toolbar {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:12px; gap:10px; flex-wrap:wrap;
+}
+.gt-count {
+  font-size:11px; color:#888; font-style:italic;
+}
+
+/* ── List view ───────────────────────────────────────────── */
+.list-view { display:flex; flex-direction:column; gap:0; }
+.list-row {
+  display:flex; align-items:center; gap:12px;
+  padding:9px 14px; background:white;
+  border-bottom:0.5px solid var(--border);
+  cursor:pointer; transition:background 0.12s;
+  position:relative;
+}
+.list-row:first-child { border-radius:6px 6px 0 0; }
+.list-row:last-child  { border-radius:0 0 6px 6px; border-bottom:none; }
+.list-row:hover { background:var(--bg); }
+.lr-name {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:14px; color:var(--dark); flex:1; min-width:0;
+}
+.lr-local { font-size:11px; color:#888; flex:1; min-width:0; }
+.lr-tags  { display:flex; gap:5px; flex-shrink:0; }
+.lr-action {
+  display:flex; gap:6px; align-items:center; flex-shrink:0; opacity:0;
+  transition:opacity 0.15s;
+}
+.list-row:hover .lr-action { opacity:1; }
+.lr-btn {
+  background:none; border:0.5px solid var(--border); border-radius:4px;
+  padding:3px 8px; font-size:9px; font-family:'DM Sans',sans-serif;
+  color:#666; cursor:pointer; white-space:nowrap; transition:all 0.12s;
+  letter-spacing:0.5px;
+}
+.lr-btn:hover { background:var(--green); color:white; border-color:var(--green); }
+.lr-btn.new-tab { background:rgba(44,90,48,0.06); }
+
+/* Card view — add new-tab button on hover */
+.spp-card, .genus-card { position:relative; }
+.card-actions {
+  position:absolute; top:7px; right:7px;
+  display:flex; gap:4px; opacity:0; transition:opacity 0.15s;
+  z-index:5;
+}
+.spp-card:hover .card-actions,
+.genus-card:hover .card-actions { opacity:1; }
+.ca-btn {
+  background:rgba(0,0,0,0.35); border:none; border-radius:3px;
+  padding:3px 7px; font-size:9px; color:white; cursor:pointer;
+  font-family:'DM Sans',sans-serif; letter-spacing:0.5px;
+  transition:background 0.12s; white-space:nowrap;
+}
+.ca-btn:hover { background:rgba(0,0,0,0.6); }
+
+/* ── Context URL scheme (for deep linking) ───────────────── */
+/* pages are pushed to hash: #family #genus/ID #species/ID   */
+
 /* ══ RESPONSIVE ══════════════════════════════════════════════════════
    Desktop : > 900px  (default — sidebar always visible)
    Tablet+Mobile : ≤ 900px — sidebar becomes slide-over panel
@@ -627,6 +702,8 @@ const TBL_ACCESS   = 'user_access';
 // ══ STATE ══════════════════════════════════════════════════════════════
 let lang          = 'en';
 let statusFilter  = 'all';
+let viewMode      = 'card';   // 'card' | 'list'
+let _historyReady = false;    // browser history guard
 let currentGenus  = null;
 let currentSpp    = null;
 let allSpecies    = [];
@@ -701,6 +778,18 @@ async function launchApp(user) {
   document.getElementById('topbar-expiry').textContent = expiryTxt;
   showScreen('screen-app');
   await Promise.all([loadGenera(), loadSpecies()]);
+  // Enable browser history now that data is loaded
+  _historyReady = true;
+  history.replaceState({ pageId:'family' }, '', '#family');
+  // Handle deep link on load
+  const hash = location.hash;
+  if (hash.startsWith('#genus/')) {
+    const id = hash.replace('#genus/','');
+    if (id) await loadGenusPage(id);
+  } else if (hash.startsWith('#species/')) {
+    const id = hash.replace('#species/','');
+    if (id) await loadSpeciesPage(id);
+  }
 }
 
 // ══ DATA LOADING ═══════════════════════════════════════════════════════
@@ -715,18 +804,49 @@ async function loadGenera() {
   document.getElementById('sb-genus-list').innerHTML = data.map(g =>
     `<div class="sb-genus-item" id="sb-g-${g.id}" onclick="loadGenusPage('${g.id}')">${g.genus_name}<span style="font-size:9px;color:rgba(168,213,162,0.4);font-style:normal">${g.species_count_peninsular||'—'}</span></div>`
   ).join('');
-  // Family genera grid
-  document.getElementById('family-genera-grid').innerHTML = data.map(g =>
-    `<div class="genus-card" onclick="loadGenusPage('${g.id}')">
-      <div class="genus-card-hd"><div class="gc-name">${g.genus_name}</div><div class="gc-auth">${g.authority||''}</div></div>
-      <div class="genus-card-bd">
-        <div class="gc-spp">${g.species_count_peninsular||'—'} spp. · ${g.local_names||''}</div>
-        <div class="gc-desc">${(g.description||'').substring(0,80)}…</div>
-      </div>
-    </div>`
-  ).join('');
-  // Genera list page
-  document.getElementById('genera-list-grid').innerHTML = document.getElementById('family-genera-grid').innerHTML;
+  // Family genera grid + genera list page — shared render function
+  renderGeneraGrid();
+}
+
+function renderGeneraGrid() {
+  const data = allGenera;
+  if (!data.length) return;
+  const toolbar = `<div class="grid-toolbar">
+    <span class="gt-count">${data.length} genera</span>
+    <div class="view-toggle">
+      <button class="vt-btn ${viewMode==='card'?'active':''}" onclick="setViewMode('card')" title="Card view">⊞</button>
+      <button class="vt-btn ${viewMode==='list'?'active':''}" onclick="setViewMode('list')" title="List view">☰</button>
+    </div>
+  </div>`;
+
+  let inner = '';
+  if (viewMode === 'list') {
+    inner = toolbar + `<div class="list-view">` + data.map(g => `
+      <div class="list-row">
+        <div class="lr-name"><em>${g.genus_name}</em></div>
+        <div class="lr-local">${g.local_names||''}</div>
+        <div class="lr-tags"><span class="tag tag-grey">${g.species_count_peninsular||'—'} spp.</span></div>
+        <div class="lr-action">
+          <button class="lr-btn" onclick="loadGenusPage('${g.id}')">Open</button>
+          <button class="lr-btn new-tab" onclick="loadGenusPage('${g.id}',true)" title="Open in new tab">↗</button>
+        </div>
+      </div>`).join('') + `</div>`;
+  } else {
+    inner = toolbar + `<div class="genera-grid">` + data.map(g => `
+      <div class="genus-card" onclick="loadGenusPage('${g.id}')">
+        <div class="card-actions">
+          <button class="ca-btn" onclick="event.stopPropagation();loadGenusPage('${g.id}',true)" title="Open in new tab">↗ New tab</button>
+        </div>
+        <div class="genus-card-hd"><div class="gc-name">${g.genus_name}</div><div class="gc-auth">${g.authority||''}</div></div>
+        <div class="genus-card-bd">
+          <div class="gc-spp">${g.species_count_peninsular||'—'} spp. · ${g.local_names||''}</div>
+          <div class="gc-desc">${(g.description||'').substring(0,80)}…</div>
+        </div>
+      </div>`).join('') + `</div>`;
+  }
+
+  document.getElementById('family-genera-grid').innerHTML = inner;
+  document.getElementById('genera-list-grid').innerHTML = inner;
 }
 
 async function loadSpecies() {
@@ -741,31 +861,74 @@ async function loadSpecies() {
   renderSpeciesGrid(document.getElementById('all-species-grid'), data);
 }
 
-function renderSpeciesGrid(container, data) {
+function renderSpeciesGrid(container, data, showToolbar=true) {
   const filtered = statusFilter === 'all' ? data : data.filter(s => s.conservation_status === statusFilter || s.my_redlist_status === statusFilter);
   if (!filtered.length) { container.innerHTML = `<div class="empty-state"><div class="empty-icon">🌿</div><div class="empty-msg">No species match this filter.</div></div>`; return; }
-  container.innerHTML = filtered.map(s => {
-    const status = s.my_redlist_status || s.conservation_status || '';
-    const tagClass = {EN:'tag-red',VU:'tag-amber',NT:'tag-blue',LC:'tag-green'}[status] || 'tag-grey';
-    const localName = lang === 'bm' ? (s.local_name_malay || s['local_name_malay'] || '') : (s.local_name_malay || '');
-    return `<div class="spp-card" onclick="loadSpeciesPage('${s.id}')">
-      <div class="spp-card-header">
-        <div class="spp-card-name">${s.scientific_name}</div>
-        <div class="spp-card-auth">${s.authority||''}</div>
+
+  const toolbar = showToolbar ? `
+    <div class="grid-toolbar">
+      <span class="gt-count">${filtered.length} species</span>
+      <div class="view-toggle">
+        <button class="vt-btn ${viewMode==='card'?'active':''}" onclick="setViewMode('card',this.closest('.view-toggle').nextElementSibling||this.closest('.grid-toolbar').nextElementSibling)" title="Card view">⊞</button>
+        <button class="vt-btn ${viewMode==='list'?'active':''}" onclick="setViewMode('list',this.closest('.view-toggle').nextElementSibling||this.closest('.grid-toolbar').nextElementSibling)" title="List view">☰</button>
       </div>
-      <div class="spp-card-body">
-        <div class="spp-card-local">${localName}</div>
-        <div class="spp-card-tags">
-          ${status ? `<span class="tag ${tagClass}">${status}</span>` : ''}
-          ${s.forest_type ? `<span class="tag tag-grey">${s.forest_type}</span>` : ''}
+    </div>` : '';
+
+  if (viewMode === 'list') {
+    container.innerHTML = toolbar + `<div class="list-view">` + filtered.map(s => {
+      const status = s.my_redlist_status || s.conservation_status || '';
+      const tagClass = {EN:'tag-red',VU:'tag-amber',NT:'tag-blue',LC:'tag-green'}[status]||'tag-grey';
+      const local = s.local_name_malay || '';
+      return `<div class="list-row">
+        <div class="lr-name"><em>${s.scientific_name}</em></div>
+        <div class="lr-local">${local}</div>
+        <div class="lr-tags">${status?`<span class="tag ${tagClass}">${status}</span>`:''}</div>
+        <div class="lr-action">
+          <button class="lr-btn" onclick="loadSpeciesPage('${s.id}')">Open</button>
+          <button class="lr-btn new-tab" onclick="loadSpeciesPage('${s.id}',true)" title="Open in new tab">↗</button>
         </div>
-      </div>
-    </div>`;
-  }).join('');
+      </div>`;
+    }).join('') + `</div>`;
+  } else {
+    container.innerHTML = toolbar + `<div class="species-grid">` + filtered.map(s => {
+      const status = s.my_redlist_status || s.conservation_status || '';
+      const tagClass = {EN:'tag-red',VU:'tag-amber',NT:'tag-blue',LC:'tag-green'}[status]||'tag-grey';
+      const local = s.local_name_malay || '';
+      return `<div class="spp-card" onclick="loadSpeciesPage('${s.id}')">
+        <div class="card-actions">
+          <button class="ca-btn" onclick="event.stopPropagation();loadSpeciesPage('${s.id}',true)" title="Open in new tab">↗ New tab</button>
+        </div>
+        <div class="spp-card-header">
+          <div class="spp-card-name">${s.scientific_name}</div>
+          <div class="spp-card-auth">${s.authority||''}</div>
+        </div>
+        <div class="spp-card-body">
+          <div class="spp-card-local">${local}</div>
+          <div class="spp-card-tags">
+            ${status?`<span class="tag ${tagClass}">${status}</span>`:''}
+            ${s.forest_type?`<span class="tag tag-grey">${s.forest_type}</span>`:''}
+          </div>
+        </div>
+      </div>`;
+    }).join('') + `</div>`;
+  }
+}
+
+function setViewMode(mode, container) {
+  viewMode = mode;
+  // Re-render whichever grid is active
+  const activePage = document.querySelector('.page.active')?.id;
+  if (activePage === 'page-all-species') renderSpeciesGrid(document.getElementById('all-species-grid'), allSpecies);
+  if (activePage === 'page-genus' && currentGenus) {
+    const gs = allSpecies.filter(s => s.genus === currentGenus.genus_name || (s.scientific_name||'').startsWith(currentGenus.genus_name+' '));
+    renderSpeciesGrid(document.getElementById('genus-species-grid'), gs);
+  }
+  if (activePage === 'page-genera' || activePage === 'page-family') renderGeneraGrid();
 }
 
 // ══ GENUS PAGE ═════════════════════════════════════════════════════════
-async function loadGenusPage(genusId) {
+async function loadGenusPage(genusId, newTab=false) {
+  if (newTab) { window.open(location.pathname + '#genus/' + genusId, '_blank'); return; }
   const genus = allGenera.find(g => g.id === genusId);
   if (!genus) return;
   currentGenus = genus;
@@ -773,6 +936,7 @@ async function loadGenusPage(genusId) {
   document.getElementById(`sb-g-${genusId}`)?.classList.add('active');
   await renderGenusPage(genus);
   showPage('genus');
+  closeSidebar();
 }
 
 function renderGenusPage(genus) {
@@ -810,7 +974,8 @@ function renderGenusPage(genus) {
 }
 
 // ══ SPECIES PAGE ════════════════════════════════════════════════════════
-async function loadSpeciesPage(spId) {
+async function loadSpeciesPage(spId, newTab=false) {
+  if (newTab) { window.open(location.pathname + '#species/' + spId, '_blank'); return; }
   const sp = allSpecies.find(s => s.id === spId);
   if (!sp) return;
   currentSpp = sp;
@@ -973,15 +1138,46 @@ function switchSpTab(tabId) {
   document.querySelectorAll('.sp-panel').forEach(p => p.classList.toggle('active', p.id === `spanel-${tabId}`));
 }
 
-// ══ PAGE NAVIGATION ════════════════════════════════════════════════════
-function showPage(pageId, navEl) {
+// ══ PAGE NAVIGATION + BROWSER HISTORY ══════════════════════════════════
+function showPage(pageId, navEl, skipHistory=false) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(`page-${pageId}`).classList.add('active');
   if (navEl) {
     document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
     navEl.classList.add('active');
   }
+  // Push to browser history so back button works
+  if (_historyReady && !skipHistory) {
+    let hash = '#' + pageId;
+    if (pageId === 'genus'   && currentGenus) hash = '#genus/'   + currentGenus.id;
+    if (pageId === 'species' && currentSpp)   hash = '#species/' + currentSpp.id;
+    history.pushState(
+      { pageId, genusId: currentGenus?.id, spId: currentSpp?.id },
+      '', hash
+    );
+  }
+  // Scroll main content back to top on every navigation
+  document.querySelector('.main-content')?.scrollTo(0, 0);
 }
+
+// Browser back / forward button handler
+window.addEventListener('popstate', async e => {
+  const s = e.state;
+  if (!s) { showPage('family', document.getElementById('nav-family'), true); return; }
+  if (s.pageId === 'species' && s.spId) {
+    const sp = allSpecies.find(x => x.id === s.spId);
+    if (sp) { currentSpp = sp; renderSpeciesPage(sp); showPage('species', null, true); switchSpTab('description'); }
+  } else if (s.pageId === 'genus' && s.genusId) {
+    const g = allGenera.find(x => x.id === s.genusId);
+    if (g) { currentGenus = g; renderGenusPage(g); showPage('genus', null, true); }
+  } else if (s.pageId === 'all-species') {
+    showPage('all-species', document.getElementById('nav-all-species'), true);
+  } else if (s.pageId === 'genera') {
+    showPage('genera', document.getElementById('nav-genera'), true);
+  } else {
+    showPage('family', document.getElementById('nav-family'), true);
+  }
+});
 
 // ══ STATUS FILTER ══════════════════════════════════════════════════════
 function setStatusFilter(status, el) {
