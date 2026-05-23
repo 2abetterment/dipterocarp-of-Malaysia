@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nama Tempatan · Trees of Malaysia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf8f3;
+    --ink: #1a1a18;
+    --ink-2: #4a4a44;
+    --ink-3: #8a8a80;
+    --forest: #2d5a27;
+    --forest-mid: #3d7a35;
+    --forest-light: #e8f0e6;
+    --blue: #334499;
+    --blue-mid: #4455bb;
+    --blue-light: #eef2ff;
+    --blue-border: #b8c4ee;
+    --border: #e0ddd5;
+    --border-strong: #c8c4b8;
+    --white: #ffffff;
+    --radius: 6px;
+    --radius-lg: 10px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+
+  /* NAV */
+  nav {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 0 2.5rem; display: flex;
+    align-items: center; justify-content: space-between; height: 54px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-left { display: flex; align-items: center; gap: 1rem; }
+  .nav-back {
+    font-size: 11px; color: var(--ink-3); text-decoration: none;
+    display: flex; align-items: center; gap: 4px;
+    transition: color 0.15s;
+  }
+  .nav-back:hover { color: var(--ink); }
+  .nav-divider { width: 1px; height: 18px; background: var(--border); }
+  .nav-brand { font-family: 'EB Garamond', serif; font-size: 17px; color: var(--ink); text-decoration: none; }
+  .nav-brand em { color: var(--forest-mid); font-style: italic; }
+  .nav-right { display: flex; align-items: center; gap: 1.5rem; }
+  .nav-lang { display: flex; gap: 3px; }
+  .lang-btn {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.05em;
+    padding: 3px 10px; border-radius: 99px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--ink-3); cursor: pointer; transition: all 0.15s;
+  }
+  .lang-btn.active { background: var(--forest); color: white; border-color: var(--forest); }
+  .nav-meta { font-size: 10px; color: var(--ink-3); text-align: right; line-height: 1.4; }
+
+  /* PAGE HEADER */
+  .page-header {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 2.5rem 2.5rem 2rem;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    flex-wrap: wrap; gap: 1.5rem;
+  }
+  .header-eye {
+    font-size: 9px; font-weight: 500; letter-spacing: 0.14em;
+    color: var(--ink-3); text-transform: uppercase; margin-bottom: 0.5rem;
+  }
+  .header-title {
+    font-family: 'EB Garamond', serif;
+    font-size: 2.2rem; font-weight: 400; line-height: 1.1;
+    letter-spacing: -0.02em; margin-bottom: 0.4rem;
+  }
+  .header-title em { color: var(--blue-mid); font-style: italic; }
+  .header-sub { font-size: 12px; color: var(--ink-3); font-style: italic; }
+  .header-stats { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .stat-pill {
+    background: var(--cream); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 0.7rem 1.1rem;
+    text-align: center; min-width: 80px;
+  }
+  .stat-n {
+    font-family: 'EB Garamond', serif; font-size: 1.6rem;
+    font-weight: 400; color: var(--ink); line-height: 1;
+  }
+  .stat-l { font-size: 10px; color: var(--ink-3); margin-top: 3px; line-height: 1.3; }
+
+  /* TOOLBAR */
+  .toolbar {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 0.9rem 2.5rem;
+    display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+  }
+  .search-wrap { position: relative; flex: 1; min-width: 220px; max-width: 420px; }
+  .search-wrap svg {
+    position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    color: var(--ink-3); pointer-events: none;
+  }
+  .search-input {
+    width: 100%; padding: 9px 12px 9px 34px;
+    font-family: 'DM Sans', sans-serif; font-size: 13px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--cream); color: var(--ink); outline: none;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .search-input:focus { border-color: var(--blue); background: var(--white); }
+  .search-input::placeholder { color: var(--ink-3); }
+  .filter-select {
+    padding: 8px 12px; font-family: 'DM Sans', sans-serif; font-size: 12px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--white); color: var(--ink-2); cursor: pointer; outline: none;
+    transition: border-color 0.15s;
+  }
+  .filter-select:focus { border-color: var(--blue); }
+  .result-count { font-size: 11px; color: var(--ink-3); margin-left: auto; white-space: nowrap; }
+
+  /* MAIN */
+  .main { flex: 1; max-width: 1100px; width: 100%; margin: 0 auto; padding: 1.5rem 2.5rem; }
+
+  /* DETAIL PANEL */
+  .detail-panel {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 1.5rem;
+    margin-bottom: 1.25rem; display: none;
+  }
+  .detail-panel.open { display: block; }
+  .detail-header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; margin-bottom: 1rem;
+  }
+  .detail-sci {
+    font-family: 'EB Garamond', serif; font-size: 1.45rem;
+    font-style: italic; color: var(--ink); font-weight: 400;
+  }
+  .detail-family { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+  .detail-close {
+    font-size: 11px; color: var(--ink-3); cursor: pointer; padding: 4px 9px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: transparent; transition: background 0.15s;
+  }
+  .detail-close:hover { background: var(--cream); }
+  .detail-names { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; }
+  .name-chip {
+    display: flex; flex-direction: column; padding: 8px 12px;
+    background: var(--cream); border: 1px solid var(--border);
+    border-radius: var(--radius); min-width: 140px;
+  }
+  .name-chip.preferred { background: var(--blue-light); border-color: var(--blue-border); }
+  .name-chip.preferred .chip-name { color: var(--blue); }
+  .chip-name { font-size: 13px; font-weight: 500; color: var(--ink); }
+  .chip-meta { font-size: 10px; color: var(--ink-3); margin-top: 3px; line-height: 1.4; }
+  .detail-links { display: flex; gap: 8px; padding-top: 1rem; border-top: 1px solid var(--border); }
+  .detail-link {
+    font-size: 11px; font-weight: 500; padding: 6px 12px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    text-decoration: none; color: var(--ink-2); background: var(--cream);
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .detail-link:hover { background: var(--white); border-color: var(--border-strong); }
+  .detail-link.primary { background: var(--blue-light); border-color: var(--blue-border); color: var(--blue); }
+
+  /* RESULTS TABLE */
+  .results-table {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  thead th {
+    background: var(--cream); padding: 10px 14px;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.07em;
+    color: var(--ink-3); text-transform: uppercase; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th.col-name   { width: 22%; }
+  th.col-sci    { width: 26%; }
+  th.col-region { width: 13%; }
+  th.col-source { width: 31%; }
+  th.col-pref   { width: 8%; text-align: center; }
+  tbody tr { border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f4f2ec; }
+  tbody td { padding: 10px 14px; font-size: 12.5px; color: var(--ink-2); vertical-align: middle; }
+  td.name-cell { font-weight: 500; color: var(--ink); }
+  td.sci-cell  { font-style: italic; font-size: 12px; }
+  td.pref-cell { text-align: center; }
+  .pref-dot {
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; background: var(--forest-mid);
+    title: "Preferred name";
+  }
+  .state-row td {
+    text-align: center; padding: 3rem;
+    color: var(--ink-3); font-size: 13px; font-style: italic;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--white); border-top: 1px solid var(--border);
+    padding: 1rem 2.5rem; display: flex;
+    justify-content: space-between; flex-wrap: wrap; gap: 0.4rem;
+  }
+  footer p { font-size: 10.5px; color: var(--ink-3); }
+
+  @media (max-width: 800px) {
+    .page-header { flex-direction: column; align-items: flex-start; padding: 1.5rem 1.25rem 1.25rem; }
+    .toolbar { padding: 0.75rem 1.25rem; }
+    .main { padding: 1rem 1.25rem; }
+    th.col-region, td:nth-child(4) { display: none; }
+    th.col-pref, td:nth-child(6) { display: none; }
+    nav { padding: 0 1rem; }
+    .nav-meta { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a class="nav-back" href="portal.html">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+      Portal
+    </a>
+    <div class="nav-divider"></div>
+    <a class="nav-brand" href="portal.html">Trees of <em>Malaysia</em></a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-lang">
+      <button class="lang-btn active" onclick="setLang('en',this)">EN</button>
+      <button class="lang-btn" onclick="setLang('bm',this)">BM</button>
+    </div>
+    <p class="nav-meta">Malaysian Forest Botany<br>M. Nazre Saleh · UPM</p>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="header-left">
+    <p class="header-eye" id="lbl-eye">Local name database · All families</p>
+    <h1 class="header-title">Nama Tempatan · <em>Local Names</em></h1>
+    <p class="header-sub" id="lbl-sub">Multi-source documented local names for trees of Malaysia</p>
+  </div>
+  <div class="header-stats">
+    <div class="stat-pill">
+      <div class="stat-n" id="stat-total">—</div>
+      <div class="stat-l" id="lbl-stat1">documented<br>names</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-n" id="stat-species">—</div>
+      <div class="stat-l" id="lbl-stat2">species<br>covered</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-n" id="stat-sources">—</div>
+      <div class="stat-l" id="lbl-stat3">indexed<br>sources</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-n" id="stat-preferred">—</div>
+      <div class="stat-l" id="lbl-stat4">preferred<br>names set</div>
+    </div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input class="search-input" id="search" type="text"
+      placeholder="Search local name or scientific name…" autocomplete="off">
+  </div>
+  <select class="filter-select" id="filter-lang">
+    <option value="">All languages</option>
+  </select>
+  <select class="filter-select" id="filter-region">
+    <option value="">All regions</option>
+    <option value="Peninsular">Peninsular Malaysia</option>
+    <option value="Sabah">Sabah</option>
+    <option value="Sarawak">Sarawak</option>
+  </select>
+  <select class="filter-select" id="filter-type">
+    <option value="">All groups</option>
+    <option value="dipterocarp">Dipterocarpaceae</option>
+    <option value="non_dipterocarp">Non-Dipterocarpaceae</option>
+  </select>
+  <span class="result-count" id="result-count"></span>
+</div>
+
+<div class="main">
+
+  <div class="detail-panel" id="detail-panel">
+    <div class="detail-header">
+      <div>
+        <div class="detail-sci" id="detail-sci">—</div>
+        <div class="detail-family" id="detail-family"></div>
+      </div>
+      <button class="detail-close" onclick="closeDetail()">Close ✕</button>
+    </div>
+    <div class="detail-names" id="detail-names"></div>
+    <div class="detail-links" id="detail-links"></div>
+  </div>
+
+  <div class="results-table">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-name">Local name</th>
+          <th class="col-sci">Scientific name</th>
+          <th class="col-region">Region</th>
+          <th class="col-source">Publication</th>
+          <th class="col-pref">Preferred</th>
+        </tr>
+      </thead>
+      <tbody id="results-body">
+        <tr class="state-row"><td colspan="5">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer>
+  <p>Nama Tempatan Database · Trees of Malaysia · CC-BY 4.0</p>
+  <p>M. Nazre Saleh · Universiti Putra Malaysia · 2025–2026</p>
+</footer>
+
+<script>
+  const SB_URL  = 'https://xrntnarchlglhllvlrnv.supabase.co';
+  const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhybnRuYXJjaGxnbGhsbHZscm52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTU4MzksImV4cCI6MjA4MDk5MTgzOX0.Q0PjW5dMU07EDoR-GGDpIjATlSC5AJxNeEdOlYaO96w';
+
+  const H = {
+    'apikey': SB_ANON,
+    'Authorization': 'Bearer ' + SB_ANON,
+    'Content-Type': 'application/json'
+  };
+
+  async function get(path) {
+    const r = await fetch(SB_URL + '/rest/v1/' + path, { headers: H });
+    if (!r.ok) throw new Error(r.status);
+    return r.json();
+  }
+
+  /* ── BILINGUAL LABELS ──────────────────────────────── */
+  const labels = {
+    en: {
+      eye: 'Local name database · All families',
+      sub: 'Multi-source documented local names for trees of Malaysia',
+      stat1: 'documented<br>names', stat2: 'species<br>covered',
+      stat3: 'indexed<br>sources', stat4: 'preferred<br>names set',
+      searchPh: 'Search local name or scientific name…',
+      allLang: 'All languages',
+      allRegion: 'All regions', peninsular: 'Peninsular Malaysia',
+      sabah: 'Sabah', sarawak: 'Sarawak',
+      allGroup: 'All groups', dip: 'Dipterocarpaceae', nonDip: 'Non-Dipterocarpaceae',
+      colName: 'Local name', colSci: 'Scientific name',
+      colRegion: 'Region', colSource: 'Publication', colPref: 'Preferred',
+      viewRecord: 'View species record →', backPortal: '← Back to portal',
+      loading: 'Loading…', noResults: 'No names match your search.',
+      names: 'names'
+    },
+    bm: {
+      eye: 'Pangkalan nama tempatan · Semua famili',
+      sub: 'Nama tempatan pokok Malaysia dari pelbagai sumber rujukan',
+      stat1: 'nama<br>didokumen', stat2: 'spesies<br>diliputi',
+      stat3: 'sumber<br>diindeks', stat4: 'nama<br>pilihan',
+      searchPh: 'Cari nama tempatan atau nama saintifik…',
+      allLang: 'Semua bahasa',
+      allRegion: 'Semua kawasan', peninsular: 'Semenanjung Malaysia',
+      sabah: 'Sabah', sarawak: 'Sarawak',
+      allGroup: 'Semua kumpulan', dip: 'Dipterokarp', nonDip: 'Bukan Dipterokarp',
+      colName: 'Nama tempatan', colSci: 'Nama saintifik',
+      colRegion: 'Kawasan', colSource: 'Penerbitan', colPref: 'Pilihan',
+      viewRecord: 'Lihat rekod spesies →', backPortal: '← Kembali ke portal',
+      loading: 'Memuatkan…', noResults: 'Tiada nama sepadan dengan carian anda.',
+      names: 'nama'
+    }
+  };
+
+  let currentLang = 'en';
+
+  function setLang(lang, btn) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const L = labels[lang];
+    document.getElementById('lbl-eye').textContent  = L.eye;
+    document.getElementById('lbl-sub').textContent  = L.sub;
+    document.getElementById('lbl-stat1').innerHTML  = L.stat1;
+    document.getElementById('lbl-stat2').innerHTML  = L.stat2;
+    document.getElementById('lbl-stat3').innerHTML  = L.stat3;
+    document.getElementById('lbl-stat4').innerHTML  = L.stat4;
+    document.getElementById('search').placeholder   = L.searchPh;
+    // Language dropdown — only update "All languages" label; options are built dynamically
+    const fl = document.getElementById('filter-lang');
+    if (fl.options[0]) fl.options[0].text = L.allLang;
+    // Region dropdown — 3 fixed regions only
+    const fr = document.getElementById('filter-region');
+    fr.options[0].text = L.allRegion;
+    fr.options[1].text = L.peninsular;
+    fr.options[2].text = L.sabah;
+    fr.options[3].text = L.sarawak;
+    const ft = document.getElementById('filter-type');
+    ft.options[0].text = L.allGroup;
+    ft.options[1].text = L.dip;
+    ft.options[2].text = L.nonDip;
+    // Table headers
+    document.querySelector('th.col-name').textContent   = L.colName;
+    document.querySelector('th.col-sci').textContent    = L.colSci;
+    document.querySelector('th.col-region').textContent = L.colRegion;
+    document.querySelector('th.col-source').textContent = L.colSource;
+    document.querySelector('th.col-pref').textContent   = L.colPref;
+    // Re-render with new labels
+    applyFilters();
+  }
+
+  /* ── DATA ──────────────────────────────────────────── */
+  let allRows   = [];
+  let sciMapDip = {};
+  let sciMapNon = {};
+  let prefSet   = new Set();
+  let sources   = [];
+  let currentSpeciesId = null;
+
+  async function init() {
+    try {
+      const [vn, dip, non, pref, src] = await Promise.all([
+        get('vernacular_names?select=id,species_id,species_type,vernacular_name,language,region,source_id,is_preferred&order=vernacular_name.asc&limit=2000'),
+        get('dipterocarp_species_2025_12_11_02_08?select=id,scientific_name,genus,family&limit=1000'),
+        get('non_dipterocarp_species?select=id,scientific_name,genus,family&limit=5000'),
+        get('preferred_vernacular_names?select=species_id,language,preferred_name&limit=1000'),
+        get('reference_sources?select=id,short_code,full_title,authors,year')
+      ]);
+
+      dip.forEach(d => sciMapDip[d.id] = d);
+      non.forEach(d => sciMapNon[d.id] = d);
+      pref.forEach(p => prefSet.add(p.species_id + '|' + (p.language || 'Malay')));
+
+      const srcMap = {};
+      sources = src;
+      src.forEach(s => srcMap[s.id] = s);
+
+      allRows = vn.map(v => {
+        const sci = sciMapDip[v.species_id] || sciMapNon[v.species_id] || {};
+        const s   = srcMap[v.source_id] || {};
+        return {
+          ...v,
+          scientific_name: sci.scientific_name || '—',
+          genus:  sci.genus  || '',
+          family: sci.family || '',
+          source_code: s.short_code || '',
+          source_full: s.full_title || '—',
+          is_pref: prefSet.has(v.species_id + '|' + (v.language || 'Malay'))
+        };
+      });
+
+      document.getElementById('stat-total').textContent     = allRows.length.toLocaleString();
+      document.getElementById('stat-species').textContent   = new Set(allRows.map(r => r.species_id)).size.toLocaleString();
+      document.getElementById('stat-preferred').textContent = prefSet.size.toLocaleString();
+
+      // Build language filter dynamically from actual DB values
+      const langs = [...new Set(allRows.map(r => r.language).filter(Boolean))].sort();
+      const fl = document.getElementById('filter-lang');
+      const currentVal = fl.value;
+      // Keep "All languages" option, rebuild the rest
+      while (fl.options.length > 1) fl.remove(1);
+      langs.forEach(lang => {
+        const opt = document.createElement('option');
+        opt.value = lang;
+        opt.text  = lang;
+        fl.appendChild(opt);
+      });
+      if (currentVal) fl.value = currentVal;
+
+      renderTable(allRows);
+    } catch(e) {
+      document.getElementById('results-body').innerHTML =
+        '<tr class="state-row"><td colspan="6">Unable to load data — check Supabase connection.</td></tr>';
+    }
+  }
+
+  /* ── RENDER TABLE ──────────────────────────────────── */
+  function renderTable(rows) {
+    const L = labels[currentLang];
+    const tbody = document.getElementById('results-body');
+    const count = rows.length;
+    document.getElementById('result-count').textContent = count.toLocaleString() + ' ' + L.names;
+
+    if (!count) {
+      tbody.innerHTML = `<tr class="state-row"><td colspan="6">${L.noResults}</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows.slice(0, 500).map(r => {
+      const srcLabel = r.source_code === 'POCKET_CHECKLIST' ? 'Pocket Checklist of Timber Trees'
+                     : r.source_code === 'EXISTING_DB'      ? 'Database record'
+                     : (r.source_full || '—').slice(0, 45);
+      return `<tr onclick="showDetail('${r.species_id}','${r.species_type}')">
+        <td class="name-cell">${r.vernacular_name}</td>
+        <td class="sci-cell">${r.scientific_name}</td>
+        <td style="font-size:11px;color:var(--ink-3)">${r.region || '—'}</td>
+        <td style="font-size:11px;color:var(--ink-3)" title="${r.source_full}">${srcLabel}</td>
+        <td class="pref-cell">${r.is_pref ? '<span class="pref-dot"></span>' : ''}</td>
+      </tr>`;
+    }).join('');
+
+    if (count > 500) {
+      tbody.innerHTML += `<tr class="state-row"><td colspan="5">${count - 500} more — refine your search to see them.</td></tr>`;
+    }
+  }
+
+  /* ── FILTERS ───────────────────────────────────────── */
+  let filterTimer;
+  function applyFilters() {
+    clearTimeout(filterTimer);
+    filterTimer = setTimeout(() => {
+      const q   = document.getElementById('search').value.trim().toLowerCase();
+      const lng = document.getElementById('filter-lang').value;
+      const reg = document.getElementById('filter-region').value;
+      const typ = document.getElementById('filter-type').value;
+      const filtered = allRows.filter(r => {
+        if (q && !r.vernacular_name.toLowerCase().includes(q) &&
+                 !r.scientific_name.toLowerCase().includes(q) &&
+                 !(r.genus||'').toLowerCase().includes(q)) return false;
+        if (lng && r.language !== lng) return false;
+        // When a region is selected, include that region AND Preferred records
+        if (reg && r.region !== reg && r.region !== 'Preferred') return false;
+        if (typ && r.species_type !== typ) return false;
+        return true;
+      });
+      renderTable(filtered);
+    }, 220);
+  }
+
+  document.getElementById('search').addEventListener('input', applyFilters);
+  document.getElementById('filter-lang').addEventListener('change', applyFilters);
+  document.getElementById('filter-region').addEventListener('change', applyFilters);
+  document.getElementById('filter-type').addEventListener('change', applyFilters);
+
+  /* ── DETAIL PANEL ──────────────────────────────────── */
+  function showDetail(speciesId, speciesType) {
+    if (currentSpeciesId === speciesId) { closeDetail(); return; }
+    currentSpeciesId = speciesId;
+    const L = labels[currentLang];
+    const panel = document.getElementById('detail-panel');
+    panel.classList.add('open');
+    const sci = sciMapDip[speciesId] || sciMapNon[speciesId] || {};
+    document.getElementById('detail-sci').textContent    = sci.scientific_name || speciesId;
+    document.getElementById('detail-family').textContent = [sci.family, sci.genus].filter(Boolean).join(' · ');
+    const names = allRows.filter(r => r.species_id === speciesId);
+    document.getElementById('detail-names').innerHTML = names.map(n => `
+      <div class="name-chip ${n.is_pref ? 'preferred' : ''}">
+        <span class="chip-name">${n.vernacular_name}</span>
+        <span class="chip-meta">${n.language || ''}${n.region ? ' · ' + n.region : ''}${n.is_pref ? ' · ★ preferred' : ''}</span>
+        <span class="chip-meta" style="font-style:italic;">${
+          n.source_code === 'POCKET_CHECKLIST' ? 'Pocket Checklist' :
+          n.source_code === 'EXISTING_DB' ? 'Database record' : n.source_full
+        }</span>
+      </div>`).join('');
+    const base   = 'https://2abetterment.github.io/dipterocarp-of-Malaysia/';
+    const target = speciesType === 'dipterocarp'
+      ? base + 'index.html?species=' + speciesId
+      : base + 'non_dipterocarp_trees_malaysia.html?species=' + speciesId;
+    document.getElementById('detail-links').innerHTML = `
+      <a class="detail-link primary" href="${target}" target="_blank">${L.viewRecord}</a>
+      <a class="detail-link" href="portal.html">${L.backPortal}</a>`;
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function closeDetail() {
+    currentSpeciesId = null;
+    document.getElementById('detail-panel').classList.remove('open');
+  }
+
+  init();
+</script>
+</body>
+</html>
