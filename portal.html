@@ -54,8 +54,8 @@ body{font-family:'DM Sans',sans-serif;background:#0F2411;min-height:100vh;}
 .feat-item{display:flex;align-items:flex-start;gap:10px;font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;}
 .feat-dot-gold{width:16px;height:16px;flex-shrink:0;margin-top:1px;}
 
-/* SUB CARDS */
-.sub-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+/* SUB CARDS — now 3 columns */
+.sub-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
 .sub-card{border-radius:14px;overflow:hidden;cursor:pointer;transition:all .2s ease;display:flex;flex-direction:column;box-shadow:0 4px 16px rgba(0,0,0,.06);}
 .sub-card:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,0,0,.12);}
 .sub-card-accent{height:2px;}
@@ -82,17 +82,9 @@ body{font-family:'DM Sans',sans-serif;background:#0F2411;min-height:100vh;}
 .footer-line1{font-size:10.5px;color:rgba(255,255,255,.2);letter-spacing:.04em;}
 .footer-line2{font-family:'Cormorant Garamond',serif;font-size:12px;font-style:italic;color:rgba(255,255,255,.26);margin-top:5px;}
 
-/* SVG helpers inline */
 svg{display:block;}
-  .live-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: #2E6B8A; flex-shrink: 0;
-    animation: livepulse 2s ease-in-out infinite;
-  }
-  @keyframes livepulse {
-    0%,100% { opacity:1; transform:scale(1); }
-    50%      { opacity:.4; transform:scale(1.3); }
-  }
+.live-dot{width:7px;height:7px;border-radius:50%;background:#2E6B8A;flex-shrink:0;animation:livepulse 2s ease-in-out infinite;}
+@keyframes livepulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(1.3);}}
 </style>
 </head>
 <body>
@@ -118,12 +110,12 @@ svg{display:block;}
     <span id="txt-eyebrow">Malaysian Forest Botany · M. Nazre Saleh · UPM</span>
   </div>
   <h1 class="hero-title" id="txt-title">Trees of<br><em>Malaysia</em></h1>
-  <p class="hero-sub" id="txt-sub">Three platforms. One shared database.</p>
+  <p class="hero-sub" id="txt-sub">Four platforms. One shared database.</p>
   <p class="hero-desc" id="txt-desc">A botanical initiative by M. Nazre Saleh, Universiti Putra Malaysia — exploring the trees of Malaysia through research, community, and open data.</p>
 
   <div class="cards-wrap">
 
-    <!-- MAIN CARD -->
+    <!-- MAIN CARD: Paid Academic Reference -->
     <a href="trees_peninsular_malaysia_webapp.html" target="_blank" style="text-decoration:none;display:block;" class="main-card">
       <div class="main-card-top-bar"></div>
       <div class="main-card-badge" id="txt-badge-paid">PAID · Licence Required</div>
@@ -161,7 +153,7 @@ svg{display:block;}
       </div>
     </a>
 
-    <!-- SUB CARDS -->
+    <!-- SUB CARDS: 3 columns -->
     <div class="sub-cards">
 
       <!-- Dipterokarp Malaysia -->
@@ -200,14 +192,33 @@ svg{display:block;}
           <div class="sc-divider" style="background:#C5D8E8;"></div>
           <p class="sc-desc" id="txt-card3-desc">Free community database covering non-dipterocarp trees of Malaysia — Leguminosae, Moraceae, Myrtaceae, Lauraceae and 137+ more families.</p>
           <div class="sc-feat-list" id="feat-list-nondip"></div>
-          <!-- Live database stats pill -->
           <div id="nondip-live-stats" style="display:none;align-items:center;gap:6px;font-size:11.5px;color:#2E6B8A;background:rgba(46,107,138,.08);border:1px solid rgba(46,107,138,.18);border-radius:20px;padding:5px 12px;margin:8px 0 4px;font-weight:500;"></div>
           <div class="sc-cta" style="background:#1A3D5C;color:white;">
             <span id="txt-cta3">Open Non-Dipterocarp Database</span><span>→</span>
           </div>
         </div>
-      </div>
+      </a>
 
+      <!-- Nama Tempatan — Vernacular Names -->
+      <a href="vernacular_names.html" target="_blank" class="sub-card" style="text-decoration:none;display:flex;flex-direction:column;background:#F5F0EC;border:1px solid #D9CDBF;">
+        <div class="sub-card-accent" style="background:#7A5C3A;"></div>
+        <div class="sub-card-inner">
+          <div class="sc-header">
+            <div class="sc-icon" style="background:linear-gradient(135deg,#5A3E28,#9E7A52);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 10h10M4 14h12M4 18h8" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <span class="sc-badge" style="background:rgba(122,92,58,.1);color:#5A3E28;border-color:rgba(122,92,58,.2);" id="txt-badge4">FREE · Open Access</span>
+          </div>
+          <div class="sc-title" id="txt-card4-title">Nama Tempatan <em style="font-size:15px;color:#8A8278;font-weight:300;">· Local Names</em></div>
+          <div class="sc-subtitle" id="txt-card4-sub">Local name database · All families</div>
+          <div class="sc-divider" style="background:#D9CDBF;"></div>
+          <p class="sc-desc" id="txt-card4-desc">Searchable database of documented local names for all Malaysian trees — Malay, Iban, Kadazan and more. Each name traceable to its published source.</p>
+          <div class="sc-feat-list" id="feat-list-vern"></div>
+          <div id="vern-live-stats" style="display:none;align-items:center;gap:6px;font-size:11.5px;color:#7A5C3A;background:rgba(122,92,58,.08);border:1px solid rgba(122,92,58,.18);border-radius:20px;padding:5px 12px;margin:8px 0 4px;font-weight:500;"></div>
+          <div class="sc-cta" style="background:#3D2810;color:white;">
+            <span id="txt-cta4">Open Nama Tempatan</span><span>→</span>
+          </div>
+        </div>
       </a>
 
     </div><!-- /sub-cards -->
@@ -215,7 +226,7 @@ svg{display:block;}
     <!-- SHARED NOTE -->
     <div class="shared-note">
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="6.5" stroke="#A8C9B3" stroke-width="1.2"/><path d="M8 5v3l2 2" stroke="#A8C9B3" stroke-width="1.3" stroke-linecap="round"/></svg>
-      <p id="txt-shared"><strong>Shared database:</strong> All three platforms draw from the same Supabase database. Photos approved in either community site automatically update across all platforms in real time.</p>
+      <p id="txt-shared"><strong>Shared database:</strong> All four platforms draw from the same Supabase database. Photos approved in either community site and vernacular names curated in Nama Tempatan update across all platforms in real time.</p>
     </div>
 
   </div><!-- /cards-wrap -->
@@ -232,7 +243,7 @@ const content = {
   en: {
     eyebrow:    "Malaysian Forest Botany · M. Nazre Saleh · UPM",
     title:      "Trees of<br><em>Malaysia</em>",
-    sub:        "Three platforms. One shared database.",
+    sub:        "Four platforms. One shared database.",
     desc:       "A botanical initiative by M. Nazre Saleh, Universiti Putra Malaysia — exploring the trees of Malaysia through research, community, and open data.",
     badgePaid:  "PAID · Licence Required",
     badge2:     "Academic Reference",
@@ -257,13 +268,20 @@ const content = {
     cta3:       "Open Non-Dipterocarp Database",
     nondip_feats: ["Browse 141+ tree families with photos","IUCN status · state-level distribution","Filter by family, genus, endemism","Contribute field photographs","English & Bahasa Malaysia"],
     nondip_no:  ["Full taxonomic descriptions","Diagnostic keys"],
-    shared:     "<strong>Shared database:</strong> All three platforms draw from the same Supabase database. Photos approved in either community site automatically update across all platforms in real time.",
+    badge4: "FREE · Open Access",
+    card4title: "Nama Tempatan <em style=\"font-size:15px;color:#8A8278;font-weight:300;\">· Local Names</em>",
+    card4sub:   "Local name database · All families",
+    card4desc:  "Searchable database of documented local names for all Malaysian trees — Malay, Iban, Kadazan and more. Each name traceable to its published source.",
+    cta4:       "Open Nama Tempatan",
+    vern_feats: ["Search by species or local name","Malay · Iban · Kadazan languages","Names linked to published sources","Covers Dipterocarp & Non-Dipterocarp","Peninsular · Sabah · Sarawak"],
+    vern_no:    [],
+    shared:     "<strong>Shared database:</strong> All four platforms draw from the same Supabase database. Photos approved in either community site and vernacular names curated in Nama Tempatan update across all platforms in real time.",
     footer1:    "Dipterocarpaceae of Peninsular Malaysia · POWO 2026 · APG IV · CC-BY 4.0",
   },
   bm: {
     eyebrow:    "Botani Hutan Malaysia · M. Nazre Saleh · UPM",
     title:      "Pokok<br><em>Malaysia</em>",
-    sub:        "Tiga platform. Satu pangkalan data.",
+    sub:        "Empat platform. Satu pangkalan data.",
     desc:       "Inisiatif botani oleh M. Nazre Saleh, UPM — meneroka pokok Malaysia melalui penyelidikan, komuniti, dan data terbuka.",
     badgePaid:  "BERBAYAR · Lesen Diperlukan",
     badge2:     "Rujukan Akademik",
@@ -288,7 +306,14 @@ const content = {
     cta3:       "Buka Pangkalan Data Bukan Dipterokarp",
     nondip_feats: ["Layari 141+ famili pokok dengan gambar","Status IUCN · taburan mengikut negeri","Tapis mengikut famili, genus, endemisma","Sumbang gambar lapangan","Bahasa Malaysia & Inggeris"],
     nondip_no:  ["Huraian taksonomi penuh","Kunci diagnostik"],
-    shared:     "<strong>Pangkalan data dikongsi:</strong> Ketiga-tiga platform menggunakan pangkalan data Supabase yang sama. Gambar yang diluluskan dikemas kini secara automatik merentasi semua platform.",
+    badge4: "PERCUMA · Akses Terbuka",
+    card4title: "Nama Tempatan <em style=\"font-size:15px;color:#8A8278;font-weight:300;\">· Local Names</em>",
+    card4sub:   "Pangkalan data nama tempatan · Semua famili",
+    card4desc:  "Pangkalan data nama tempatan pokok Malaysia yang boleh dicari — Melayu, Iban, Kadazan dan lain-lain. Setiap nama boleh dikesan ke sumber asal.",
+    cta4:       "Buka Nama Tempatan",
+    vern_feats: ["Cari mengikut spesies atau nama tempatan","Bahasa Melayu · Iban · Kadazan","Nama dikaitkan dengan sumber diterbitkan","Merangkumi Dipterokarp & Bukan Dipterokarp","Semenanjung · Sabah · Sarawak"],
+    vern_no:    [],
+    shared:     "<strong>Pangkalan data dikongsi:</strong> Keempat-empat platform menggunakan pangkalan data Supabase yang sama. Gambar yang diluluskan dan nama tempatan yang dikurasi dikemas kini secara automatik merentasi semua platform.",
     footer1:    "Dipterocarpaceae Semenanjung Malaysia · POWO 2026 · APG IV · CC-BY 4.0",
   }
 };
@@ -302,123 +327,99 @@ function setLang(lang) {
   currentLang = lang;
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.textContent.toLowerCase() === lang));
   const c = content[lang];
+  document.getElementById('txt-eyebrow').textContent    = c.eyebrow;
+  document.getElementById('txt-title').innerHTML         = c.title;
+  document.getElementById('txt-sub').textContent         = c.sub;
+  document.getElementById('txt-desc').textContent        = c.desc;
+  document.getElementById('txt-badge-paid').textContent  = c.badgePaid;
+  document.getElementById('txt-badge2').textContent      = c.badge2;
+  document.getElementById('txt-card2-title').textContent = c.card2title;
+  document.getElementById('txt-card2-desc').textContent  = c.card2desc;
+  document.getElementById('txt-tiers').textContent       = c.tiers;
+  document.getElementById('txt-t1').textContent          = c.t1;
+  document.getElementById('txt-t2').textContent          = c.t2;
+  document.getElementById('txt-t3').textContent          = c.t3;
+  document.getElementById('txt-cta2').textContent        = c.cta2;
+  document.getElementById('txt-included').textContent    = c.included;
+  document.getElementById('txt-badge1').textContent      = c.badge1;
+  document.getElementById('txt-card1-title').textContent = c.card1title;
+  document.getElementById('txt-card1-sub').textContent   = c.card1sub;
+  document.getElementById('txt-card1-desc').textContent  = c.card1desc;
+  document.getElementById('txt-cta1').textContent        = c.cta1;
+  document.getElementById('txt-badge3').textContent      = c.badge3;
+  document.getElementById('txt-card3-title').textContent = c.card3title;
+  document.getElementById('txt-card3-sub').textContent   = c.card3sub;
+  document.getElementById('txt-card3-desc').textContent  = c.card3desc;
+  document.getElementById('txt-cta3').textContent        = c.cta3;
+  document.getElementById('txt-badge4').textContent      = c.badge4;
+  document.getElementById('txt-card4-title').innerHTML = c.card4title;
+  document.getElementById('txt-card4-sub').textContent   = c.card4sub;
+  document.getElementById('txt-card4-desc').textContent  = c.card4desc;
+  document.getElementById('txt-cta4').textContent        = c.cta4;
+  document.getElementById('txt-shared').innerHTML        = c.shared;
+  document.getElementById('txt-footer1').textContent     = c.footer1;
 
-  document.getElementById('txt-eyebrow').textContent   = c.eyebrow;
-  document.getElementById('txt-title').innerHTML        = c.title;
-  document.getElementById('txt-sub').textContent        = c.sub;
-  document.getElementById('txt-desc').textContent       = c.desc;
-  document.getElementById('txt-badge-paid').textContent = c.badgePaid;
-  document.getElementById('txt-badge2').textContent     = c.badge2;
-  document.getElementById('txt-card2-title').textContent= c.card2title;
-  document.getElementById('txt-card2-desc').textContent = c.card2desc;
-  document.getElementById('txt-tiers').textContent      = c.tiers;
-  document.getElementById('txt-t1').textContent         = c.t1;
-  document.getElementById('txt-t2').textContent         = c.t2;
-  document.getElementById('txt-t3').textContent         = c.t3;
-  document.getElementById('txt-cta2').textContent       = c.cta2;
-  document.getElementById('txt-included').textContent   = c.included;
-  document.getElementById('txt-badge1').textContent     = c.badge1;
-  document.getElementById('txt-card1-title').textContent= c.card1title;
-  document.getElementById('txt-card1-sub').textContent  = c.card1sub;
-  document.getElementById('txt-card1-desc').textContent = c.card1desc;
-  document.getElementById('txt-cta1').textContent       = c.cta1;
-  document.getElementById('txt-badge3').textContent     = c.badge3;
-  document.getElementById('txt-card3-title').textContent= c.card3title;
-  document.getElementById('txt-card3-sub').textContent  = c.card3sub;
-  document.getElementById('txt-card3-desc').textContent = c.card3desc;
-  document.getElementById('txt-cta3').textContent       = c.cta3;
-  document.getElementById('txt-shared').innerHTML       = c.shared;
-  document.getElementById('txt-footer1').textContent    = c.footer1;
-
-  // Paid features
   document.getElementById('feat-list-paid').innerHTML = c.paidFeats.map(f =>
-    `<div class="feat-item">${checkSVG('#F0B861')}<span>${f}</span></div>`
-  ).join('');
+    `<div class="feat-item">${checkSVG('#F0B861')}<span>${f}</span></div>`).join('');
 
-  // Dipterocarp features
   document.getElementById('feat-list-dip').innerHTML =
     c.dip_feats.map(f => `<div class="sc-feat">${checkSVG('#2C5A30')}<span>${f}</span></div>`).join('') +
     c.dip_no.map(f => `<div class="sc-nofeat">${crossSVG()}<span>${f}</span></div>`).join('');
 
-  // Non-dip features
   document.getElementById('feat-list-nondip').innerHTML =
     c.nondip_feats.map(f => `<div class="sc-feat">${checkSVG('#2E6B8A')}<span>${f}</span></div>`).join('') +
     c.nondip_no.map(f => `<div class="sc-nofeat">${crossSVG()}<span>${f}</span></div>`).join('');
+
+  document.getElementById('feat-list-vern').innerHTML =
+    c.vern_feats.map(f => `<div class="sc-feat">${checkSVG('#7A5C3A')}<span>${f}</span></div>`).join('') +
+    c.vern_no.map(f => `<div class="sc-nofeat">${crossSVG()}<span>${f}</span></div>`).join('');
 }
 
-// Init
 setLang('en');
 
-// ── Live stats from Supabase ──────────────────────────────────────────────
+// ── Live stats: Non-Dipterocarp ──
 (function loadNonDipStats() {
-  const SUPA_URL  = 'https://xrntnarchlglhllvlrnv.supabase.co';
-  const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhybnRuYXJjaGxnbGhsbHZscm52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTU4MzksImV4cCI6MjA4MDk5MTgzOX0.Q0PjW5dMU07EDoR-GGDpIjATlSC5AJxNeEdOlYaO96w';
-  const headers   = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY };
-
-  // Fetch all three counts in parallel
+  const SUPA_URL = 'https://xrntnarchlglhllvlrnv.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhybnRuYXJjaGxnbGhsbHZscm52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTU4MzksImV4cCI6MjA4MDk5MTgzOX0.Q0PjW5dMU07EDoR-GGDpIjATlSC5AJxNeEdOlYaO96w';
+  const headers  = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY };
   Promise.all([
-    fetch(SUPA_URL + '/rest/v1/non_dipterocarp_species?select=count', { headers }).then(r => r.json()),
-    fetch(SUPA_URL + '/rest/v1/non_dipterocarp_families?select=count', { headers }).then(r => r.json()),
-    fetch(SUPA_URL + '/rest/v1/non_dipterocarp_genera?select=count',   { headers }).then(r => r.json()),
-  ])
-  .then(([speciesRes, familiesRes, generaRes]) => {
-    // Supabase returns [{count:"N"}] when using ?select=count with Prefer:count header
-    // Simpler: use head=true to get the count from Content-Range header instead
-    // But easiest: just count the rows returned (with limit override)
-    // Use the exact count approach via RPC or header
-    return Promise.all([
-      fetch(SUPA_URL + '/rest/v1/non_dipterocarp_species?select=id', {
-        headers: { ...headers, 'Prefer': 'count=exact', 'Range': '0-0' }
-      }),
-      fetch(SUPA_URL + '/rest/v1/non_dipterocarp_families?select=id', {
-        headers: { ...headers, 'Prefer': 'count=exact', 'Range': '0-0' }
-      }),
-      fetch(SUPA_URL + '/rest/v1/non_dipterocarp_genera?select=id', {
-        headers: { ...headers, 'Prefer': 'count=exact', 'Range': '0-0' }
-      }),
-    ]);
-  })
-  .then(([speciesResp, familiesResp, generaResp]) => {
-    // Content-Range: 0-0/3601
-    const parseCount = resp => {
-      const cr = resp.headers.get('Content-Range') || '';
-      const m  = cr.match(/\/(\d+)$/);
-      return m ? parseInt(m[1], 10) : null;
-    };
-    const nSpecies  = parseCount(speciesResp);
-    const nFamilies = parseCount(familiesResp);
-    const nGenera   = parseCount(generaResp);
-
-    if (!nSpecies) return; // fetch failed silently
-
-    // Update the subtitle stat badge
+    fetch(SUPA_URL + '/rest/v1/non_dipterocarp_species?select=id', { headers: { ...headers, 'Prefer': 'count=exact', 'Range': '0-0' } }),
+    fetch(SUPA_URL + '/rest/v1/non_dipterocarp_families?select=id', { headers: { ...headers, 'Prefer': 'count=exact', 'Range': '0-0' } }),
+    fetch(SUPA_URL + '/rest/v1/non_dipterocarp_genera?select=id',   { headers: { ...headers, 'Prefer': 'count=exact', 'Range': '0-0' } }),
+  ]).then(([sr, fr, gr]) => {
+    const pc = r => { const m = (r.headers.get('Content-Range')||'').match(/\/(\d+)$/); return m ? parseInt(m[1]) : null; };
+    const nS = pc(sr), nF = pc(fr), nG = pc(gr);
+    if (!nS) return;
     const sub3 = document.getElementById('txt-card3-sub');
-    if (sub3) {
-      const isBM = (typeof currentLang !== 'undefined' && currentLang === 'bm');
-      sub3.textContent = isBM
-        ? `Pangkalan data komuniti · ${nFamilies} famili · ${nGenera} genera · ${nSpecies.toLocaleString()} spesies`
-        : `Community database · ${nFamilies} families · ${nGenera} genera · ${nSpecies.toLocaleString()} species`;
-    }
-
-    // Inject a live-count pill into the card
-    const statsEl = document.getElementById('nondip-live-stats');
-    if (statsEl) {
-      statsEl.innerHTML =
-        `<span class="live-dot"></span>` +
-        `<strong>${nSpecies.toLocaleString()}</strong> species &nbsp;·&nbsp; ` +
-        `<strong>${nGenera}</strong> genera &nbsp;·&nbsp; ` +
-        `<strong>${nFamilies}</strong> families`;
-      statsEl.style.display = 'flex';
-    }
-
-    // Also patch the bilingual content so setLang() keeps correct numbers
-    const fmt = n => n.toLocaleString();
+    if (sub3) sub3.textContent = currentLang === 'bm'
+      ? `Pangkalan data komuniti · ${nF} famili · ${nG} genera · ${nS.toLocaleString()} spesies`
+      : `Community database · ${nF} families · ${nG} genera · ${nS.toLocaleString()} species`;
+    const el = document.getElementById('nondip-live-stats');
+    if (el) { el.innerHTML = `<span class="live-dot"></span><strong>${nS.toLocaleString()}</strong> species &nbsp;·&nbsp; <strong>${nG}</strong> genera &nbsp;·&nbsp; <strong>${nF}</strong> families`; el.style.display = 'flex'; }
     if (typeof content !== 'undefined') {
-      content.en.card3sub = `Community database · ${nFamilies} families · ${nGenera} genera · ${fmt(nSpecies)} species`;
-      content.bm.card3sub = `Pangkalan data komuniti · ${nFamilies} famili · ${nGenera} genera · ${fmt(nSpecies)} spesies`;
+      content.en.card3sub = `Community database · ${nF} families · ${nG} genera · ${nS.toLocaleString()} species`;
+      content.bm.card3sub = `Pangkalan data komuniti · ${nF} famili · ${nG} genera · ${nS.toLocaleString()} spesies`;
     }
-  })
-  .catch(() => { /* fail silently — static fallback text stays visible */ });
+  }).catch(()=>{});
+})();
+
+// ── Live stats: Vernacular Names ──
+(function loadVernStats() {
+  const SUPA_URL = 'https://xrntnarchlglhllvlrnv.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhybnRuYXJjaGxnbGhsbHZscm52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTU4MzksImV4cCI6MjA4MDk5MTgzOX0.Q0PjW5dMU07EDoR-GGDpIjATlSC5AJxNeEdOlYaO96w';
+  const headers  = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY };
+  fetch(SUPA_URL + '/rest/v1/vernacular_names?select=id', { headers: { ...headers, 'Prefer': 'count=exact', 'Range': '0-0' } })
+  .then(r => {
+    const m = (r.headers.get('Content-Range')||'').match(/\/(\d+)$/);
+    const n = m ? parseInt(m[1]) : null;
+    if (!n) return;
+    const el = document.getElementById('vern-live-stats');
+    if (el) { el.innerHTML = `<span class="live-dot" style="background:#7A5C3A;"></span><strong>${n.toLocaleString()}</strong> documented names`; el.style.display = 'flex'; }
+    const sub4 = document.getElementById('txt-card4-sub');
+    if (sub4) sub4.textContent = currentLang === 'bm'
+      ? `Pangkalan data nama tempatan · ${n.toLocaleString()} nama`
+      : `Local name database · ${n.toLocaleString()} names`;
+  }).catch(()=>{});
 })();
 </script>
 </body>
