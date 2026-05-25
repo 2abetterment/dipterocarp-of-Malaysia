@@ -264,10 +264,21 @@ let allGroups = [];    // master grouped array, built once
 /* ── INIT ─────────────────────────────────────────── */
 async function init() {
   try {
+    // Fetch non_dipterocarp_species in pages of 1000 (table has 3556 rows)
+    async function getAll(path, pageSize=1000) {
+      let all=[], offset=0, page;
+      do {
+        page = await get(path + '&limit=' + pageSize + '&offset=' + offset);
+        all = all.concat(page);
+        offset += pageSize;
+      } while (page.length === pageSize);
+      return all;
+    }
+
     const [vn, dip, non, pref, src] = await Promise.all([
       get('vernacular_names?select=id,species_id,species_type,vernacular_name,language,region,source_id,is_preferred&order=vernacular_name.asc&limit=2000'),
       get('dipterocarp_species_2025_12_11_02_08?select=id,scientific_name,genus,family&limit=1000'),
-      get('non_dipterocarp_species?select=id,scientific_name,genus,family&limit=5000'),
+      getAll('non_dipterocarp_species?select=id,scientific_name,genus,family'),
       get('preferred_vernacular_names?select=species_id,language,preferred_name&limit=1000'),
       get('reference_sources?select=id,short_code,full_title,authors,year')
     ]);
