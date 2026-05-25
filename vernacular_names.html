@@ -184,7 +184,7 @@ footer p { font-size: 10.5px; color: var(--ink-3); }
       <thead>
         <tr>
           <th class="col-sci"  id="th-sci">Scientific name</th>
-          <th class="col-fam"  id="th-fam">Family · Genus</th>
+          <th class="col-fam"  id="th-fam">Family</th>
           <th class="col-reg"  id="th-reg">Region</th>
           <th class="col-names" id="th-names">Local names &amp; sources</th>
         </tr>
@@ -220,7 +220,7 @@ const labels = {
     searchPh:'Search local name or scientific name…', allLang:'All languages',
     allRegion:'All regions', peninsular:'Peninsular Malaysia', sabah:'Sabah', sarawak:'Sarawak',
     allGroup:'All groups', dip:'Dipterocarpaceae', nonDip:'Non-Dipterocarpaceae',
-    thSci:'Scientific name', thFam:'Family · Genus', thReg:'Region', thNames:'Local names & sources',
+    thSci:'Scientific name', thFam:'Family', thReg:'Region', thNames:'Local names & sources',
     noResults:'No species match your search.', species:'species'
   },
   bm: {
@@ -229,7 +229,7 @@ const labels = {
     searchPh:'Cari nama tempatan atau nama saintifik…', allLang:'Semua bahasa',
     allRegion:'Semua kawasan', peninsular:'Semenanjung Malaysia', sabah:'Sabah', sarawak:'Sarawak',
     allGroup:'Semua kumpulan', dip:'Dipterokarp', nonDip:'Bukan Dipterokarp',
-    thSci:'Nama saintifik', thFam:'Famili · Genus', thReg:'Kawasan', thNames:'Nama tempatan & sumber',
+    thSci:'Nama saintifik', thFam:'Famili', thReg:'Kawasan', thNames:'Nama tempatan & sumber',
     noResults:'Tiada spesies sepadan dengan carian anda.', species:'spesies'
   }
 };
@@ -397,7 +397,7 @@ function renderTable(groups) {
 
     return `<tr>
       <td class="sci-cell">${grp.scientific_name}</td>
-      <td class="fam-cell">${[grp.family, grp.genus].filter(Boolean).join('<br>') || '—'}</td>
+      <td class="fam-cell">${grp.family || '—'}</td>
       <td class="reg-cell">${grp.regions}</td>
       <td><div class="names-list">${nameRows}</div></td>
     </tr>`;
