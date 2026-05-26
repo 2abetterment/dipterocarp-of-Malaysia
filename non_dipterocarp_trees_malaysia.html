@@ -576,6 +576,11 @@ function App(){
   const[lang,setLang]=useState('en');
   const[isAdmin,setIsAdmin]=useState(false);
   const[showLogin,setShowLogin]=useState(false);
+  // ── Deep-link: open species directly via ?id=UUID ──
+  useEffect(()=>{
+    const id = new URLSearchParams(window.location.search).get('id');
+    if(id){setDetailId(id);setRoute('detail');}
+  },[]);
   useEffect(()=>{
     fetch(`${SB}/rest/v1/${T_SPP}?select=*&order=scientific_name`,{headers:H})
       .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
