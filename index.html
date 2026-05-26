@@ -235,6 +235,21 @@ function tv(v,lang){if(lang==='en'||!v)return v;const m={'Vulnerable':'Terancam'
 
 const IM={'CR':{l:'Critically Endangered'},'EN':{l:'Endangered'},'VU':{l:'Vulnerable'},'NT':{l:'Near Threatened'},'LC':{l:'Least Concern'},'DD':{l:'Data Deficient'}};
 function pi(s){if(!s)return'DD';const l=s.toLowerCase();if(l.includes('critically'))return'CR';if(l.includes('endangered'))return'EN';if(l.includes('vulnerable'))return'VU';if(l.includes('near'))return'NT';if(l.includes('least'))return'LC';return'DD';}
+
+/* ── Format scientific name: taxon italic, authority roman ── */
+function formatSci(name, opts={}){
+  if(!name||name==='—') return name;
+  const fontSize = opts.fontSize||'inherit';
+  const color = opts.color||'inherit';
+  // Match: Genus epithet [subsp.|var.|f. infraepithet] — then rest is authority
+  const m = name.match(/^([A-Z][a-z×+]+(?:\s+[a-z×+\-]+){1,2}(?:\s+(?:subsp\.|var\.|f\.)\s+[a-z×+\-]+)?)(.*)/);
+  if(!m) return `<i>${name}</i>`;
+  const taxon = m[1].trim();
+  const auth  = m[2].trim();
+  return auth
+    ? `<i>${taxon}</i> <span style="font-style:normal;font-weight:400">${auth}</span>`
+    : `<i>${taxon}</i>`;
+}
 function mr(r){return{id:r.id,sci:r.scientific_name||'',genus:r.genus||'',family:r.family||'Dipterocarpaceae',common:[r.local_name_malay,r.maksud_epitet].filter(Boolean),iucn:pi(r.conservation_status),cs:r.conservation_status||'',endemic:!!r.endemic_to_malaysia,height:r.height_range||'—',dbh:r.trunk_diameter||'—',habitat:r.habitat||'—',alt:r.elevation_range||'—',phen:r.flowering_pattern||'—',bark:r.bark_description||'',leaf:r.leaf_description||'',flower:r.flower_description||'',fruit:r.fruit_description||'',eco:r.ecological_notes||'',uses:r.economic_importance||'—',taxdesc:r.taxonomic_description||'',dist:[r.distribution_peninsular&&'Peninsular Malaysia',r.distribution_sabah&&'Sabah',r.distribution_sarawak&&'Sarawak'].filter(Boolean),img:r.image_url||''};}
 
 function Pill({code,sm}){return <span className={`pill ${sm?'psm':''} p${code}`}><span style={{width:5,height:5,borderRadius:999,background:'currentColor',display:'inline-block',opacity:.7}}/>{code}</span>;}
@@ -246,7 +261,7 @@ function SpI({src,seed,ratio,rounded}){
   return <div className="sph" style={{aspectRatio:ratio||'4/3',borderRadius:r2,background:`linear-gradient(135deg,hsl(${h},22%,80%),hsl(${h+25},28%,70%))`}}><div className="sphi" style={{backgroundImage:`radial-gradient(circle at 35% 65%,rgba(107,171,130,.45),transparent 55%),radial-gradient(circle at 75% 30%,rgba(201,134,42,.28),transparent 50%)`}}/></div>;
 }
 
-function Card({s,i,onClick}){return <button className="card" onClick={onClick}><div className="cimg"><SpI src={s.img} seed={i} ratio="4/3"/></div><div className="cbody"><div className="cmeta"><span className="cfam">{s.family}</span><div className="cbadges"><Pill code={s.iucn} sm/>{s.endemic&&<span style={{fontSize:10,padding:'1px 7px',background:'var(--forest)',color:'white',borderRadius:999,fontWeight:600}}>Endemik</span>}</div></div><div className="csci">{s.sci}</div><div className="cname">{s.common[0]||s.genus}</div></div></button>;}
+function Card({s,i,onClick}){return <button className="card" onClick={onClick}><div className="cimg"><SpI src={s.img} seed={i} ratio="4/3"/></div><div className="cbody"><div className="cmeta"><span className="cfam">{s.family}</span><div className="cbadges"><Pill code={s.iucn} sm/>{s.endemic&&<span style={{fontSize:10,padding:'1px 7px',background:'var(--forest)',color:'white',borderRadius:999,fontWeight:600}}>Endemik</span>}</div></div><div className="csci" dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/><div className="cname">{s.common[0]||s.genus}</div></div></button>;}
 
 function TopBar({route,setRoute,query,setQuery,onSearch,lang,setLang,isAdmin,setShowLogin}){
   const ui=UI[lang];
@@ -303,7 +318,7 @@ function Home({species,loading,error,setRoute,setDetailId,setQuery}){
     </div>
     {!loading&&species.slice(3,7).length>0&&<div className="sec">
       <h2 className="st" style={{marginBottom:20}}>{ui.recent}</h2>
-      <div className="cg4">{species.slice(3,7).map((s,i)=><button key={s.id} onClick={()=>{setDetailId(s.id);setRoute('detail');}} style={{background:'none',border:'none',padding:0,cursor:'pointer',textAlign:'left'}}><SpI src={s.img} seed={i+30} ratio="1/1"/><div style={{marginTop:10,fontFamily:'Playfair Display',fontSize:14,fontStyle:'italic',color:'var(--text)'}}>{s.sci}</div><div style={{fontSize:12,color:'var(--text-3)',marginTop:3}}>{s.family}</div></button>)}</div>
+      <div className="cg4">{species.slice(3,7).map((s,i)=><button key={s.id} onClick={()=>{setDetailId(s.id);setRoute('detail');}} style={{background:'none',border:'none',padding:0,cursor:'pointer',textAlign:'left'}}><SpI src={s.img} seed={i+30} ratio="1/1"/><div style={{marginTop:10,fontFamily:'Playfair Display',fontSize:14,fontStyle:'italic',color:'var(--text)'}}><span dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/></div><div style={{fontSize:12,color:'var(--text-3)',marginTop:3}}>{s.family}</div></button>)}</div>
     </div>}
     {loading&&<div className="lc"><div className="spin"/><div style={{marginTop:16,fontSize:14}}>{ui.loading}</div></div>}
   </div>;
@@ -351,7 +366,7 @@ function Browse({species,query,setQuery,setRoute,setDetailId}){
         ?<div className="empty"><div style={{fontSize:40,marginBottom:16,opacity:.5}}>🌿</div><div style={{fontFamily:'Playfair Display',fontSize:20,color:'var(--forest)',marginBottom:8}}>{ui.no_match}</div><div style={{fontSize:14,color:'var(--text-3)',marginBottom:20}}>{ui.no_match_sub}</div><button className="btn bs" onClick={()=>{setQuery('');setFilters({genus:[],iucn:[],region:[],endemic:false});}}>{ui.reset}</button></div>
         :view==='grid'
           ?<div className="cg3">{filtered.map((s,i)=><Card key={s.id} s={s} i={i} onClick={()=>{setDetailId(s.id);setRoute('detail');}}/>)}</div>
-          :<div className="lt2"><div className="lth"><div/><div>Species</div><div>{lang==='en'?'Local name':'Nama tempatan'}</div><div>Genus</div><div>IUCN</div></div>{filtered.map((s,i)=><button key={s.id} className="ltr" onClick={()=>{setDetailId(s.id);setRoute('detail');}}><div style={{width:40,height:40,borderRadius:7,overflow:'hidden'}}><SpI src={s.img} seed={i} ratio="1/1" rounded={false}/></div><div><div style={{fontFamily:'Playfair Display',fontSize:14,fontStyle:'italic',fontWeight:500}}>{s.sci}</div><div style={{fontSize:11,color:'var(--text-3)',fontFamily:'DM Mono'}}>{s.family}</div></div><div style={{fontSize:13}}>{s.common[0]||'—'}</div><div style={{fontSize:13,fontStyle:'italic',color:'var(--text-2)'}}>{s.genus}</div><Pill code={s.iucn} sm/></button>)}</div>
+          :<div className="lt2"><div className="lth"><div/><div>Species</div><div>{lang==='en'?'Local name':'Nama tempatan'}</div><div>Genus</div><div>IUCN</div></div>{filtered.map((s,i)=><button key={s.id} className="ltr" onClick={()=>{setDetailId(s.id);setRoute('detail');}}><div style={{width:40,height:40,borderRadius:7,overflow:'hidden'}}><SpI src={s.img} seed={i} ratio="1/1" rounded={false}/></div><div><div style={{fontFamily:'Playfair Display',fontSize:14,fontStyle:'italic',fontWeight:500}}><span dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/></div><div style={{fontSize:11,color:'var(--text-3)',fontFamily:'DM Mono'}}>{s.family}</div></div><div style={{fontSize:13}}>{s.common[0]||'—'}</div><div style={{fontSize:13,fontStyle:'italic',color:'var(--text-2)'}}>{s.genus}</div><Pill code={s.iucn} sm/></button>)}</div>
       }
     </main>
   </div>;
@@ -364,12 +379,12 @@ function Detail({species,detailId,setRoute,setQuery}){
   const t2=v=>tv(v,lang);
   if(!s)return <div className="lc">Not found.</div>;
   return <div className="dw">
-    <div className="bc"><button onClick={()=>setRoute('home')}>{ui.home}</button><span>›</span><button onClick={()=>setRoute('browse')}>{ui.browse}</button><span>›</span><button onClick={()=>{setQuery(s.genus);setRoute('browse');}} style={{fontStyle:'italic'}}>{s.genus}</button><span>›</span><span style={{color:'var(--text)',fontStyle:'italic'}}>{s.sci}</span></div>
+    <div className="bc"><button onClick={()=>setRoute('home')}>{ui.home}</button><span>›</span><button onClick={()=>setRoute('browse')}>{ui.browse}</button><span>›</span><button onClick={()=>{setQuery(s.genus);setRoute('browse');}} style={{fontStyle:'italic'}}>{s.genus}</button><span>›</span><span style={{color:'var(--text)',fontStyle:'italic'}}><span dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/></span></div>
     <div className="dh">
       <SpI src={s.img} seed={species.indexOf(s)} ratio="4/3"/>
       <div>
         <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:14}}><span className="dtag">{s.family}</span>{s.endemic&&<span className="detag">Endemik</span>}</div>
-        <div className="dsci">{s.sci}</div>
+        <div className="dsci" dangerouslySetInnerHTML={{__html:formatSci(s.sci,{fontSize:42})}}/>
         {s.common.length>0&&<><div className="dll">{ui.local_names}</div><div className="dlv">{s.common.join(' · ')}</div></>}
         <div className="cbox"><div className="cl">{ui.conservation}</div><div style={{display:'flex',alignItems:'center',gap:10}}><Pill code={s.iucn}/><span style={{fontSize:13.5,color:'var(--text-2)'}}>{t2(s.cs)||IM[s.iucn]?.l}</span></div></div>
         <div className="qg">{[[ui.habitat,t2(s.habitat)],[ui.altitude,s.alt],[ui.phenology,t2(s.phen)]].map(([k,v])=><div key={k}><div className="qk">{k}</div><div className="qv">{v}</div></div>)}</div>
