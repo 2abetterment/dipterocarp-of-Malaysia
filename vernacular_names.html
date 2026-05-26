@@ -108,6 +108,10 @@ td.reg-cell { font-size: 11px; color: var(--ink-3); padding-top: 13px; }
 .ne-source { font-size: 11px; color: var(--ink-3); font-style: italic; flex: 1; }
 
 .state-row td { text-align: center; padding: 3rem; color: var(--ink-3); font-size: 13px; font-style: italic; }
+.sci-link { color: var(--ink); text-decoration: none; font-style: italic; }
+.sci-link:hover { color: var(--blue); text-decoration: underline; }
+.ext-icon { font-size: 10px; color: var(--ink-3); font-style: normal; }
+.no-name { font-size: 11.5px; color: var(--ink-3); font-style: italic; }
 
 footer { background: var(--white); border-top: 1px solid var(--border); padding: 1rem 2.5rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; }
 footer p { font-size: 10.5px; color: var(--ink-3); }
@@ -304,7 +308,7 @@ async function init() {
     });
 
     document.getElementById('stat-total').textContent   = allRows.length.toLocaleString();
-    document.getElementById('stat-species').textContent = new Set(allRows.map(r => r.species_id)).size.toLocaleString();
+    document.getElementById('stat-species').textContent = (dip.length + non.length).toLocaleString();
     document.getElementById('stat-preferred').textContent = prefSet.size.toLocaleString();
     document.getElementById('stat-sources').textContent = new Set(allRows.map(r => r.source_id).filter(Boolean)).size.toLocaleString();
 
@@ -314,7 +318,8 @@ async function init() {
     while (fl.options.length > 1) fl.remove(1);
     langs.forEach(lang => { const o = document.createElement('option'); o.value = o.text = lang; fl.appendChild(o); });
 
-    allGroups = buildGroups(allRows);
+    // Build full species list (all species, even those with no vernacular name)
+    allGroups = buildGroupsFromSpecies(dip, non, allRows);
     renderTable(allGroups);
 
   } catch(e) {
@@ -324,23 +329,27 @@ async function init() {
   }
 }
 
-/* ── GROUP BY SPECIES ──────────────────────────────── */
-function buildGroups(rows) {
+/* ── GROUP BY SPECIES (from full species list) ─────── */
+function buildGroupsFromSpecies(dip, non, vnRows) {
+  const BASE = 'https://2abetterment.github.io/dipterocarp-of-Malaysia/';
   const map = new Map();
-  rows.forEach(r => {
-    if (!map.has(r.species_id)) {
-      map.set(r.species_id, {
-        species_id:    r.species_id,
-        species_type:  r.species_type,
-        scientific_name: r.scientific_name,
-        genus:  r.genus,
-        family: r.family,
-        names:  []   // each entry: { vernacular_name, language, region, source_label, is_pref }
-      });
-    }
+
+  // Seed map with ALL species first
+  dip.forEach(s => map.set(s.id, {
+    species_id: s.id, species_type: 'dipterocarp',
+    scientific_name: s.scientific_name, genus: s.genus || '', family: s.family || '',
+    page_url: BASE + 'index.html', names: []
+  }));
+  non.forEach(s => map.set(s.id, {
+    species_id: s.id, species_type: 'non_dipterocarp',
+    scientific_name: s.scientific_name, genus: s.genus || '', family: s.family || '',
+    page_url: BASE + 'non_dipterocarp_trees_malaysia.html', names: []
+  }));
+
+  // Attach vernacular names
+  vnRows.forEach(r => {
+    if (!map.has(r.species_id)) return;
     const grp = map.get(r.species_id);
-    // Keep every unique vernacular_name + source combination (shows all publications)
-    // but deduplicate truly identical rows (same name + language + source)
     const key = r.vernacular_name + '||' + (r.language||'') + '||' + (r.source_code||r.source_id||'');
     if (!grp.names.find(n => n._key === key)) {
       const srcLabel = r.source_code === 'POCKET_CHECKLIST' ? 'Pocket Checklist of Timber Trees'
@@ -352,23 +361,52 @@ function buildGroups(rows) {
         language: r.language || '',
         region:   r.region   || '',
         source_label: srcLabel,
-        is_pref:  r.is_pref
+        is_pref: r.is_pref
       });
     }
   });
 
-  // Within each species: preferred first, then alphabetical by name
   map.forEach(grp => {
     grp.names.sort((a, b) => {
       if (a.is_pref !== b.is_pref) return a.is_pref ? -1 : 1;
       return a.vernacular_name.localeCompare(b.vernacular_name);
     });
-    // Region summary for the region cell (distinct, excluding 'Preferred')
     grp.regions = [...new Set(grp.names.map(n => n.region).filter(r => r && r !== 'Preferred'))].join(', ') || '—';
   });
 
-  // Sort species alphabetically
   return [...map.values()].sort((a,b) => a.scientific_name.localeCompare(b.scientific_name));
+}
+
+/* ── FILTER-TIME REGROUP (from filtered vnRows only) ─ */
+function buildGroups(rows) {
+  // Used only during filtering — restricts to species that have matching vn rows
+  const map = new Map();
+  rows.forEach(r => {
+    if (!map.has(r.species_id)) {
+      map.set(r.species_id, {
+        species_id: r.species_id, species_type: r.species_type,
+        scientific_name: r.scientific_name, genus: r.genus, family: r.family,
+        page_url: 'https://2abetterment.github.io/dipterocarp-of-Malaysia/' +
+          (r.species_type === 'dipterocarp' ? 'index.html' : 'non_dipterocarp_trees_malaysia.html'),
+        names: []
+      });
+    }
+    const grp = map.get(r.species_id);
+    const key = r.vernacular_name + '||' + (r.language||'') + '||' + (r.source_code||r.source_id||'');
+    if (!grp.names.find(n => n._key === key)) {
+      const srcLabel = r.source_code === 'POCKET_CHECKLIST' ? 'Pocket Checklist of Timber Trees'
+        : r.source_code === 'EXISTING_DB' ? 'Database record'
+        : (r.source_full || '—').length > 50 ? r.source_full.slice(0,50) + '…' : (r.source_full || '—');
+      grp.names.push({ _key: key, vernacular_name: r.vernacular_name,
+        language: r.language || '', region: r.region || '',
+        source_label: srcLabel, is_pref: r.is_pref });
+    }
+  });
+  map.forEach(grp => {
+    grp.names.sort((a,b) => a.is_pref !== b.is_pref ? (a.is_pref?-1:1) : a.vernacular_name.localeCompare(b.vernacular_name));
+    grp.regions = [...new Set(grp.names.map(n=>n.region).filter(r=>r&&r!=='Preferred'))].join(', ')||'—';
+  });
+  return [...map.values()].sort((a,b)=>a.scientific_name.localeCompare(b.scientific_name));
 }
 
 /* ── RENDER ───────────────────────────────────────── */
@@ -395,11 +433,16 @@ function renderTable(groups) {
       </div>`;
     }).join('');
 
+    const sciLink = grp.page_url
+      ? `<a href="${grp.page_url}" target="_blank" class="sci-link" title="Open species page">${grp.scientific_name} <span class="ext-icon">↗</span></a>`
+      : grp.scientific_name;
+    const namesContent = nameRows || '<span class="no-name">No local name recorded</span>';
+
     return `<tr>
-      <td class="sci-cell">${grp.scientific_name}</td>
+      <td class="sci-cell">${sciLink}</td>
       <td class="fam-cell">${grp.family || '—'}</td>
       <td class="reg-cell">${grp.regions}</td>
-      <td><div class="names-list">${nameRows}</div></td>
+      <td><div class="names-list">${namesContent}</div></td>
     </tr>`;
   }).join('');
 
@@ -429,7 +472,9 @@ function applyFilters() {
       return true;
     });
 
-    renderTable(buildGroups(filteredRows));
+    // If no filters active, show all species (including those with no vernacular name)
+    const noFilters = !q && !lng && !reg && !typ;
+    renderTable(noFilters ? allGroups : buildGroups(filteredRows));
   }, 220);
 }
 
