@@ -434,7 +434,7 @@ function renderTable(groups) {
     }).join('');
 
     const sciLink = grp.page_url
-      ? `<a href="${grp.page_url}" target="_blank" class="sci-link" title="Open species page">${grp.scientific_name} <span class="ext-icon">↗</span></a>`
+      ? `<a href="${grp.page_url}?id=${grp.species_id}" target="_blank" class="sci-link" title="Open species page">${grp.scientific_name} <span class="ext-icon">↗</span></a>`
       : grp.scientific_name;
     const namesContent = nameRows || '<span class="no-name">No local name recorded</span>';
 
