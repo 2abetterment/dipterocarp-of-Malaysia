@@ -320,6 +320,17 @@ async function init() {
       };
     });
 
+    // DEBUG — remove after diagnosis
+    const floraMpRows = allRows.filter(r => r.source_id === 5);
+    console.log('Total allRows:', allRows.length);
+    console.log('Flora MP rows (source_id=5):', floraMpRows.length);
+    if(floraMpRows.length > 0) {
+      console.log('Sample Flora MP row:', JSON.stringify(floraMpRows[0]));
+    } else {
+      console.warn('NO Flora MP rows found!');
+      const allSourceIds = [...new Set(allRows.map(r=>r.source_id))];
+      console.log('source_ids present:', allSourceIds);
+    }
     document.getElementById('stat-total').textContent   = allRows.length.toLocaleString();
     document.getElementById('stat-species').textContent = (dip.length + non.length).toLocaleString();
     document.getElementById('stat-preferred').textContent = prefSet.size.toLocaleString();
