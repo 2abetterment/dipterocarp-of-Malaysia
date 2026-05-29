@@ -222,7 +222,10 @@ const H = { 'apikey': SB_ANON, 'Authorization': 'Bearer ' + SB_ANON, 'Content-Ty
 
 async function get(path) {
   const r = await fetch(SB_URL + '/rest/v1/' + path, { headers: H });
-  if (!r.ok) throw new Error(r.status);
+  if (!r.ok) {
+    const body = await r.text().catch(()=>'');
+    throw new Error(r.status + ' on ' + path.split('?')[0] + ' — ' + body.slice(0,200));
+  }
   return r.json();
 }
 
