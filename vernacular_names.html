@@ -290,7 +290,7 @@ async function init() {
     }
 
     const [vn, dip, non, pref, src] = await Promise.all([
-      get('vernacular_names?select=id,species_id,species_type,vernacular_name,language,region,source_id,is_preferred&order=vernacular_name.asc&limit=2000'),
+      getAll('vernacular_names?select=id,species_id,species_type,vernacular_name,language,region,source_id,source,is_preferred&order=vernacular_name.asc'),
       get('dipterocarp_species_2025_12_11_02_08?select=id,scientific_name,genus,family&limit=1000'),
       getAll('non_dipterocarp_species?select=id,scientific_name,genus,family'),
       get('preferred_vernacular_names?select=species_id,language,preferred_name&limit=1000'),
@@ -312,7 +312,7 @@ async function init() {
         genus: sci.genus || '',
         family: sci.family || '',
         source_code: s.short_code || '',
-        source_full: s.full_title || '—',
+        source_full: s.full_title || v.source || '—',
         is_pref: prefSet.has(v.species_id + '|' + (v.language || 'Malay'))
       };
     });
@@ -364,7 +364,10 @@ function buildGroupsFromSpecies(dip, non, vnRows) {
     if (!grp.names.find(n => n._key === key)) {
       const srcLabel = r.source_code === 'POCKET_CHECKLIST' ? 'Pocket Checklist of Timber Trees'
         : r.source_code === 'EXISTING_DB' ? 'Database record'
-        : (r.source_full || '—').length > 50 ? r.source_full.slice(0,50) + '…' : (r.source_full || '—');
+        : r.source_code === 'FLORA_MP_VOL1' ? 'Flora of the Malay Peninsula Vol.1 (Ridley 1922)'
+        : r.source_code === 'TFSS_VOL5' ? 'Tree Flora of Sabah & Sarawak Vol.5'
+        : r.source_code === 'RIDLEY_CURTIS_1902' ? 'J. Straits Branch R. Asiat. Soc. 38 (1902)'
+        : (r.source_full || '—').length > 55 ? r.source_full.slice(0,55) + '…' : (r.source_full || '—');
       grp.names.push({
         _key: key,
         vernacular_name: r.vernacular_name,
@@ -406,7 +409,10 @@ function buildGroups(rows) {
     if (!grp.names.find(n => n._key === key)) {
       const srcLabel = r.source_code === 'POCKET_CHECKLIST' ? 'Pocket Checklist of Timber Trees'
         : r.source_code === 'EXISTING_DB' ? 'Database record'
-        : (r.source_full || '—').length > 50 ? r.source_full.slice(0,50) + '…' : (r.source_full || '—');
+        : r.source_code === 'FLORA_MP_VOL1' ? 'Flora of the Malay Peninsula Vol.1 (Ridley 1922)'
+        : r.source_code === 'TFSS_VOL5' ? 'Tree Flora of Sabah & Sarawak Vol.5'
+        : r.source_code === 'RIDLEY_CURTIS_1902' ? 'J. Straits Branch R. Asiat. Soc. 38 (1902)'
+        : (r.source_full || '—').length > 55 ? r.source_full.slice(0,55) + '…' : (r.source_full || '—');
       grp.names.push({ _key: key, vernacular_name: r.vernacular_name,
         language: r.language || '', region: r.region || '',
         source_label: srcLabel, is_pref: r.is_pref });
