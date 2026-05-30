@@ -183,8 +183,8 @@ footer p { font-size: 10.5px; color: var(--ink-3); }
   <select class="filter-select" id="filter-source">
     <option value="">All sources</option>
     <option value="POCKET_CHECKLIST">Pocket Checklist</option>
-    <option value="RIDLEY_CURTIS_1902">Ridley &amp; Curtis 1902</option>
-    <option value="FLORA_MP_VOL1">Flora of Malay Peninsula Vol.1</option>
+    <option value="RIDLEY_CURTIS_1902">Ridley &amp; Curtis (1902) Malay Plant Names</option>
+    <option value="FLORA_MP_VOL1">Ridley (1922) FMP 1</option>
     <option value="TFSS_VOL5">Tree Flora Sabah &amp; Sarawak Vol.5</option>
   </select>
   <span class="result-count" id="result-count"></span>
@@ -374,9 +374,9 @@ function buildGroupsFromSpecies(dip, non, vnRows) {
     if (!grp.names.find(n => n._key === key)) {
       const srcLabel = r.source_code === 'POCKET_CHECKLIST' ? 'Pocket Checklist of Timber Trees'
         : r.source_code === 'EXISTING_DB' ? 'Database record'
-        : r.source_code === 'FLORA_MP_VOL1' ? 'Flora of the Malay Peninsula Vol.1 (Ridley 1922)'
+        : r.source_code === 'FLORA_MP_VOL1' ? 'Ridley (1922) FMP 1'
         : r.source_code === 'TFSS_VOL5' ? 'Tree Flora of Sabah & Sarawak Vol.5'
-        : r.source_code === 'RIDLEY_CURTIS_1902' ? 'J. Straits Branch R. Asiat. Soc. 38 (1902)'
+        : r.source_code === 'RIDLEY_CURTIS_1902' ? 'Ridley & Curtis (1902) Malay Plant Names'
         : (r.source_full || '—').length > 55 ? r.source_full.slice(0,55) + '…' : (r.source_full || '—');
       grp.names.push({
         _key: key,
@@ -419,9 +419,9 @@ function buildGroups(rows) {
     if (!grp.names.find(n => n._key === key)) {
       const srcLabel = r.source_code === 'POCKET_CHECKLIST' ? 'Pocket Checklist of Timber Trees'
         : r.source_code === 'EXISTING_DB' ? 'Database record'
-        : r.source_code === 'FLORA_MP_VOL1' ? 'Flora of the Malay Peninsula Vol.1 (Ridley 1922)'
+        : r.source_code === 'FLORA_MP_VOL1' ? 'Ridley (1922) FMP 1'
         : r.source_code === 'TFSS_VOL5' ? 'Tree Flora of Sabah & Sarawak Vol.5'
-        : r.source_code === 'RIDLEY_CURTIS_1902' ? 'J. Straits Branch R. Asiat. Soc. 38 (1902)'
+        : r.source_code === 'RIDLEY_CURTIS_1902' ? 'Ridley & Curtis (1902) Malay Plant Names'
         : (r.source_full || '—').length > 55 ? r.source_full.slice(0,55) + '…' : (r.source_full || '—');
       grp.names.push({ _key: key, vernacular_name: r.vernacular_name,
         language: r.language || '', region: r.region || '',
