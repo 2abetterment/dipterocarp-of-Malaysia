@@ -431,8 +431,7 @@ function buildGroups(rows) {
 /* ── RENDER ───────────────────────────────────────── */
 function renderTable(groups) {
   const floraGroups = groups.filter(g => g.names.some(n => n.source_label && n.source_label.includes('Flora')));
-  console.log('renderTable called with', groups.length, 'groups,', floraGroups.length, 'have Flora MP names');
-  if(floraGroups.length > 0) console.log('Flora MP sample:', floraGroups[0].scientific_name, floraGroups[0].names[0]);
+  console.log('renderTable:', groups.length, 'groups |', floraGroups.length, 'Flora MP | filter-lang:', document.getElementById('filter-lang').value);
   const L = labels[currentLang];
   const tbody = document.getElementById('results-body');
   document.getElementById('result-count').textContent = groups.length.toLocaleString() + ' ' + L.species;
@@ -495,6 +494,8 @@ function applyFilters() {
       return true;
     });
 
+    const floraFiltered = filteredRows.filter(r => r.source_id === 5);
+    console.log('applyFilters: filteredRows=', filteredRows.length, '| Flora MP rows=', floraFiltered.length, '| lng=', lng);
     // Default: show only species that have vernacular names
     const noFilters = !q && !lng && !reg && !typ;
     if(noFilters){
