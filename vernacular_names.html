@@ -320,17 +320,6 @@ async function init() {
       };
     });
 
-    // DEBUG — remove after diagnosis
-    const floraMpRows = allRows.filter(r => r.source_id === 5);
-    console.log('Total allRows:', allRows.length);
-    console.log('Flora MP rows (source_id=5):', floraMpRows.length);
-    if(floraMpRows.length > 0) {
-      console.log('Sample Flora MP row:', JSON.stringify(floraMpRows[0]));
-    } else {
-      console.warn('NO Flora MP rows found!');
-      const allSourceIds = [...new Set(allRows.map(r=>r.source_id))];
-      console.log('source_ids present:', allSourceIds);
-    }
     document.getElementById('stat-total').textContent   = allRows.length.toLocaleString();
     document.getElementById('stat-species').textContent = (dip.length + non.length).toLocaleString();
     document.getElementById('stat-preferred').textContent = prefSet.size.toLocaleString();
@@ -369,13 +358,6 @@ function buildGroupsFromSpecies(dip, non, vnRows) {
     scientific_name: s.scientific_name, genus: s.genus || '', family: s.family || '',
     page_url: BASE + 'non_dipterocarp_trees_malaysia.html', names: []
   }));
-
-  // DEBUG
-  const floraSample = vnRows.filter(r=>r.source_id===5).slice(0,3);
-  floraSample.forEach(r=>{
-    console.log('Flora MP species_id in map?', r.species_id, map.has(r.species_id), r.vernacular_name);
-  });
-  console.log('map size:', map.size, '| non array size:', non.length, '| dip array size:', dip.length);
 
   // Attach vernacular names
   vnRows.forEach(r => {
@@ -457,7 +439,7 @@ function renderTable(groups) {
     return;
   }
 
-  const slice = groups.slice(0, 400);
+  const slice = groups.slice(0, 2000);
   tbody.innerHTML = slice.map(grp => {
     const nameRows = grp.names.map(n => {
       const star   = n.is_pref ? '<span class="pref-star">★</span>' : '';
@@ -509,9 +491,13 @@ function applyFilters() {
       return true;
     });
 
-    // If no filters active, show all species (including those with no vernacular name)
+    // Default: show only species that have vernacular names
     const noFilters = !q && !lng && !reg && !typ;
-    renderTable(noFilters ? allGroups : buildGroups(filteredRows));
+    if(noFilters){
+      renderTable(allGroups.filter(g => g.names.length > 0));
+    } else {
+      renderTable(buildGroups(filteredRows));
+    }
   }, 220);
 }
 
