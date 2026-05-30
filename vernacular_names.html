@@ -180,6 +180,13 @@ footer p { font-size: 10.5px; color: var(--ink-3); }
     <option value="dipterocarp">Dipterocarpaceae</option>
     <option value="non_dipterocarp">Non-Dipterocarpaceae</option>
   </select>
+  <select class="filter-select" id="filter-source">
+    <option value="">All sources</option>
+    <option value="POCKET_CHECKLIST">Pocket Checklist</option>
+    <option value="RIDLEY_CURTIS_1902">Ridley &amp; Curtis 1902</option>
+    <option value="FLORA_MP_VOL1">Flora of Malay Peninsula Vol.1</option>
+    <option value="TFSS_VOL5">Tree Flora Sabah &amp; Sarawak Vol.5</option>
+  </select>
   <span class="result-count" id="result-count"></span>
 </div>
 
@@ -430,8 +437,6 @@ function buildGroups(rows) {
 
 /* ── RENDER ───────────────────────────────────────── */
 function renderTable(groups) {
-  const floraGroups = groups.filter(g => g.names.some(n => n.source_label && n.source_label.includes('Flora')));
-  console.log('renderTable:', groups.length, 'groups |', floraGroups.length, 'Flora MP | filter-lang:', document.getElementById('filter-lang').value);
   const L = labels[currentLang];
   const tbody = document.getElementById('results-body');
   document.getElementById('result-count').textContent = groups.length.toLocaleString() + ' ' + L.species;
@@ -481,6 +486,7 @@ function applyFilters() {
     const lng = document.getElementById('filter-lang').value;
     const reg = document.getElementById('filter-region').value;
     const typ = document.getElementById('filter-type').value;
+    const src = document.getElementById('filter-source').value;
 
     // Filter raw rows, then regroup
     const filteredRows = allRows.filter(r => {
@@ -491,13 +497,12 @@ function applyFilters() {
       if (lng && r.language !== lng) return false;
       if (reg && r.region !== reg && r.region !== 'Preferred') return false;
       if (typ && r.species_type !== typ) return false;
+      if (src && r.source_code !== src) return false;
       return true;
     });
 
-    const floraFiltered = filteredRows.filter(r => r.source_id === 5);
-    console.log('applyFilters: filteredRows=', filteredRows.length, '| Flora MP rows=', floraFiltered.length, '| lng=', lng);
     // Default: show only species that have vernacular names
-    const noFilters = !q && !lng && !reg && !typ;
+    const noFilters = !q && !lng && !reg && !typ && !src;
     if(noFilters){
       renderTable(allGroups.filter(g => g.names.length > 0 && g.scientific_name !== '—'));
     } else {
@@ -510,6 +515,7 @@ document.getElementById('search').addEventListener('input', applyFilters);
 document.getElementById('filter-lang').addEventListener('change', applyFilters);
 document.getElementById('filter-region').addEventListener('change', applyFilters);
 document.getElementById('filter-type').addEventListener('change', applyFilters);
+document.getElementById('filter-source').addEventListener('change', applyFilters);
 
 init();
 </script>
