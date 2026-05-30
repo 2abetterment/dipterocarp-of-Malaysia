@@ -363,7 +363,7 @@ function buildGroupsFromSpecies(dip, non, vnRows) {
   vnRows.forEach(r => {
     if (!map.has(r.species_id)) return;
     const grp = map.get(r.species_id);
-    const key = r.vernacular_name + '||' + (r.language||'') + '||' + (r.source_code||r.source_id||'');
+    const key = r.vernacular_name.toLowerCase() + '||' + (r.language||'').toLowerCase() + '||' + (r.source_code||r.source_id||'');
     if (!grp.names.find(n => n._key === key)) {
       const srcLabel = r.source_code === 'POCKET_CHECKLIST' ? 'Pocket Checklist of Timber Trees'
         : r.source_code === 'EXISTING_DB' ? 'Database record'
@@ -408,7 +408,7 @@ function buildGroups(rows) {
       });
     }
     const grp = map.get(r.species_id);
-    const key = r.vernacular_name + '||' + (r.language||'') + '||' + (r.source_code||r.source_id||'');
+    const key = r.vernacular_name.toLowerCase() + '||' + (r.language||'').toLowerCase() + '||' + (r.source_code||r.source_id||'');
     if (!grp.names.find(n => n._key === key)) {
       const srcLabel = r.source_code === 'POCKET_CHECKLIST' ? 'Pocket Checklist of Timber Trees'
         : r.source_code === 'EXISTING_DB' ? 'Database record'
@@ -466,7 +466,7 @@ function renderTable(groups) {
   }).join('');
 
   if (groups.length > 400) {
-    tbody.innerHTML += `<tr class="state-row"><td colspan="4">${groups.length - 400} more species — refine your search to see them.</td></tr>`;
+    tbody.innerHTML += `<tr class="state-row"><td colspan="4">${groups.length - 400} more — refine your search to see all.</td></tr>`;
   }
 }
 
@@ -482,6 +482,7 @@ function applyFilters() {
 
     // Filter raw rows, then regroup
     const filteredRows = allRows.filter(r => {
+      if (r.scientific_name === '—') return false; // skip unresolved species
       if (q && !r.vernacular_name.toLowerCase().includes(q) &&
                !r.scientific_name.toLowerCase().includes(q) &&
                !(r.genus||'').toLowerCase().includes(q)) return false;
@@ -494,7 +495,7 @@ function applyFilters() {
     // Default: show only species that have vernacular names
     const noFilters = !q && !lng && !reg && !typ;
     if(noFilters){
-      renderTable(allGroups.filter(g => g.names.length > 0));
+      renderTable(allGroups.filter(g => g.names.length > 0 && g.scientific_name !== '—'));
     } else {
       renderTable(buildGroups(filteredRows));
     }
