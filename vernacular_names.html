@@ -370,6 +370,13 @@ function buildGroupsFromSpecies(dip, non, vnRows) {
     page_url: BASE + 'non_dipterocarp_trees_malaysia.html', names: []
   }));
 
+  // DEBUG
+  const floraSample = vnRows.filter(r=>r.source_id===5).slice(0,3);
+  floraSample.forEach(r=>{
+    console.log('Flora MP species_id in map?', r.species_id, map.has(r.species_id), r.vernacular_name);
+  });
+  console.log('map size:', map.size, '| non array size:', non.length, '| dip array size:', dip.length);
+
   // Attach vernacular names
   vnRows.forEach(r => {
     if (!map.has(r.species_id)) return;
