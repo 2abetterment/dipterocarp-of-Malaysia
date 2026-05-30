@@ -333,7 +333,7 @@ async function init() {
 
     // Build full species list (all species, even those with no vernacular name)
     allGroups = buildGroupsFromSpecies(dip, non, allRows);
-    renderTable(allGroups);
+    renderTable(allGroups.filter(g => g.names.length > 0 && g.scientific_name !== '—'));
 
   } catch(e) {
     document.getElementById('results-body').innerHTML =
@@ -430,6 +430,9 @@ function buildGroups(rows) {
 
 /* ── RENDER ───────────────────────────────────────── */
 function renderTable(groups) {
+  const floraGroups = groups.filter(g => g.names.some(n => n.source_label && n.source_label.includes('Flora')));
+  console.log('renderTable called with', groups.length, 'groups,', floraGroups.length, 'have Flora MP names');
+  if(floraGroups.length > 0) console.log('Flora MP sample:', floraGroups[0].scientific_name, floraGroups[0].names[0]);
   const L = labels[currentLang];
   const tbody = document.getElementById('results-body');
   document.getElementById('result-count').textContent = groups.length.toLocaleString() + ' ' + L.species;
