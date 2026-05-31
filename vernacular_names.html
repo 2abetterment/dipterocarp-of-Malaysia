@@ -185,7 +185,7 @@ footer p { font-size: 10.5px; color: var(--ink-3); }
     <option value="POCKET_CHECKLIST">Kochummen (1997). Pocket Checklist of Timber Trees of Peninsular Malaysia</option>
     <option value="RIDLEY_CURTIS_1902">Ridley &amp; Curtis (1902). Malay Plant Names. J. Straits Branch R. Asiat. Soc. 38</option>
     <option value="FLORA_MP_VOL1">Ridley (1922). The Flora of the Malay Peninsula. Vol. 1</option>
-    <option value="FLORA_MP_VOL2">Ridley (1922). The Flora of the Malay Peninsula. Vol. 2</option>
+    <option value="FLORA_MP_VOL2">Ridley (1923). The Flora of the Malay Peninsula. Vol. 2</option>
     <option value="TFSS_VOL5">Ashton (2004). Dipterocarpaceae. In Tree Flora of Sabah &amp; Sarawak, Vol. 5</option>
   </select>
   <span class="result-count" id="result-count"></span>
@@ -376,7 +376,7 @@ function buildGroupsFromSpecies(dip, non, vnRows) {
       const srcLabel = r.source_code === 'POCKET_CHECKLIST' ? 'Pocket Checklist of Timber Trees'
         : r.source_code === 'EXISTING_DB' ? 'Database record'
         : r.source_code === 'FLORA_MP_VOL1' ? 'Ridley (1922) FMP 1'
-        : r.source_code === 'FLORA_MP_VOL2' ? 'Ridley (1922) FMP 2'
+        : r.source_code === 'FLORA_MP_VOL2' ? 'Ridley (1923) FMP 2'
         : r.source_code === 'TFSS_VOL5' ? 'Tree Flora of Sabah & Sarawak Vol.5'
         : r.source_code === 'RIDLEY_CURTIS_1902' ? 'Ridley & Curtis (1902) Malay Plant Names'
         : (r.source_full || '—').length > 55 ? r.source_full.slice(0,55) + '…' : (r.source_full || '—');
@@ -422,7 +422,7 @@ function buildGroups(rows) {
       const srcLabel = r.source_code === 'POCKET_CHECKLIST' ? 'Pocket Checklist of Timber Trees'
         : r.source_code === 'EXISTING_DB' ? 'Database record'
         : r.source_code === 'FLORA_MP_VOL1' ? 'Ridley (1922) FMP 1'
-        : r.source_code === 'FLORA_MP_VOL2' ? 'Ridley (1922) FMP 2'
+        : r.source_code === 'FLORA_MP_VOL2' ? 'Ridley (1923) FMP 2'
         : r.source_code === 'TFSS_VOL5' ? 'Tree Flora of Sabah & Sarawak Vol.5'
         : r.source_code === 'RIDLEY_CURTIS_1902' ? 'Ridley & Curtis (1902) Malay Plant Names'
         : (r.source_full || '—').length > 55 ? r.source_full.slice(0,55) + '…' : (r.source_full || '—');
