@@ -378,30 +378,34 @@ function Home({species,loading,error,setRoute,setDetailId,setQuery,lang}){
 function Browse({species,query,setQuery,setRoute,setDetailId,lang}){
   const ui=UI[lang];
   const[view,setView]=useState('grid');
-  const[filters,setFilters]=useState({family:[],iucn:[],region:[],endemic:false});
+  const[filters,setFilters]=useState({family:[],genus:[],region:[],endemic:false});
   const[sort,setSort]=useState('name');
   const[fO,setFO]=useState(true);
-  const[iO,setIO]=useState(true);
+  const[gO,setGO]=useState(true);
   const allF=useMemo(()=>[...new Set(species.map(s=>s.family).filter(Boolean))].sort(),[species]);
+  const allG=useMemo(()=>{
+    const src=filters.family.length?species.filter(s=>filters.family.includes(s.family)):species;
+    return [...new Set(src.map(s=>s.genus).filter(Boolean))].sort();
+  },[species,filters.family]);
   const filtered=useMemo(()=>{
     let r=[...species];
     if(query){const q=query.toLowerCase();r=r.filter(s=>s.sci.toLowerCase().includes(q)||s.genus.toLowerCase().includes(q)||s.family.toLowerCase().includes(q)||s.common.some(c=>c.toLowerCase().includes(q)));}
     if(filters.family.length)r=r.filter(s=>filters.family.includes(s.family));
-    if(filters.iucn.length)r=r.filter(s=>filters.iucn.includes(s.iucn));
+    if(filters.genus.length)r=r.filter(s=>filters.genus.includes(s.genus));
     if(filters.endemic)r=r.filter(s=>s.endemic);
     if(sort==='name')r.sort((a,b)=>a.sci.localeCompare(b.sci));
     if(sort==='status'){const o=['CR','EN','VU','NT','LC','DD'];r.sort((a,b)=>o.indexOf(a.iucn)-o.indexOf(b.iucn));}
     return r;
   },[species,query,filters,sort]);
   const tog=(k,v)=>setFilters(f=>({...f,[k]:f[k].includes(v)?f[k].filter(x=>x!==v):[...f[k],v]}));
-  const ac=filters.family.length+filters.iucn.length+(filters.endemic?1:0);
+  const ac=filters.family.length+filters.genus.length+(filters.endemic?1:0);
   const FG=({title,open,onT,children})=><div className="fg"><button className="fgh" onClick={onT}><span className="fgl">{title}</span><span style={{fontSize:10,color:'var(--text-3)'}}>{open?'▲':'▼'}</span></button>{open&&<div className="fgb">{children}</div>}</div>;
   const Ck=({checked,onClick,children,count})=><button className="cr" onClick={onClick}><span className={`cb ${checked?'cbon':'cboff'}`}>{checked&&'✓'}</span><span style={{flex:1,fontSize:13}}>{children}</span>{count!==undefined&&<span style={{fontSize:11,color:'var(--text-3)',fontFamily:'DM Mono'}}>{count}</span>}</button>;
   return <div className="blayout">
     <aside>
-      <div className="sbh"><span className="sbt">{ui.filters}</span>{ac>0&&<button className="btn bg bsm" style={{fontSize:12,color:'var(--moss)',padding:'2px 6px'}} onClick={()=>setFilters({family:[],iucn:[],region:[],endemic:false})}>{ui.clear}</button>}</div>
-      <FG title={ui.iucn} open={iO} onT={()=>setIO(o=>!o)}>{['CR','EN','VU','NT','LC','DD'].map(c=><Ck key={c} checked={filters.iucn.includes(c)} onClick={()=>tog('iucn',c)} count={species.filter(s=>s.iucn===c).length}><Pill code={c} sm/></Ck>)}</FG>
-      <FG title={ui.family} open={fO} onT={()=>setFO(o=>!o)}><div style={{maxHeight:220,overflowY:'auto'}}>{allF.map(f=><Ck key={f} checked={filters.family.includes(f)} onClick={()=>tog('family',f)} count={species.filter(s=>s.family===f).length}><span style={{fontStyle:'italic',fontSize:12}}>{f}</span></Ck>)}</div></FG>
+      <div className="sbh"><span className="sbt">{ui.filters}</span>{ac>0&&<button className="btn bg bsm" style={{fontSize:12,color:'var(--moss)',padding:'2px 6px'}} onClick={()=>setFilters({family:[],genus:[],region:[],endemic:false})}>{ui.clear}</button>}</div>
+      <FG title={ui.family} open={fO} onT={()=>setFO(o=>!o)}><div style={{maxHeight:220,overflowY:'auto'}}>{allF.map(f=><Ck key={f} checked={filters.family.includes(f)} onClick={()=>{tog('family',f);setFilters(prev=>({...prev,genus:[]}));}} count={species.filter(s=>s.family===f).length}><span style={{fontStyle:'italic',fontSize:12}}>{f}</span></Ck>)}</div></FG>
+      <FG title={lang==='en'?'Genus':'Genus'} open={gO} onT={()=>setGO(o=>!o)}><div style={{maxHeight:220,overflowY:'auto'}}>{allG.length===0?<span style={{fontSize:12,color:'var(--text-3)',padding:'4px 8px',display:'block'}}>{lang==='en'?'Select a family first':'Pilih famili dahulu'}</span>:allG.map(g=><Ck key={g} checked={filters.genus.includes(g)} onClick={()=>tog('genus',g)} count={species.filter(s=>s.genus===g).length}><span style={{fontStyle:'italic',fontSize:12}}>{g}</span></Ck>)}</div></FG>
       <FG title={ui.others} open={true} onT={()=>{}}><Ck checked={filters.endemic} onClick={()=>setFilters(f=>({...f,endemic:!f.endemic}))}>{ui.endemic_my}</Ck></FG>
     </aside>
     <main>
@@ -412,7 +416,7 @@ function Browse({species,query,setQuery,setRoute,setDetailId,lang}){
         <div className="vt"><button className={`vb${view==='grid'?' vbon':''}`} onClick={()=>setView('grid')}>⊞</button><button className={`vb${view==='list'?' vbon':''}`} onClick={()=>setView('list')}>≡</button></div>
       </div>
       {filtered.length===0
-        ?<div className="empty"><div style={{fontSize:40,marginBottom:16,opacity:.5}}>🌳</div><div style={{fontFamily:'Playfair Display',fontSize:20,color:'var(--forest)',marginBottom:8}}>{ui.no_match}</div><div style={{fontSize:14,color:'var(--text-3)',marginBottom:20}}>{ui.no_match_sub}</div><button className="btn bs" onClick={()=>{setQuery('');setFilters({family:[],iucn:[],region:[],endemic:false});}}>{ui.reset}</button></div>
+        ?<div className="empty"><div style={{fontSize:40,marginBottom:16,opacity:.5}}>🌳</div><div style={{fontFamily:'Playfair Display',fontSize:20,color:'var(--forest)',marginBottom:8}}>{ui.no_match}</div><div style={{fontSize:14,color:'var(--text-3)',marginBottom:20}}>{ui.no_match_sub}</div><button className="btn bs" onClick={()=>{setQuery('');setFilters({family:[],genus:[],region:[],endemic:false});}}>{ui.reset}</button></div>
         :view==='grid'
           ?<div className="cg3">{filtered.map((s,i)=><Card key={s.id} s={s} i={i} onClick={()=>{setDetailId(s.id);setRoute('detail');}}/>)}</div>
           :<div className="lt2"><div className="lth"><div/><div>Species</div><div>{lang==='en'?'Local name':'Nama tempatan'}</div><div>Family</div><div>IUCN</div></div>{filtered.map((s,i)=><button key={s.id} className="ltr" onClick={()=>{setDetailId(s.id);setRoute('detail');}}><div style={{width:40,height:40,borderRadius:7,overflow:'hidden'}}><SpI src={s.img} seed={i} ratio="1/1" rounded={false}/></div><div><div style={{fontFamily:'Playfair Display',fontSize:14,fontStyle:'italic',fontWeight:500}}><span dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/></div><div style={{fontSize:11,color:'var(--text-3)',fontFamily:'DM Mono'}}>{s.family}</div></div><div style={{fontSize:13}}>{s.common[0]||'—'}</div><div style={{fontSize:13,fontStyle:'italic',color:'var(--text-2)'}}>{s.family}</div><Pill code={s.iucn} sm/></button>)}</div>
