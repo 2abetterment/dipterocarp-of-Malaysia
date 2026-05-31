@@ -227,7 +227,7 @@ footer p { font-size: 10.5px; color: var(--ink-3); }
 /* ── Format scientific name: taxon italic, authority roman ── */
 function formatSci(name){
   if(!name||name==='—') return name;
-  const m = name.match(/^([A-Z][a-zÀ-ɏ×+]+(?:\s+[a-zÀ-ɏ×+\-]+){1,2}(?:\s+(?:subsp\.|var\.|f\.)\s+[a-zÀ-ɏ×+\-]+)?)(.*)/);
+  const m = name.match(/^([A-Z][a-zÀ-ɏ×+]+\s+[a-zÀ-ɏ×+\-]+(?:\s+(?:subsp\.|ssp\.|var\.|f\.)\s+[a-zÀ-ɏ×+\-]+)?)(.*)/);
   if(!m) return `<i>${name}</i>`;
   const taxon = m[1].trim(), auth = m[2].trim();
   return auth ? `<i>${taxon}</i> <span class="authority">${auth}</span>` : `<i>${taxon}</i>`;
