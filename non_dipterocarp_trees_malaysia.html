@@ -320,7 +320,7 @@ function SpI({src,seed,ratio,rounded}){
   return <div className="sph" style={{aspectRatio:ratio||'4/3',borderRadius:r2,background:`linear-gradient(135deg,hsl(${h},22%,80%),hsl(${h+25},28%,70%))`}}><div className="sphi" style={{backgroundImage:`radial-gradient(circle at 35% 65%,rgba(107,171,130,.45),transparent 55%),radial-gradient(circle at 75% 30%,rgba(201,134,42,.28),transparent 50%)`}}/></div>;
 }
 
-function Card({s,i,onClick}){return <button className="card" onClick={onClick}><div className="cimg"><SpI src={s.img} seed={i} ratio="4/3"/></div><div className="cbody"><div className="cmeta"><span className="cfam" style={{fontSize:10}}>{s.family}</span><div className="cbadges"><Pill code={s.iucn} sm/>{s.endemic&&<span style={{fontSize:10,padding:'1px 7px',background:'var(--forest)',color:'white',borderRadius:999,fontWeight:600}}>Endemik</span>}</div></div><div className="csci" dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/><div className="cname">{s.preferred||s.common[0]||s.genus}</div></div></button>;}
+function Card({s,i,onClick}){return <button className="card" onClick={onClick}><div className="cimg"><SpI src={s.img} seed={i} ratio="4/3"/></div><div className="cbody"><div className="cmeta"><span className="cfam" style={{fontSize:10}}>{s.family}</span><div className="cbadges"><Pill code={s.iucn} sm/>{s.endemic&&<span style={{fontSize:10,padding:'1px 7px',background:'var(--forest)',color:'white',borderRadius:999,fontWeight:600}}>Endemik</span>}</div></div><div className="csci" dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/><div className="cname">{s.preferred||s.common[0]||''}</div></div></button>;}
 
 function TopBar({route,setRoute,query,setQuery,onSearch,lang,setLang,isAdmin,setShowLogin}){
   const ui=UI[lang];
