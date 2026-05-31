@@ -333,9 +333,7 @@ function TopBar({route,setRoute,query,setQuery,onSearch,lang,setLang,isAdmin,set
     <nav className="nav">
       {[['browse',ui.browse],['contribute',ui.contribute],['about',ui.about]].map(([id,l])=><button key={id} className={`nb${route===id?' on':''}`} onClick={()=>setRoute(id)}>{l}</button>)}
     </nav>
-    <form onSubmit={e=>{e.preventDefault();onSearch();}} style={{flex:1,maxWidth:380}}>
-      <div className="sw"><svg width={14} height={14} viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="var(--text-3)" strokeWidth="1.5"/><path d="M11 11l3.5 3.5" stroke="var(--text-3)" strokeWidth="1.5" strokeLinecap="round"/></svg><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={ui.search}/></div>
-    </form>
+    
     <div className="sp"/>
     <button className="lt" onClick={()=>setLang(l=>l==='en'?'bm':'en')}><span style={{opacity:lang==='en'?1:.35}}>EN</span><span style={{color:'var(--border-2)'}}>|</span><span style={{opacity:lang==='bm'?1:.35}}>BM</span></button>
     <button className="btn ba bsm" onClick={()=>setRoute('contribute')}>{ui.contribute}</button>
