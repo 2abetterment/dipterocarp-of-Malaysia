@@ -390,7 +390,7 @@ function Browse({species,query,setQuery,setRoute,setDetailId,navigate,lang}){
   },[species,filters.family]);
   const filtered=useMemo(()=>{
     let r=[...species];
-    if(query){const q=query.toLowerCase();r=r.filter(s=>s.sci.toLowerCase().includes(q)||s.genus.toLowerCase().includes(q)||s.family.toLowerCase().includes(q)||s.common.some(c=>c.toLowerCase().includes(q)));}
+    if(query){const q=query.toLowerCase();r=r.filter(s=>s.sci.toLowerCase().includes(q)||s.genus.toLowerCase().includes(q)||s.family.toLowerCase().includes(q)||s.common.some(c=>c.toLowerCase().includes(q))||(s.preferred&&s.preferred.toLowerCase().includes(q))||(s.allNames&&s.allNames.some(n=>n.toLowerCase().includes(q))));}
     if(filters.family.length)r=r.filter(s=>filters.family.includes(s.family));
     if(filters.genus.length)r=r.filter(s=>filters.genus.includes(s.genus));
     if(filters.endemic)r=r.filter(s=>s.endemic);
@@ -630,12 +630,17 @@ function App(){
   useEffect(()=>{
     Promise.all([
       (async()=>{const PAGE=1000;let off=0,all=[];while(true){const r=await fetch(`${SB}/rest/v1/${T_SPP}?select=*&order=scientific_name&limit=${PAGE}&offset=${off}`,{headers:H});const d=await r.json();if(!Array.isArray(d)||!d.length)break;all=all.concat(d);if(d.length<PAGE)break;off+=PAGE;}return all;})(),
-      fetch(`${SB}/rest/v1/vernacular_names?select=species_id,vernacular_name&species_type=eq.non_dipterocarp&is_preferred=eq.true&language=eq.Malay&limit=2000`,{headers:H}).then(r=>r.json())
+      (async()=>{const PAGE=1000;let off=0,all=[];while(true){const r=await fetch(`${SB}/rest/v1/vernacular_names?select=species_id,vernacular_name,is_preferred&species_type=eq.non_dipterocarp&language=eq.Malay&limit=${PAGE}&offset=${off}`,{headers:H});const d=await r.json();if(!Array.isArray(d)||!d.length)break;all=all.concat(d);if(d.length<PAGE)break;off+=PAGE;}return all;})()
     ])
-    .then(([rows,pref])=>{
+    .then(([rows,vnames])=>{
       const prefMap={};
-      pref.forEach(p=>{if(!prefMap[p.species_id])prefMap[p.species_id]=p.vernacular_name;});
-      setSpecies(rows.map(r=>({...mr(r),preferred:prefMap[r.id]||null})));
+      const allNamesMap={};
+      vnames.forEach(v=>{
+        if(!allNamesMap[v.species_id])allNamesMap[v.species_id]=[];
+        allNamesMap[v.species_id].push(v.vernacular_name);
+        if(v.is_preferred&&!prefMap[v.species_id])prefMap[v.species_id]=v.vernacular_name;
+      });
+      setSpecies(rows.map(r=>({...mr(r),preferred:prefMap[r.id]||null,allNames:allNamesMap[r.id]||[]})));
       setLoading(false);
     })
     .catch(e=>{setError(e.message);setLoading(false);});
