@@ -271,7 +271,8 @@ const UI={
     morph:'Morphological characters',height:'Height',dbh:'DBH',bark:'Bark',
     leaf:'Leaf',flower:'Flower',fruit:'Fruit',
     taxdesc_label:'Taxonomic Description',
-    taxdesc_note:'No taxonomic description recorded yet for this species.'},
+    taxdesc_note:'No taxonomic description recorded yet for this species.',
+    spotchars:'Spot Characters'},
   bm:{browse:'Layari',contribute:'Sumbang',about:'Perihal',
     search:'Cari spesies, famili, genus, nama Melayu…',
     loading:'Memuatkan dari pangkalan data…',featured:'Spesies ikonik',
@@ -291,7 +292,8 @@ const UI={
     morph:'Ciri morfologi',height:'Ketinggian',dbh:'DBH',bark:'Kulit kayu',
     leaf:'Daun',flower:'Bunga',fruit:'Buah',
     taxdesc_label:'Huraian Taksonomi',
-    taxdesc_note:'Tiada huraian taksonomi direkodkan untuk spesies ini.'}
+    taxdesc_note:'Tiada huraian taksonomi direkodkan untuk spesies ini.',
+    spotchars:'Ciri Lapangan'}
 };
 
 function pi(s){if(!s)return'DD';const l=s.toLowerCase();if(l.includes('critically'))return'CR';if(l.includes('endangered'))return'EN';if(l.includes('vulnerable'))return'VU';if(l.includes('near'))return'NT';if(l.includes('least'))return'LC';return'DD';}
@@ -310,7 +312,7 @@ function formatSci(name, opts={}){
     ? `<i>${taxon}</i> <span style="font-style:normal;font-weight:400">${auth}</span>`
     : `<i>${taxon}</i>`;
 }
-function mr(r){return{id:r.id,sci:(r.scientific_name||'')+(r.infraspecific_epithet?' '+r.infraspecific_epithet:''),genus:r.genus||'',family:r.family||'',common:[r.local_name_malay,r['maksud epitet']].filter(Boolean),iucn:pi(r.conservation_status),cs:r.conservation_status||'',endemic:!!r.endemic_to_malaysia,height:r.height_range||'—',dbh:r.trunk_diameter||'—',habitat:r.habitat||'—',alt:r.elevation_range||'—',phen:r.flowering_pattern||'—',bark:r.bark_description||'',leaf:r.leaf_description||'',flower:r.flower_description||'',fruit:r.fruit_description||'',eco:r.ecological_notes||'',uses:r.economic_importance||'—',taxdesc:r.taxonomic_description||'',dist:[r.distribution_peninsular&&'Peninsular Malaysia',r.distribution_sabah&&'Sabah',r.distribution_sarawak&&'Sarawak'].filter(Boolean),img:r.image_url||''};}
+function mr(r){return{id:r.id,sci:(r.scientific_name||'')+(r.infraspecific_epithet?' '+r.infraspecific_epithet:''),genus:r.genus||'',family:r.family||'',common:[r.local_name_malay,r['maksud epitet']].filter(Boolean),iucn:pi(r.conservation_status),cs:r.conservation_status||'',endemic:!!r.endemic_to_malaysia,height:r.height_range||'—',dbh:r.trunk_diameter||'—',habitat:r.habitat||'—',alt:r.elevation_range||'—',phen:r.flowering_pattern||'—',bark:r.bark_description||'',leaf:r.leaf_description||'',flower:r.flower_description||'',fruit:r.fruit_description||'',eco:r.ecological_notes||'',uses:r.economic_importance||'—',taxdesc:r.taxonomic_description||'',authority:r.authority||'',publication:r.publication||'',dist:[r.distribution_peninsular&&'Peninsular Malaysia',r.distribution_sabah&&'Sabah',r.distribution_sarawak&&'Sarawak'].filter(Boolean),img:r.image_url||''};}
 
 function Pill({code,sm}){return <span className={`pill ${sm?'psm':''} p${code}`}><span style={{width:5,height:5,borderRadius:999,background:'currentColor',display:'inline-block',opacity:.7}}/>{code}</span>;}
 
@@ -438,30 +440,56 @@ function Detail({species,detailId,setRoute,setQuery,navigate,lang}){
       <div>
         <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:14}}><span className="dtag">{s.family}</span>{s.endemic&&<span className="detag">Endemik</span>}</div>
         <div className="dsci" dangerouslySetInnerHTML={{__html:formatSci(s.sci,{fontSize:42})}}/>
-        {s.common.length>0&&<><div className="dll">{ui.local_names}</div><div className="dlv">{s.common.join(' · ')}</div></>}
+        {(()=>{
+          // Merge all names: from local_name_malay column + vernacular_names table, deduplicated case-insensitively
+          const fromCommon = s.common.flatMap(c=>c.split(';').map(n=>n.trim())).filter(Boolean);
+          const fromDB = (s.allNames||[]).map(n=>n.trim()).filter(Boolean);
+          const seen = new Set();
+          const allVn = [...fromCommon,...fromDB].filter(n=>{
+            const k=n.toLowerCase();
+            if(seen.has(k))return false;
+            seen.add(k);return true;
+          });
+          if(!allVn.length)return null;
+          return <><div className="dll">{ui.local_names}</div>
+            <div style={{display:'flex',flexWrap:'wrap',gap:6,marginBottom:4}}>
+              {allVn.map(n=><span key={n} style={{fontSize:13,padding:'3px 10px',background:'var(--parch)',border:'1px solid var(--border)',borderRadius:999,color:'var(--text)'}}>{n}</span>)}
+            </div>
+            <a href={`https://2abetterment.github.io/dipterocarp-of-Malaysia/vernacular_names.html?id=${s.id}`} target="_blank" style={{fontSize:12,color:'var(--moss)',textDecoration:'none',fontWeight:500}}>{lang==='en'?'View all in Names Database →':'Lihat semua dalam Pangkalan Nama →'}</a>
+          </>;
+        })()}
         <div className="cbox"><div className="cl">{ui.conservation}</div><div style={{display:'flex',alignItems:'center',gap:10}}><Pill code={s.iucn}/><span style={{fontSize:13.5,color:'var(--text-2)'}}>{s.cs}</span></div></div>
-        <div className="qg">{[[ui.habitat,s.habitat],[ui.altitude,s.alt],[ui.phenology,s.phen]].map(([k,v])=><div key={k}><div className="qk">{k}</div><div className="qv">{v}</div></div>)}</div>
+        <div className="qg">{[[ui.habitat,s.habitat],[ui.altitude,s.alt]].map(([k,v])=><div key={k}><div className="qk">{k}</div><div className="qv">{v}</div></div>)}</div>
       </div>
     </div>
-    <div className="tabs2">{[['overview',ui.overview],['taxonomy',ui.taxonomy],['distribution',ui.dist_tab],['morphology',ui.morphology]].map(([id,l])=><button key={id} className={`tb2${tab===id?' on':''}`} onClick={()=>setTab(id)}>{l}</button>)}</div>
+    <div className="tabs2">{[['overview',ui.overview],['taxonomy',ui.taxonomy],['distribution',ui.dist_tab],['spotchars',ui.spotchars]].map(([id,l])=><button key={id} className={`tb2${tab===id?' on':''}`} onClick={()=>setTab(id)}>{l}</button>)}</div>
     {tab==='overview'&&<div className="dgrid">
       <div>
         {s.taxdesc&&<div className="sblock"><div className="stitle">{ui.taxdesc_label}</div><p style={{fontSize:15,lineHeight:1.85,color:'var(--text)',fontFamily:'Georgia,serif'}}>{s.taxdesc}</p></div>}
         {(s.bark||s.leaf)&&<div className="sblock"><div className="stitle">{ui.description}</div><p style={{fontSize:15,lineHeight:1.7}}>{[s.bark,s.leaf].filter(Boolean).join(' ')}</p></div>}
-        <div className="sblock"><div className="stitle">{ui.ecology}</div>{[[ui.habitat,s.habitat],[ui.altitude,s.alt],[ui.phenology,s.phen],...(s.eco?[['Notes',s.eco]]:[])].map(([k,v])=><div key={k} className="kv"><span className="kk">{k}</span><span className="kv2">{v}</span></div>)}</div>
+        <div className="sblock"><div className="stitle">{ui.ecology}</div>{[[ui.habitat,s.habitat],[ui.altitude,s.alt],...(s.eco?[['Notes',s.eco]]:[])].map(([k,v])=><div key={k} className="kv"><span className="kk">{k}</span><span className="kv2">{v}</span></div>)}</div>
         {s.uses&&s.uses!=='—'&&<div className="sblock"><div className="stitle">{ui.uses}</div><p style={{fontSize:15,lineHeight:1.7}}>{s.uses}</p></div>}
       </div>
       <aside><div className="qfc"><div style={{fontSize:11,fontWeight:700,color:'var(--text-3)',textTransform:'uppercase',letterSpacing:'.08em',marginBottom:14}}>{ui.quick}</div>{[['Genus',<span style={{fontStyle:'italic'}}>{s.genus}</span>],['Family',<span style={{fontStyle:'italic'}}>{s.family}</span>],[ui.endemic,s.endemic?ui.yes:ui.no],[ui.distribution,s.dist.join(', ')||'—']].map(([k,v])=><div key={k} className="qfr"><span className="qfk">{k}</span><span className="qfv">{v}</span></div>)}</div></aside>
     </div>}
     {tab==='taxonomy'&&<div>
-      <div style={{marginBottom:32}}><div className="stitle">{ui.taxdesc_label}</div>{s.taxdesc?<div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:'var(--r)',padding:28,maxWidth:780}}><p style={{fontSize:15,lineHeight:1.85,color:'var(--text)',margin:0,fontFamily:'Georgia,serif'}}>{s.taxdesc}</p></div>:<div style={{padding:'24px 28px',background:'var(--parch)',border:'1.5px dashed var(--border-2)',borderRadius:'var(--r)',color:'var(--text-3)',fontSize:14,fontStyle:'italic'}}>{ui.taxdesc_note}</div>}</div>
-      <div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:'var(--r)',padding:28,maxWidth:680}}>
-        <div className="stitle">{lang==='en'?'Taxonomic classification':'Pengelasan taksonomi'}</div>
-        {[['Kingdom','Plantae'],['Order','—'],['Family',s.family],['Genus',s.genus],['Species',s.sci.split(' ')[1]||'—'],[lang==='en'?'Accepted name':'Nama diterima',s.sci]].map(([k,v])=><div key={k} className="txr"><span className="txk">{k}</span><span className="txv" style={{fontStyle:['Family','Genus','Species',lang==='en'?'Accepted name':'Nama diterima'].includes(k)?'italic':'normal'}}>{v}</span></div>)}
+      <div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:'var(--r)',padding:28,maxWidth:560}}>
+        <div className="stitle">{lang==='en'?'APG IV Classification':'Pengelasan APG IV'}</div>
+        <div className="txr"><span className="txk">{lang==='en'?'Accepted name':'Nama diterima'}</span><span className="txv" style={{fontStyle:'italic',fontWeight:500}}><span dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/></span></div>
+        {s.authority&&<div className="txr"><span className="txk">{lang==='en'?'Authority':'Autoriti'}</span><span className="txv">{s.authority}</span></div>}
+        <div className="txr"><span className="txk">Order</span><span className="txv">—</span></div>
+        <div className="txr"><span className="txk">Family</span><span className="txv">{s.family}</span></div>
+        {s.publication&&<div className="txr"><span className="txk">{lang==='en'?'Publication':'Penerbitan'}</span><span className="txv" style={{fontSize:13,color:'var(--text-2)'}}>{s.publication}</span></div>}
       </div>
     </div>}
     {tab==='distribution'&&<div><div style={{fontFamily:'Playfair Display',fontSize:20,fontWeight:700,color:'var(--forest)',marginBottom:20}}>{ui.dist_rec(s.dist.length)}</div><div style={{display:'flex',flexWrap:'wrap',gap:0,marginBottom:28}}>{['Peninsular Malaysia','Sabah','Sarawak'].map(rg=><span key={rg} className={`dp ${s.dist.includes(rg)?'dpy':'dpn'}`}>{rg}</span>)}</div><div style={{padding:20,background:'var(--parch)',border:'1px solid var(--border)',borderRadius:'var(--r)'}}><div className="stitle">Habitat</div><div style={{fontSize:14,color:'var(--text-2)'}}>{s.habitat}{s.alt!=='—'&&`. Altitude ${s.alt}.`}</div></div></div>}
-    {tab==='morphology'&&<div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:'var(--r)',padding:28,maxWidth:680}}><div className="stitle">{ui.morph}</div>{[[ui.height,s.height],[ui.dbh,s.dbh],[ui.bark,s.bark],[ui.leaf,s.leaf],[ui.flower,s.flower],[ui.fruit,s.fruit]].filter(([,v])=>v&&v!=='—').map(([k,v])=><div key={k} className="txr"><span className="txk">{k}</span><span style={{fontSize:14}}>{v}</span></div>)}</div>}
+    {tab==='spotchars'&&<div style={{maxWidth:720}}>
+      <div style={{fontSize:13,color:'var(--text-3)',marginBottom:20}}>{lang==='en'?'Key field characters for identification — habit, bark, leaf, flower and fruit.':'Ciri-ciri lapangan utama untuk pengecaman spesies.'}</div>
+      <div style={{display:'flex',flexDirection:'column',gap:12}}>
+        {[[ui.height+' / '+ui.dbh, [s.height,s.dbh].filter(b=>b&&b!=='—').join(' · ')],[ui.bark,s.bark],[ui.leaf,s.leaf],[ui.flower,s.flower],[ui.fruit,s.fruit]].filter(([,v])=>v&&v!=='—'&&v.trim()).map(([k,v])=><div key={k} style={{padding:'14px 18px',background:'var(--surface)',border:'1px solid var(--border)',borderRadius:'var(--r-sm)',display:'grid',gridTemplateColumns:'110px 1fr',gap:12,alignItems:'start'}}><span style={{fontSize:11,fontWeight:700,color:'var(--text-3)',textTransform:'uppercase',letterSpacing:'.07em',paddingTop:2}}>{k}</span><span style={{fontSize:14,lineHeight:1.65,color:'var(--text)'}}>{v}</span></div>)}
+        {(!s.bark&&!s.leaf&&!s.flower&&!s.fruit)&&<div style={{padding:'24px 28px',background:'var(--parch)',border:'1.5px dashed var(--border-2)',borderRadius:'var(--r)',color:'var(--text-3)',fontSize:14,fontStyle:'italic'}}>{lang==='en'?'No spot characters recorded yet for this species.':'Tiada ciri lapangan direkodkan untuk spesies ini.'}</div>}
+      </div>
+    </div>}
   </div>;
 }
 
