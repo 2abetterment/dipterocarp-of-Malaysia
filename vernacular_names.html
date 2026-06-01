@@ -354,7 +354,23 @@ async function init() {
 
     // Build full species list (all species, even those with no vernacular name)
     allGroups = buildGroupsFromSpecies(dip, non, allRows);
-    renderTable(allGroups.filter(g => g.names.length > 0 && g.scientific_name !== '—'));
+
+    // Deep-link: ?id=<species_uuid> pre-filters to that species
+    const urlId = new URLSearchParams(window.location.search).get('id');
+    if (urlId) {
+      const match = allGroups.filter(g => g.species_id === urlId);
+      if (match.length) {
+        renderTable(match);
+        // Also populate search box with species name for context
+        const inp = document.getElementById('search');
+        if (inp && match[0]) inp.value = match[0].scientific_name;
+        document.getElementById('search-clear').classList.add('visible');
+      } else {
+        renderTable(allGroups.filter(g => g.names.length > 0 && g.scientific_name !== '—'));
+      }
+    } else {
+      renderTable(allGroups.filter(g => g.names.length > 0 && g.scientific_name !== '—'));
+    }
 
   } catch(e) {
     document.getElementById('results-body').innerHTML =
