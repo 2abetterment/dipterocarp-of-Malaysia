@@ -249,9 +249,7 @@ const H={'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/
 const LC=createContext('en');
 const ul=()=>useContext(LC);
 
-/* Module-level navigate ref — set by App, callable from any component */
-const _nav={fn:null};
-const navigate=(r,id=null)=>_nav.fn&&_nav.fn(r,id);
+/* navigate is passed as prop from App to all child components */
 
 const UI={
   en:{browse:'Browse',contribute:'Contribute',about:'About',
@@ -325,7 +323,7 @@ function SpI({src,seed,ratio,rounded}){
 
 function Card({s,i,onClick}){return <button className="card" onClick={onClick}><div className="cimg"><SpI src={s.img} seed={i} ratio="4/3"/></div><div className="cbody"><div className="cmeta"><span className="cfam" style={{fontSize:10}}>{s.family}</span><div className="cbadges"><Pill code={s.iucn} sm/>{s.endemic&&<span style={{fontSize:10,padding:'1px 7px',background:'var(--forest)',color:'white',borderRadius:999,fontWeight:600}}>Endemik</span>}</div></div><div className="csci" dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/><div className="cname">{s.preferred||s.common[0]||''}</div></div></button>;}
 
-function TopBar({route,setRoute,query,setQuery,onSearch,lang,setLang,isAdmin,setShowLogin}){
+function TopBar({route,setRoute,query,setQuery,onSearch,navigate,lang,setLang,isAdmin,setShowLogin}){
   const ui=UI[lang];
   return <div id="topbar"><div className="tb">
     <button className="logo" onClick={()=>navigate('home')}>
@@ -345,7 +343,7 @@ function TopBar({route,setRoute,query,setQuery,onSearch,lang,setLang,isAdmin,set
   </div></div>;
 }
 
-function Home({species,loading,error,setRoute,setDetailId,setQuery,lang}){
+function Home({species,loading,error,setRoute,setDetailId,setQuery,navigate,lang}){
   const ui=UI[lang];
   const[hq,setHq]=useState('');
   const families=useMemo(()=>new Set(species.map(s=>s.family)).size,[species]);
@@ -378,7 +376,7 @@ function Home({species,loading,error,setRoute,setDetailId,setQuery,lang}){
   </div>;
 }
 
-function Browse({species,query,setQuery,setRoute,setDetailId,lang}){
+function Browse({species,query,setQuery,setRoute,setDetailId,navigate,lang}){
   const ui=UI[lang];
   const[view,setView]=useState('grid');
   const[filters,setFilters]=useState({family:[],genus:[],region:[],endemic:false});
@@ -428,7 +426,7 @@ function Browse({species,query,setQuery,setRoute,setDetailId,lang}){
   </div>;
 }
 
-function Detail({species,detailId,setRoute,setQuery,lang}){
+function Detail({species,detailId,setRoute,setQuery,navigate,lang}){
   const ui=UI[lang];
   const s=species.find(x=>x.id===detailId)||species[0];
   const[tab,setTab]=useState('overview');
@@ -596,13 +594,12 @@ function App(){
   const[lang,setLang]=useState('en');
   const[isAdmin,setIsAdmin]=useState(false);
   const[showLogin,setShowLogin]=useState(false);
-  const _navigateImpl=(r,id=null)=>{
+  const navigate=(r,id=null)=>{
     setRoute(r);
     setDetailId(id);
     const url = r==='detail'&&id ? `?id=${id}` : r==='home' ? (window.location.pathname+window.location.search).replace(/[?#].*/,'') : '#'+r;
     history.pushState({route:r,detailId:id},'',url);
   };
-  _nav.fn=_navigateImpl;
   // ── Deep-link + browser back/forward support ──
   useEffect(()=>{
     // On first load: read ?id= or #route from URL
@@ -647,11 +644,11 @@ function App(){
   return <LC.Provider value={lang}>
     <div style={{minHeight:'100vh',display:'flex',flexDirection:'column'}}>
       {isAdmin&&<div className="admin-bar"><div className="admin-bar-inner"><span style={{width:8,height:8,borderRadius:999,background:'var(--amber-lt)',display:'inline-block'}}/><span>Admin mode active</span><button onClick={()=>setRoute('admin')} style={{background:'rgba(255,255,255,.15)',border:'none',color:'white',padding:'3px 10px',borderRadius:5,cursor:'pointer',fontSize:12,fontWeight:600}}>📋 Photo Approvals</button><div style={{flex:1}}/><button onClick={()=>{setIsAdmin(false);if(route==='admin')navigate('home');}} style={{background:'none',border:'1px solid rgba(255,255,255,.3)',color:'rgba(255,255,255,.8)',padding:'3px 10px',borderRadius:5,cursor:'pointer',fontSize:12}}>Log out</button></div></div>}
-      <TopBar route={route} setRoute={setRoute} query={query} setQuery={setQuery} onSearch={()=>navigate('browse')} lang={lang} setLang={setLang} isAdmin={isAdmin} setShowLogin={setShowLogin}/>
+      <TopBar route={route} setRoute={setRoute} query={query} setQuery={setQuery} onSearch={()=>navigate('browse')} navigate={navigate} lang={lang} setLang={setLang} isAdmin={isAdmin} setShowLogin={setShowLogin}/>
       <div style={{flex:1}}>
-        {route==='home'&&<Home species={species} loading={loading} error={error} setRoute={setRoute} setDetailId={setDetailId} setQuery={setQuery} lang={lang}/>}
-        {route==='browse'&&<Browse species={species} query={query} setQuery={setQuery} setRoute={setRoute} setDetailId={setDetailId} lang={lang}/>}
-        {route==='detail'&&<Detail species={species} detailId={detailId} setRoute={setRoute} setQuery={setQuery} lang={lang}/>}
+        {route==='home'&&<Home species={species} loading={loading} error={error} setRoute={setRoute} setDetailId={setDetailId} setQuery={setQuery} navigate={navigate} lang={lang}/>}
+        {route==='browse'&&<Browse species={species} query={query} setQuery={setQuery} setRoute={setRoute} setDetailId={setDetailId} navigate={navigate} lang={lang}/>}
+        {route==='detail'&&<Detail species={species} detailId={detailId} setRoute={setRoute} setQuery={setQuery} navigate={navigate} lang={lang}/>}
         {route==='contribute'&&<Contribute species={species} lang={lang}/>}
         {route==='about'&&<About lang={lang}/>}
         {route==='admin'&&isAdmin&&<AdminPanel species={species} setSpecies={setSpecies} onLogout={()=>{setIsAdmin(false);navigate('home');}} lang={lang}/>}
