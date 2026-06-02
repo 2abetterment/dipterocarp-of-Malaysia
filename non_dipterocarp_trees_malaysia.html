@@ -475,10 +475,9 @@ function Detail({species,detailId,setRoute,setQuery,navigate,lang}){
     {tab==='taxonomy'&&<div>
       <div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:'var(--r)',padding:28,maxWidth:560}}>
         <div className="stitle">{lang==='en'?'APG IV Classification':'Pengelasan APG IV'}</div>
+        <div className="txr"><span className="txk">Family</span><span className="txv">{s.family}</span></div>
         <div className="txr"><span className="txk">{lang==='en'?'Accepted name':'Nama diterima'}</span><span className="txv" style={{fontStyle:'italic',fontWeight:500}}><span dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/></span></div>
         {s.authority&&<div className="txr"><span className="txk">{lang==='en'?'Authority':'Autoriti'}</span><span className="txv">{s.authority}</span></div>}
-        <div className="txr"><span className="txk">Order</span><span className="txv">—</span></div>
-        <div className="txr"><span className="txk">Family</span><span className="txv">{s.family}</span></div>
         {s.publication&&<div className="txr"><span className="txk">{lang==='en'?'Publication':'Penerbitan'}</span><span className="txv" style={{fontSize:13,color:'var(--text-2)'}}>{s.publication}</span></div>}
       </div>
     </div>}
