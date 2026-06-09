@@ -77,7 +77,7 @@ button,input,select,textarea{font-family:'DM Sans',sans-serif}
 .sc{background:var(--surface);border:1px solid var(--border);padding:26px 28px;transition:transform .18s,box-shadow .18s}
 .sc:first-child{border-radius:var(--r) 0 0 var(--r)}.sc:last-child{border-radius:0 var(--r) var(--r) 0}
 .sc+.sc{border-left:none}.sc:hover{transform:translateY(-2px);box-shadow:var(--sh)}
-.sn{font-family:'Libre Baskerville',serif;font-size:34px;font-weight:700;color:var(--forest);letter-spacing:-.02em}
+.sn{font-family:'Libre Baskerville',serif;font-size:34px;font-weight:700;font-style:italic;color:var(--forest);letter-spacing:-.02em}
 .sl{font-size:12px;color:var(--text-3);margin-top:5px;font-weight:500;text-transform:uppercase;letter-spacing:.06em}
 
 /* SECTIONS */
@@ -230,6 +230,162 @@ button,input,select,textarea{font-family:'DM Sans',sans-serif}
 footer{border-top:1px solid var(--border);padding:32px;margin-top:auto}
 .fi{max-width:1320px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--text-3)}
 .flogo{display:flex;align-items:center;gap:8px}
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE — Tablet (≤900px) and Mobile (≤600px)
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Tablet ────────────────────────────────────────────── */
+@media(max-width:900px){
+  /* Topbar */
+  .tb{padding:0 16px;gap:10px;height:56px}
+  .logo-text{display:none}
+  .nav{gap:0}
+  .nb{padding:6px 10px;font-size:12.5px}
+  .sw{max-width:220px}
+  .sp{display:none}
+
+  /* Hero */
+  .hero{padding:56px 20px 72px}
+  .hero h1{font-size:38px}
+  .hsub{font-size:14.5px;margin-bottom:24px}
+  .hsearch{max-width:100%}
+
+  /* Stats */
+  .stats{grid-template-columns:repeat(2,1fr);padding:0 16px;margin:-20px auto 40px}
+  .sc:first-child{border-radius:var(--r) 0 0 0}
+  .sc:last-child{border-radius:0 0 var(--r) 0}
+  .sc:nth-child(2){border-radius:0 var(--r) 0 0}
+  .sc:nth-child(3){border-radius:0 0 0 var(--r);border-top:none;border-left:1px solid var(--border)}
+  .sc:nth-child(3)+.sc{border-top:none}
+  .sc+.sc{border-left:none}
+  .sn{font-size:26px}
+
+  /* Sections */
+  .sec{padding:0 16px 48px}
+
+  /* Cards */
+  .cg4{grid-template-columns:repeat(2,1fr);gap:12px}
+  .cg3{grid-template-columns:repeat(2,1fr);gap:14px}
+
+  /* Browse */
+  .blayout{grid-template-columns:1fr;padding:16px 16px 48px;gap:20px}
+
+  /* List view */
+  .lth{grid-template-columns:40px 1.6fr 1fr 80px}
+  .ltr{grid-template-columns:40px 1.6fr 1fr 80px}
+  .lth>div:nth-child(4),.ltr>div:nth-child(4){display:none}
+
+  /* Detail */
+  .dw{padding:16px 16px 48px}
+  .dh{grid-template-columns:1fr;gap:20px}
+  .dgrid{grid-template-columns:1fr;gap:28px}
+  .dsci{font-size:26px}
+  .qg{grid-template-columns:1fr 1fr}
+  .tabs2{overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch}
+  .tb2{padding:10px 14px;font-size:13px}
+
+  /* Contribute form */
+  .ctw{padding:32px 16px 48px}
+  .fgrid{grid-template-columns:1fr}
+
+  /* About */
+  .aw{padding:40px 16px}
+  .agrid{grid-template-columns:1fr}
+  .ahero{padding:36px 24px}
+  .ahero h1{font-size:26px}
+
+  /* Admin */
+  .ap-wrap{padding:20px 16px 48px}
+  .ap-head{flex-direction:column;align-items:flex-start;gap:12px}
+  .sub-grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+
+  /* Footer */
+  footer{padding:24px 16px}
+  .fi{flex-direction:column;align-items:flex-start;gap:8px}
+}
+
+/* ── Mobile ────────────────────────────────────────────── */
+@media(max-width:600px){
+  /* Topbar */
+  .tb{padding:0 12px;gap:8px;height:52px}
+  .div{display:none}
+  .nb{padding:5px 8px;font-size:12px}
+  .sw{max-width:160px;padding:7px 10px}
+  .lt{display:none}
+
+  /* Hero */
+  .hero{padding:40px 16px 56px}
+  .hero h1{font-size:28px;margin-bottom:14px}
+  .hsub{font-size:13.5px;margin-bottom:20px}
+  .hsearch{padding:8px 8px 8px 14px}
+  .hsearch input{font-size:14px}
+  .htags{gap:6px}
+  .tag{font-size:11px;padding:4px 10px}
+
+  /* Stats — single column on very small screens */
+  .stats{grid-template-columns:repeat(2,1fr);margin:-16px auto 32px;padding:0 12px}
+  .sn{font-size:22px}
+  .sl{font-size:11px}
+  .sc{padding:16px 18px}
+
+  /* Sections */
+  .sec{padding:0 12px 36px}
+  .sh2{flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:20px}
+
+  /* Cards */
+  .cg4{grid-template-columns:1fr 1fr;gap:10px}
+  .cg3{grid-template-columns:1fr;gap:12px}
+  .cbody{padding:12px}
+  .csci{font-size:14px}
+
+  /* Browse */
+  .blayout{padding:12px 12px 36px}
+  .rh{flex-direction:column;align-items:flex-start;gap:8px}
+  .rct{font-size:18px}
+
+  /* List view — hide local name column on mobile */
+  .lth{grid-template-columns:36px 1fr 80px}
+  .ltr{grid-template-columns:36px 1fr 80px}
+  .lth>div:nth-child(3),.ltr>div:nth-child(3){display:none}
+  .lth>div:nth-child(4),.ltr>div:nth-child(4){display:none}
+
+  /* Detail */
+  .dw{padding:12px 12px 36px}
+  .bc{font-size:12px;flex-wrap:wrap;gap:5px;margin-bottom:18px}
+  .dsci{font-size:22px;margin-top:8px}
+  .dll{margin:14px 0 5px}
+  .qg{grid-template-columns:1fr}
+  .tabs2{gap:0;border-bottom:2px solid var(--border)}
+  .tb2{padding:9px 12px;font-size:12.5px}
+  .kv{grid-template-columns:110px 1fr;padding:8px 0}
+  .kk{font-size:12px}.kv2{font-size:13px}
+  .txr{grid-template-columns:120px 1fr;padding:9px 0}
+  .txk{font-size:12px}.txv{font-size:13px}
+  .qfr{padding:8px 0}
+  .qfk{font-size:12px}.qfv{font-size:12px}
+  .cbox{padding:14px}
+  .stitle{margin-bottom:10px}
+  .sblock{margin-bottom:24px}
+
+  /* Modal */
+  .modal{padding:28px 20px}
+  .modal-title{font-size:22px}
+
+  /* Admin */
+  .ap-tabs{flex-wrap:wrap}
+  .sub-grid{grid-template-columns:1fr}
+
+  /* Contribute */
+  .ctw{padding:24px 12px 36px}
+  .cth h1{font-size:28px}
+
+  /* About */
+  .aw{padding:28px 12px}
+  .ahero{padding:28px 18px}
+  .ahero h1{font-size:22px}
+  .ahero p{font-size:13.5px}
+}
+
 </style>
 </head>
 <body>
@@ -422,7 +578,7 @@ function Browse({species,query,setQuery,setRoute,setDetailId,navigate,lang}){
         ?<div className="empty"><div style={{fontSize:40,marginBottom:16,opacity:.5}}>🌳</div><div style={{fontFamily:'Playfair Display',fontSize:20,color:'var(--forest)',marginBottom:8}}>{ui.no_match}</div><div style={{fontSize:14,color:'var(--text-3)',marginBottom:20}}>{ui.no_match_sub}</div><button className="btn bs" onClick={()=>{setQuery('');setFilters({family:[],genus:[],region:[],endemic:false});}}>{ui.reset}</button></div>
         :view==='grid'
           ?<div className="cg3">{filtered.map((s,i)=><Card key={s.id} s={s} i={i} onClick={()=>{navigate('detail',s.id);}}/>)}</div>
-          :<div className="lt2"><div className="lth"><div/><div>Species</div><div>{lang==='en'?'Local name':'Nama tempatan'}</div><div>Family</div><div>IUCN</div></div>{filtered.map((s,i)=><button key={s.id} className="ltr" onClick={()=>{navigate('detail',s.id);}}><div style={{width:40,height:40,borderRadius:7,overflow:'hidden'}}><SpI src={s.img} seed={i} ratio="1/1" rounded={false}/></div><div><div style={{fontFamily:'Playfair Display',fontSize:14,fontStyle:'italic',fontWeight:500}}><span dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/></div><div style={{fontSize:11,color:'var(--text-3)',fontFamily:'DM Mono'}}>{s.family}</div></div><div style={{fontSize:13}}>{s.common[0]||'—'}</div><div style={{fontSize:13,fontStyle:'italic',color:'var(--text-2)'}}>{s.family}</div><Pill code={s.iucn} sm/></button>)}</div>
+          :<div className="lt2"><div className="lth"><div/><div>Species</div><div>{lang==='en'?'Local name':'Nama tempatan'}</div><div>Family</div><div>IUCN</div></div>{filtered.map((s,i)=><button key={s.id} className="ltr" onClick={()=>{navigate('detail',s.id);}}><div style={{width:40,height:40,borderRadius:7,overflow:'hidden'}}><SpI src={s.img} seed={i} ratio="1/1" rounded={false}/></div><div><div style={{fontFamily:'Playfair Display',fontSize:14,fontStyle:'italic',fontWeight:500}}><span dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/></div><div style={{fontSize:11,color:'var(--text-3)',fontFamily:'DM Mono'}}>{s.family}</div></div><div style={{fontSize:13}}>{s.preferred||s.allNames&&s.allNames[0]||s.common[0]||'—'}</div><div style={{fontSize:13,fontStyle:'italic',color:'var(--text-2)'}}>{s.family}</div><Pill code={s.iucn} sm/></button>)}</div>
       }
     </main>
   </div>;
@@ -527,7 +683,7 @@ function Contribute({species,lang}){
         <div style={{display:'flex',flexWrap:'wrap',gap:6,marginTop:14}}>{['habit','leaf','bark','flower','fruit'].map(t=><button key={t} onClick={()=>upd('photo_type',t)} style={{padding:'5px 12px',borderRadius:999,fontSize:12,fontWeight:500,cursor:'pointer',background:form.photo_type===t?'var(--forest)':'var(--parch)',color:form.photo_type===t?'white':'var(--text-2)',border:'1px solid '+(form.photo_type===t?'var(--forest)':'var(--border-2)')}}>{t}</button>)}</div>
       </div>
       <div style={{display:'flex',flexDirection:'column',gap:14}}>
-        <div className="fl"><label className="flabel">{lang==='en'?'Species *':'Spesies *'}</label><select value={form.species_id} onChange={e=>{const s=species.find(x=>x.id===e.target.value);upd('species_id',e.target.value);upd('species_name',s?s.sci:'');}}><option value="">{lang==='en'?'– Select –':'– Pilih –'}</option>{species.map(s=><option key={s.id} value={s.id}>{s.sci}{s.common[0]?' — '+s.common[0]:''}</option>)}</select></div>
+        <div className="fl"><label className="flabel">{lang==='en'?'Species *':'Spesies *'}</label><select value={form.species_id} onChange={e=>{const s=species.find(x=>x.id===e.target.value);upd('species_id',e.target.value);upd('species_name',s?s.sci:'');}}><option value="">{lang==='en'?'– Select –':'– Pilih –'}</option>{species.map(s=><option key={s.id} value={s.id}>{s.sci}{s.allNames&&s.allNames[0]?' — '+s.allNames[0]:s.common[0]?' — '+s.common[0]:''}</option>)}</select></div>
         <div className="fl"><label className="flabel">{lang==='en'?'Your name *':'Nama anda *'}</label><input value={form.contributor_name} onChange={e=>upd('contributor_name',e.target.value)}/></div>
         <div className="fl"><label className="flabel">Email</label><input type="email" value={form.contributor_email} onChange={e=>upd('contributor_email',e.target.value)}/></div>
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
