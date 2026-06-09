@@ -125,15 +125,52 @@ td.reg-cell { font-size: 11px; color: var(--ink-3); padding-top: 13px; }
 footer { background: var(--white); border-top: 1px solid var(--border); padding: 1rem 2.5rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; }
 footer p { font-size: 10.5px; color: var(--ink-3); }
 
-@media (max-width: 800px) {
-  .page-header { flex-direction: column; align-items: flex-start; padding: 1.5rem 1.25rem 1.25rem; }
-  .toolbar, .main { padding: 0.75rem 1.25rem; }
-  th.col-fam, th.col-reg { display: none; }
-  td.fam-cell, td.reg-cell { display: none; }
-  th.col-sci { width: 32%; } th.col-names { width: 68%; }
-  nav { padding: 0 1rem; }
+/* ── Tablet ≤900px ───────────────────────────── */
+@media (max-width: 900px) {
+  nav { padding: 0 1.25rem; }
   .nav-meta { display: none; }
-  .ne-source { display: none; }
+  .nav-brand { font-size: 15px; }
+  .page-header { flex-direction: column; align-items: flex-start; padding: 1.5rem 1.25rem 1.25rem; gap: 1rem; }
+  .header-title { font-size: 1.8rem; }
+  .header-stats { gap: 0.5rem; }
+  .stat-pill { padding: 0.5rem 0.8rem; min-width: 70px; }
+  .stat-n { font-size: 1.3rem; }
+  .toolbar { padding: 0.75rem 1.25rem; gap: 0.5rem; flex-wrap: wrap; }
+  .search-wrap { min-width: 180px; flex: 1 1 180px; }
+  .filter-select { font-size: 11.5px; padding: 7px 10px; }
+  .result-count { width: 100%; margin-left: 0; }
+  .main { padding: 0.75rem 1.25rem; }
+  footer { padding: 1rem 1.25rem; flex-direction: column; gap: 0.25rem; }
+}
+
+/* ── Mobile ≤600px ───────────────────────────── */
+@media (max-width: 600px) {
+  nav { padding: 0 0.75rem; height: 44px; }
+  .nav-meta { display: none; }
+  .nav-brand { font-size: 14px; }
+  .lang-btn { padding: 2px 8px; font-size: 9.5px; }
+  .page-header { padding: 1rem 0.75rem; }
+  .header-title { font-size: 1.4rem; }
+  .header-stats { gap: 0.4rem; }
+  .stat-pill { padding: 0.4rem 0.6rem; min-width: 58px; }
+  .stat-n { font-size: 1.1rem; }
+  .stat-l { font-size: 9px; }
+  .toolbar { padding: 0.6rem 0.75rem; gap: 0.4rem; }
+  .search-wrap { min-width: 100%; }
+  .filter-select { font-size: 11px; padding: 6px 8px; }
+  .result-count { display: none; }
+  .main { padding: 0.5rem 0.75rem; }
+  /* Hide only Family and Region columns on very small screens */
+  th.col-fam, td.fam-cell { display: none; }
+  th.col-reg, td.reg-cell { display: none; }
+  th.col-sci { width: 40%; }
+  th.col-names { width: 60%; }
+  /* Keep source label visible always */
+  .ne-source { font-size: 10.5px; }
+  .ne-name { font-size: 12.5px; }
+  .ne-lang { font-size: 9px; padding: 1px 5px; }
+  footer { padding: 0.75rem; }
+  footer p { font-size: 10px; }
 }
 </style>
 </head>
