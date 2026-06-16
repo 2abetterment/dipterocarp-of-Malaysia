@@ -468,7 +468,7 @@ function formatSci(name, opts={}){
     ? `<i>${taxon}</i> <span style="font-style:normal;font-weight:400">${auth}</span>`
     : `<i>${taxon}</i>`;
 }
-function mr(r){return{id:r.id,sci:(r.scientific_name||'')+(r.infraspecific_epithet?' '+r.infraspecific_epithet:''),genus:r.genus||'',family:r.family||'',common:[r.local_name_malay,r['maksud epitet']].filter(Boolean),iucn:pi(r.conservation_status),cs:r.conservation_status||'',endemic:!!r.endemic_to_malaysia,height:r.height_range||'—',dbh:r.trunk_diameter||'—',habitat:r.habitat||'—',alt:r.elevation_range||'—',phen:r.flowering_pattern||'—',bark:r.bark_description||'',leaf:r.leaf_description||'',flower:r.flower_description||'',fruit:r.fruit_description||'',eco:r.ecological_notes||'',uses:r.economic_importance||'—',taxdesc:r.taxonomic_description||'',authority:r.authority||'',publication:r.publication||'',dist:[r.distribution_peninsular&&'Peninsular Malaysia',r.distribution_sabah&&'Sabah',r.distribution_sarawak&&'Sarawak'].filter(Boolean),img:r.image_url||''};}
+function mr(r){return{id:r.id,sci:(r.scientific_name||'')+(r.infraspecific_epithet?' '+r.infraspecific_epithet:''),genus:r.genus||'',family:r.family||'',common:[r.local_name_malay,r['maksud epitet']].filter(Boolean),iucn:pi(r.conservation_status),cs:r.conservation_status||'',endemic:!!r.endemic_to_malaysia,height:r.height_range||'—',dbh:r.trunk_diameter||'—',habitat:r.habitat||'—',alt:r.elevation_range||'—',phen:r.flowering_pattern||'—',bark:r.bark_description||'',leaf:r.leaf_description||'',flower:r.flower_description||'',fruit:r.fruit_description||'',eco:r.ecological_notes||'',uses:r.economic_importance||'—',taxdesc:r.taxonomic_description||'',authority:r.authority||'',publication:r.publication||'',dist:[r.distribution_peninsular&&'Peninsular Malaysia',r.distribution_sabah&&'Sabah',r.distribution_sarawak&&'Sarawak'].filter(Boolean),nativeDist:r.native_distribution||'',endemAssess:r.endemism_assessment||'',infrageneric:r.infrageneric||'',img:r.image_url||''};}
 
 function Pill({code,sm}){return <span className={`pill ${sm?'psm':''} p${code}`}><span style={{width:5,height:5,borderRadius:999,background:'currentColor',display:'inline-block',opacity:.7}}/>{code}</span>;}
 
@@ -633,11 +633,24 @@ function Detail({species,detailId,setRoute,setQuery,navigate,lang}){
         <div className="stitle">{lang==='en'?'APG IV Classification':'Pengelasan APG IV'}</div>
         <div className="txr"><span className="txk">Family</span><span className="txv">{s.family}</span></div>
         <div className="txr"><span className="txk">{lang==='en'?'Accepted name':'Nama diterima'}</span><span className="txv" style={{fontStyle:'italic',fontWeight:500}}><span dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/></span></div>
+        {s.infrageneric&&<div className="txr"><span className="txk">{lang==='en'?'Infrageneric':'Infragenera'}</span><span className="txv" style={{fontStyle:'italic',fontSize:13}}>{s.infrageneric}</span></div>}
         {s.authority&&<div className="txr"><span className="txk">{lang==='en'?'Authority':'Autoriti'}</span><span className="txv">{s.authority}</span></div>}
-        {s.publication&&<div className="txr"><span className="txk">{lang==='en'?'Publication':'Penerbitan'}</span><span className="txv" style={{fontSize:13,color:'var(--text-2)'}}>{s.publication}</span></div>}
+        {s.publication&&<div className="txr"><span className="txk">{lang==='en'?'Publication':'Penerbitan'}</span><span className="txv" style={{fontSize:13,color:'var(--text-2)',lineHeight:1.6}}>{s.publication}</span></div>}
       </div>
     </div>}
-    {tab==='distribution'&&<div><div style={{fontFamily:'Playfair Display',fontSize:20,fontWeight:700,color:'var(--forest)',marginBottom:20}}>{ui.dist_rec(s.dist.length)}</div><div style={{display:'flex',flexWrap:'wrap',gap:0,marginBottom:28}}>{['Peninsular Malaysia','Sabah','Sarawak'].map(rg=><span key={rg} className={`dp ${s.dist.includes(rg)?'dpy':'dpn'}`}>{rg}</span>)}</div><div style={{padding:20,background:'var(--parch)',border:'1px solid var(--border)',borderRadius:'var(--r)'}}><div className="stitle">Habitat</div><div style={{fontSize:14,color:'var(--text-2)'}}>{s.habitat}{s.alt!=='—'&&`. Altitude ${s.alt}.`}</div></div></div>}
+    {tab==='distribution'&&<div>
+      <div style={{fontFamily:'Playfair Display',fontSize:20,fontWeight:700,color:'var(--forest)',marginBottom:20}}>{ui.dist_rec(s.dist.length)}</div>
+      <div style={{display:'flex',flexWrap:'wrap',gap:0,marginBottom:28}}>{['Peninsular Malaysia','Sabah','Sarawak'].map(rg=><span key={rg} className={`dp ${s.dist.includes(rg)?'dpy':'dpn'}`}>{rg}</span>)}</div>
+      {s.endemAssess&&<div style={{marginBottom:24}}>
+        <div className="stitle">{lang==='en'?'Endemism Status':'Status Endemik'}</div>
+        <div style={{padding:'12px 18px',background:s.endemic?'var(--forest)':'var(--surface)',border:'1px solid var(--border)',borderRadius:'var(--r-sm)',color:s.endemic?'white':'var(--text)',fontSize:14,fontWeight:s.endemic?600:400,maxWidth:680}}>{s.endemAssess}</div>
+      </div>}
+      {s.nativeDist&&<div style={{marginBottom:24}}>
+        <div className="stitle">{lang==='en'?'Native Distribution':'Taburan Asli'}</div>
+        <div style={{display:'flex',flexWrap:'wrap',gap:6,maxWidth:780}}>{s.nativeDist.split('|').map(a=>a.trim()).filter(Boolean).map(area=><span key={area} style={{fontSize:12.5,padding:'3px 10px',background:'var(--surface)',border:'1px solid var(--border)',borderRadius:999,color:'var(--text-2)'}}>{area}</span>)}</div>
+      </div>}
+      <div style={{padding:20,background:'var(--parch)',border:'1px solid var(--border)',borderRadius:'var(--r)'}}><div className="stitle">{lang==='en'?'Habitat':'Habitat'}</div><div style={{fontSize:14,color:'var(--text-2)'}}>{s.habitat!=='—'?s.habitat:(lang==='en'?'No habitat data recorded.':'Tiada data habitat.')}{s.alt!=='—'&&` Altitude: ${s.alt}.`}</div></div>
+    </div>}
     {tab==='spotchars'&&<div style={{maxWidth:720}}>
       <div style={{fontSize:13,color:'var(--text-3)',marginBottom:20}}>{lang==='en'?'Key field characters for identification — habit, bark, leaf, flower and fruit.':'Ciri-ciri lapangan utama untuk pengecaman spesies.'}</div>
       <div style={{display:'flex',flexDirection:'column',gap:12}}>
