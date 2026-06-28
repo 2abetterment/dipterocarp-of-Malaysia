@@ -1,5 +1,3 @@
-
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -250,8 +248,8 @@ function formatSci(name, opts={}){
     ? `<i>${taxon}</i> <span style="font-style:normal;font-weight:400">${auth}</span>`
     : `<i>${taxon}</i>`;
 }
-function mr(r){return{id:r.id,sci:r.scientific_name||'',genus:r.genus||'',family:r.family||'Dipterocarpaceae',common:[r.local_name_malay,r.maksud_epitet].filter(Boolean),iucn:pi(r.conservation_status),cs:r.conservation_status||'',endemic:!!r.endemic_to_malaysia,height:r.height_range||'—',dbh:r.trunk_diameter||'—',habitat:r.habitat||'—',alt:r.elevation_range||'—',phen:r.flowering_pattern||'—',bark:r.bark_description||'',leaf:r.leaf_description||'',flower:r.flower_description||'',fruit:r.fruit_description||'',eco:r.ecological_notes||'',uses:r.economic_importance||'—',taxdesc:r.taxonomic_description||'',dist:[r.distribution_peninsular&&'Peninsular Malaysia',r.distribution_sabah&&'Sabah',r.distribution_sarawak&&'Sarawak'].filter(Boolean),img:r.image_url||''};}
-
+function nativeStatusFromEco(eco){if(!eco)return'native';const e=eco.toLowerCase();if(e.startsWith('possible occurrence'))return'verify';if(e.includes('cultivat')||e.includes('naturalised')||e.includes('introduced')||e.includes('ditanam')||e.includes('diperkenalkan'))return'introduced';return'native';}
+function mr(r){const eco=r.ecological_notes||'';return{id:r.id,sci:r.scientific_name||'',genus:r.genus||'',family:r.family||'Dipterocarpaceae',common:[r.local_name_malay,r.maksud_epitet].filter(Boolean),iucn:pi(r.conservation_status),cs:r.conservation_status||'',endemic:!!r.endemic_to_malaysia,height:r.height_range||'—',dbh:r.trunk_diameter||'—',habitat:r.habitat||'—',alt:r.elevation_range||'—',phen:r.flowering_pattern||'—',bark:r.bark_description||'',leaf:r.leaf_description||'',flower:r.flower_description||'',fruit:r.fruit_description||'',eco,nativeStatus:nativeStatusFromEco(eco),uses:r.economic_importance||'—',taxdesc:r.taxonomic_description||'',dist:[r.distribution_peninsular&&'Peninsular Malaysia',r.distribution_sabah&&'Sabah',r.distribution_sarawak&&'Sarawak'].filter(Boolean),img:r.image_url||''};}
 function Pill({code,sm}){return <span className={`pill ${sm?'psm':''} p${code}`}><span style={{width:5,height:5,borderRadius:999,background:'currentColor',display:'inline-block',opacity:.7}}/>{code}</span>;}
 
 function SpI({src,seed,ratio,rounded}){
@@ -261,7 +259,14 @@ function SpI({src,seed,ratio,rounded}){
   return <div className="sph" style={{aspectRatio:ratio||'4/3',borderRadius:r2,background:`linear-gradient(135deg,hsl(${h},22%,80%),hsl(${h+25},28%,70%))`}}><div className="sphi" style={{backgroundImage:`radial-gradient(circle at 35% 65%,rgba(107,171,130,.45),transparent 55%),radial-gradient(circle at 75% 30%,rgba(201,134,42,.28),transparent 50%)`}}/></div>;
 }
 
-function Card({s,i,onClick}){return <button className="card" onClick={onClick}><div className="cimg"><SpI src={s.img} seed={i} ratio="4/3"/></div><div className="cbody"><div className="cmeta"><span className="cfam">{s.family}</span><div className="cbadges"><Pill code={s.iucn} sm/>{s.endemic&&<span style={{fontSize:10,padding:'1px 7px',background:'var(--forest)',color:'white',borderRadius:999,fontWeight:600}}>Endemik</span>}</div></div><div className="csci" dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/><div className="cname">{s.common[0]||s.genus}</div></div></button>;}
+function Card({s,i,onClick}){
+  const stBadge=s.nativeStatus==='verify'
+    ?<span style={{fontSize:10,padding:'1px 7px',background:'#FEF3C7',color:'#92400E',borderRadius:999,fontWeight:600,border:'1px solid #FDE68A'}}>⚠ {s.eco&&s.eco.toLowerCase().includes('borneo')?'PM+Borneo?':'PM?'}</span>
+    :s.nativeStatus==='introduced'
+      ?<span style={{fontSize:10,padding:'1px 7px',background:'#EDE9FE',color:'#5B21B6',borderRadius:999,fontWeight:600,border:'1px solid #DDD6FE'}}>Introduced</span>
+      :null;
+  return <button className="card" onClick={onClick}><div className="cimg"><SpI src={s.img} seed={i} ratio="4/3"/></div><div className="cbody"><div className="cmeta"><span className="cfam">{s.family}</span><div className="cbadges"><Pill code={s.iucn} sm/>{s.endemic&&<span style={{fontSize:10,padding:'1px 7px',background:'var(--forest)',color:'white',borderRadius:999,fontWeight:600}}>Endemik</span>}{stBadge}</div></div><div className="csci" dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/><div className="cname">{s.common[0]||s.genus}</div></div></button>;
+}
 
 function TopBar({route,setRoute,query,setQuery,onSearch,lang,setLang,isAdmin,setShowLogin}){
   const ui=UI[lang];
@@ -395,7 +400,7 @@ function Detail({species,detailId,setRoute,setQuery}){
       <div>
         {s.taxdesc&&<div className="sblock"><div className="stitle">{ui.taxdesc_label}</div><p style={{fontSize:15,lineHeight:1.85,color:'var(--text)',fontFamily:'Georgia,serif'}}>{s.taxdesc}</p></div>}
         {(s.bark||s.leaf)&&<div className="sblock"><div className="stitle">{ui.description}</div><p style={{fontSize:15,lineHeight:1.7}}>{[s.bark,s.leaf].filter(Boolean).join(' ')}</p></div>}
-        <div className="sblock"><div className="stitle">{ui.ecology}</div>{[[ui.habitat,t2(s.habitat)],[ui.altitude,s.alt],[ui.phenology,t2(s.phen)],...(s.eco?[['Notes',s.eco]]:[])].map(([k,v])=><div key={k} className="kv"><span className="kk">{k}</span><span className="kv2">{v}</span></div>)}</div>
+        <div className="sblock"><div className="stitle">{ui.ecology}</div>{[[ui.habitat,t2(s.habitat)],[ui.altitude,s.alt],[ui.phenology,t2(s.phen)]].map(([k,v])=><div key={k} className="kv"><span className="kk">{k}</span><span className="kv2">{v}</span></div>)}{s.eco&&<div style={{marginTop:14,padding:'12px 16px',borderRadius:'var(--r-sm)',background:s.nativeStatus==='verify'?'#FFFBEB':s.nativeStatus==='introduced'?'#F5F3FF':'var(--parch)',border:`1px solid ${s.nativeStatus==='verify'?'#FDE68A':s.nativeStatus==='introduced'?'#DDD6FE':'var(--border)'}`,display:'flex',gap:10,alignItems:'flex-start'}}><span style={{fontSize:16,flexShrink:0}}>{s.nativeStatus==='verify'?'⚠':s.nativeStatus==='introduced'?'🌐':'ℹ'}</span><div><div style={{fontSize:11,fontWeight:700,textTransform:'uppercase',letterSpacing:'.06em',color:s.nativeStatus==='verify'?'#92400E':s.nativeStatus==='introduced'?'#5B21B6':'var(--text-3)',marginBottom:4}}>{s.nativeStatus==='verify'?(lang==='en'?'Occurrence unverified':'Rekod belum disahkan'):s.nativeStatus==='introduced'?(lang==='en'?'Introduced / Cultivated':'Diperkenalkan / Ditanam'):(lang==='en'?'Ecological notes':'Nota ekologi')}</div><div style={{fontSize:13,lineHeight:1.65,color:'var(--text-2)'}}>{s.eco}</div></div></div>}</div>
         {s.uses&&s.uses!=='—'&&<div className="sblock"><div className="stitle">{ui.uses}</div><p style={{fontSize:15,lineHeight:1.7}}>{t2(s.uses)}</p></div>}
       </div>
       <aside><div className="qfc"><div style={{fontSize:11,fontWeight:700,color:'var(--text-3)',textTransform:'uppercase',letterSpacing:'.08em',marginBottom:14}}>{ui.quick}</div>{[['Genus',<span style={{fontStyle:'italic'}}>{s.genus}</span>],['Family',<span style={{fontStyle:'italic'}}>{s.family}</span>],[ui.endemic,s.endemic?ui.yes:ui.no],[ui.distribution,s.dist.map(d=>tv(d,lang)).join(', ')||'—']].map(([k,v])=><div key={k} className="qfr"><span className="qfk">{k}</span><span className="qfv">{v}</span></div>)}</div></aside>
