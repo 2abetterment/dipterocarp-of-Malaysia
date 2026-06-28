@@ -380,7 +380,7 @@ setLang('en');
 // ── Live stats: Non-Dipterocarp ──
 (function loadNonDipStats() {
   const SUPA_URL = 'https://xrntnarchlglhllvlrnv.supabase.co';
-  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhybnRuYXJjaGxnbGhsbHZscm52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTU4MzksImV4cCI6MjA4MDk5MTgzOX0.Q0PjW5dMU07EDoR-GGDpIjATlSC5AJxNeEdOlYaO96w';
+  const SUPA_KEY = 'sb_publishable_N968wHizQmuFaPYlHwDxhw_WXCOs32h';
   const headers  = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY };
   Promise.all([
     fetch(SUPA_URL + '/rest/v1/non_dipterocarp_species?select=id', { headers: { ...headers, 'Prefer': 'count=exact', 'Range': '0-0' } }),
@@ -406,7 +406,7 @@ setLang('en');
 // ── Live stats: Vernacular Names ──
 (function loadVernStats() {
   const SUPA_URL = 'https://xrntnarchlglhllvlrnv.supabase.co';
-  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhybnRuYXJjaGxnbGhsbHZscm52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTU4MzksImV4cCI6MjA4MDk5MTgzOX0.Q0PjW5dMU07EDoR-GGDpIjATlSC5AJxNeEdOlYaO96w';
+  const SUPA_KEY = 'sb_publishable_N968wHizQmuFaPYlHwDxhw_WXCOs32h';
   const headers  = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY };
   fetch(SUPA_URL + '/rest/v1/vernacular_names?select=id', { headers: { ...headers, 'Prefer': 'count=exact', 'Range': '0-0' } })
   .then(r => {
