@@ -396,7 +396,7 @@ footer{border-top:1px solid var(--border);padding:32px;margin-top:auto}
 <script type="text/babel">
 const {useState,useEffect,useMemo,useContext,createContext}=React;
 const SB='https://xrntnarchlglhllvlrnv.supabase.co';
-const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhybnRuYXJjaGxnbGhsbHZscm52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTU4MzksImV4cCI6MjA4MDk5MTgzOX0.Q0PjW5dMU07EDoR-GGDpIjATlSC5AJxNeEdOlYaO96w';
+const KEY='sb_publishable_N968wHizQmuFaPYlHwDxhw_WXCOs32h';
 const T_SPP='non_dipterocarp_species';
 const T_FAM='non_dipterocarp_families';
 const T_GEN='non_dipterocarp_genera';
@@ -579,6 +579,7 @@ function Browse({species,query,setQuery,setRoute,setDetailId,navigate,lang}){
         <Ck checked={filters.nativeStatus.includes('introduced')} onClick={()=>tog('nativeStatus','introduced')} count={species.filter(s=>s.nativeStatus==='introduced').length}><span style={{fontSize:12,color:'#5B21B6'}}>{lang==='en'?'Introduced / Cultivated':'Diperkenalkan / Ditanam'}</span></Ck>
         <Ck checked={filters.nativeStatus.includes('verify')} onClick={()=>tog('nativeStatus','verify')} count={species.filter(s=>s.nativeStatus==='verify').length}><span style={{fontSize:12,color:'#92400E'}}>{lang==='en'?'⚠ Verify occurrence':'⚠ Perlu pengesahan'}</span></Ck>
       </FG>
+
       <FG title={ui.others} open={true} onT={()=>{}}><Ck checked={filters.endemic} onClick={()=>setFilters(f=>({...f,endemic:!f.endemic}))}>{ui.endemic_my}</Ck></FG>
     </aside>
     <main>
