@@ -468,7 +468,8 @@ function formatSci(name, opts={}){
     ? `<i>${taxon}</i> <span style="font-style:normal;font-weight:400">${auth}</span>`
     : `<i>${taxon}</i>`;
 }
-function mr(r){return{id:r.id,sci:(r.scientific_name||'')+(r.infraspecific_epithet?' '+r.infraspecific_epithet:''),genus:r.genus||'',family:r.family||'',common:[r.local_name_malay,r['maksud epitet']].filter(Boolean),iucn:pi(r.conservation_status),cs:r.conservation_status||'',endemic:!!r.endemic_to_malaysia,height:r.height_range||'—',dbh:r.trunk_diameter||'—',habit:(r.habit&&r.habit.length?r.habit.join(', '):'—'),habitat:r.habitat||'—',alt:r.elevation_range||'—',phen:r.flowering_pattern||'—',bark:r.bark_description||'',leaf:r.leaf_description||'',flower:r.flower_description||'',fruit:r.fruit_description||'',eco:r.ecological_notes||'',uses:r.economic_importance||'—',taxdesc:r.taxonomic_description||'',authority:r.authority||'',publication:r.publication||'',dist:[r.distribution_peninsular&&'Peninsular Malaysia',r.distribution_sabah&&'Sabah',r.distribution_sarawak&&'Sarawak'].filter(Boolean),nativeDist:r.native_distribution||'',endemAssess:r.endemism_assessment||'',infrageneric:r.infrageneric||'',img:r.image_url||''};}
+function nativeStatusFromEco(eco){if(!eco)return'native';const e=eco.toLowerCase();if(e.startsWith('possible occurrence'))return'verify';if(e.includes('cultivat')||e.includes('naturalised')||e.includes('introduced')||e.includes('ditanam')||e.includes('diperkenalkan'))return'introduced';return'native';}
+function mr(r){const eco=r.ecological_notes||'';return{id:r.id,sci:(r.scientific_name||'')+(r.infraspecific_epithet?' '+r.infraspecific_epithet:''),genus:r.genus||'',family:r.family||'',common:[r.local_name_malay,r['maksud epitet']].filter(Boolean),iucn:pi(r.conservation_status),cs:r.conservation_status||'',endemic:!!r.endemic_to_malaysia,height:r.height_range||'—',dbh:r.trunk_diameter||'—',habit:(r.habit&&r.habit.length?r.habit.join(', '):'—'),habitat:r.habitat||'—',alt:r.elevation_range||'—',phen:r.flowering_pattern||'—',bark:r.bark_description||'',leaf:r.leaf_description||'',flower:r.flower_description||'',fruit:r.fruit_description||'',eco,nativeStatus:nativeStatusFromEco(eco),uses:r.economic_importance||'—',taxdesc:r.taxonomic_description||'',authority:r.authority||'',publication:r.publication||'',dist:[r.distribution_peninsular&&'Peninsular Malaysia',r.distribution_sabah&&'Sabah',r.distribution_sarawak&&'Sarawak'].filter(Boolean),nativeDist:r.native_distribution||'',endemAssess:r.endemism_assessment||'',infrageneric:r.infrageneric||'',img:r.image_url||''};}
 
 function Pill({code,sm}){return <span className={`pill ${sm?'psm':''} p${code}`}><span style={{width:5,height:5,borderRadius:999,background:'currentColor',display:'inline-block',opacity:.7}}/>{code}</span>;}
 
@@ -479,7 +480,14 @@ function SpI({src,seed,ratio,rounded}){
   return <div className="sph" style={{aspectRatio:ratio||'4/3',borderRadius:r2,background:`linear-gradient(135deg,hsl(${h},22%,80%),hsl(${h+25},28%,70%))`}}><div className="sphi" style={{backgroundImage:`radial-gradient(circle at 35% 65%,rgba(107,171,130,.45),transparent 55%),radial-gradient(circle at 75% 30%,rgba(201,134,42,.28),transparent 50%)`}}/></div>;
 }
 
-function Card({s,i,onClick}){return <button className="card" onClick={onClick}><div className="cimg"><SpI src={s.img} seed={i} ratio="4/3"/></div><div className="cbody"><div className="cmeta"><span className="cfam" style={{fontSize:10}}>{s.family}</span><div className="cbadges"><Pill code={s.iucn} sm/>{s.endemic&&<span style={{fontSize:10,padding:'1px 7px',background:'var(--forest)',color:'white',borderRadius:999,fontWeight:600}}>Endemik</span>}</div></div><div className="csci" dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/><div className="cname">{s.preferred||s.common[0]||''}</div></div></button>;}
+function Card({s,i,onClick}){
+  const stBadge=s.nativeStatus==='verify'
+    ?<span style={{fontSize:10,padding:'1px 7px',background:'#FEF3C7',color:'#92400E',borderRadius:999,fontWeight:600,border:'1px solid #FDE68A'}}>⚠ {s.eco&&s.eco.toLowerCase().includes('borneo')?'PM+Borneo?':'PM?'}</span>
+    :s.nativeStatus==='introduced'
+      ?<span style={{fontSize:10,padding:'1px 7px',background:'#EDE9FE',color:'#5B21B6',borderRadius:999,fontWeight:600,border:'1px solid #DDD6FE'}}>Introduced</span>
+      :null;
+  return <button className="card" onClick={onClick}><div className="cimg"><SpI src={s.img} seed={i} ratio="4/3"/></div><div className="cbody"><div className="cmeta"><span className="cfam" style={{fontSize:10}}>{s.family}</span><div className="cbadges"><Pill code={s.iucn} sm/>{s.endemic&&<span style={{fontSize:10,padding:'1px 7px',background:'var(--forest)',color:'white',borderRadius:999,fontWeight:600}}>Endemik</span>}{stBadge}</div></div><div className="csci" dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/><div className="cname">{s.preferred||s.common[0]||''}</div></div></button>;
+}
 
 function TopBar({route,setRoute,query,setQuery,onSearch,navigate,lang,setLang,isAdmin,setShowLogin}){
   const ui=UI[lang];
@@ -537,7 +545,7 @@ function Home({species,loading,error,setRoute,setDetailId,setQuery,navigate,lang
 function Browse({species,query,setQuery,setRoute,setDetailId,navigate,lang}){
   const ui=UI[lang];
   const[view,setView]=useState('grid');
-  const[filters,setFilters]=useState({family:[],genus:[],region:[],endemic:false});
+  const[filters,setFilters]=useState({family:[],genus:[],region:[],endemic:false,nativeStatus:[]});
   const[sort,setSort]=useState('name');
   const[fO,setFO]=useState(true);
   const[gO,setGO]=useState(true);
@@ -552,19 +560,25 @@ function Browse({species,query,setQuery,setRoute,setDetailId,navigate,lang}){
     if(filters.family.length)r=r.filter(s=>filters.family.includes(s.family));
     if(filters.genus.length)r=r.filter(s=>filters.genus.includes(s.genus));
     if(filters.endemic)r=r.filter(s=>s.endemic);
+    if(filters.nativeStatus.length)r=r.filter(s=>filters.nativeStatus.includes(s.nativeStatus));
     if(sort==='name')r.sort((a,b)=>a.sci.localeCompare(b.sci));
     if(sort==='status'){const o=['CR','EN','VU','NT','LC','DD'];r.sort((a,b)=>o.indexOf(a.iucn)-o.indexOf(b.iucn));}
     return r;
   },[species,query,filters,sort]);
   const tog=(k,v)=>setFilters(f=>({...f,[k]:f[k].includes(v)?f[k].filter(x=>x!==v):[...f[k],v]}));
-  const ac=filters.family.length+filters.genus.length+(filters.endemic?1:0);
+  const ac=filters.family.length+filters.genus.length+(filters.endemic?1:0)+filters.nativeStatus.length;
   const FG=({title,open,onT,children})=><div className="fg"><button className="fgh" onClick={onT}><span className="fgl">{title}</span><span style={{fontSize:10,color:'var(--text-3)'}}>{open?'▲':'▼'}</span></button>{open&&<div className="fgb">{children}</div>}</div>;
   const Ck=({checked,onClick,children,count})=><button className="cr" onClick={onClick}><span className={`cb ${checked?'cbon':'cboff'}`}>{checked&&'✓'}</span><span style={{flex:1,fontSize:13}}>{children}</span>{count!==undefined&&<span style={{fontSize:11,color:'var(--text-3)',fontFamily:'DM Mono'}}>{count}</span>}</button>;
   return <div className="blayout">
     <aside>
-      <div className="sbh"><span className="sbt">{ui.filters}</span>{ac>0&&<button className="btn bg bsm" style={{fontSize:12,color:'var(--moss)',padding:'2px 6px'}} onClick={()=>setFilters({family:[],genus:[],region:[],endemic:false})}>{ui.clear}</button>}</div>
+      <div className="sbh"><span className="sbt">{ui.filters}</span>{ac>0&&<button className="btn bg bsm" style={{fontSize:12,color:'var(--moss)',padding:'2px 6px'}} onClick={()=>setFilters({family:[],genus:[],region:[],endemic:false,nativeStatus:[]})}>{ui.clear}</button>}</div>
       <FG title={ui.family} open={fO} onT={()=>setFO(o=>!o)}><div style={{maxHeight:220,overflowY:'auto'}}>{allF.map(f=><Ck key={f} checked={filters.family.includes(f)} onClick={()=>{tog('family',f);setFilters(prev=>({...prev,genus:[]}));}} count={species.filter(s=>s.family===f).length}><span style={{fontStyle:'italic',fontSize:12}}>{f}</span></Ck>)}</div></FG>
       <FG title={lang==='en'?'Genus':'Genus'} open={gO} onT={()=>setGO(o=>!o)}><div style={{maxHeight:220,overflowY:'auto'}}>{allG.length===0?<span style={{fontSize:12,color:'var(--text-3)',padding:'4px 8px',display:'block'}}>{lang==='en'?'Select a family first':'Pilih famili dahulu'}</span>:allG.map(g=><Ck key={g} checked={filters.genus.includes(g)} onClick={()=>tog('genus',g)} count={species.filter(s=>s.genus===g).length}><span style={{fontStyle:'italic',fontSize:12}}>{g}</span></Ck>)}</div></FG>
+      <FG title={lang==='en'?'Status':'Status'} open={true} onT={()=>{}}>
+        <Ck checked={filters.nativeStatus.includes('native')} onClick={()=>tog('nativeStatus','native')} count={species.filter(s=>s.nativeStatus==='native').length}><span style={{fontSize:12}}>{lang==='en'?'✦ Native':'✦ Asli'}</span></Ck>
+        <Ck checked={filters.nativeStatus.includes('introduced')} onClick={()=>tog('nativeStatus','introduced')} count={species.filter(s=>s.nativeStatus==='introduced').length}><span style={{fontSize:12,color:'#5B21B6'}}>{lang==='en'?'Introduced / Cultivated':'Diperkenalkan / Ditanam'}</span></Ck>
+        <Ck checked={filters.nativeStatus.includes('verify')} onClick={()=>tog('nativeStatus','verify')} count={species.filter(s=>s.nativeStatus==='verify').length}><span style={{fontSize:12,color:'#92400E'}}>{lang==='en'?'⚠ Verify occurrence':'⚠ Perlu pengesahan'}</span></Ck>
+      </FG>
       <FG title={ui.others} open={true} onT={()=>{}}><Ck checked={filters.endemic} onClick={()=>setFilters(f=>({...f,endemic:!f.endemic}))}>{ui.endemic_my}</Ck></FG>
     </aside>
     <main>
@@ -575,7 +589,7 @@ function Browse({species,query,setQuery,setRoute,setDetailId,navigate,lang}){
         <div className="vt"><button className={`vb${view==='grid'?' vbon':''}`} onClick={()=>setView('grid')}>⊞</button><button className={`vb${view==='list'?' vbon':''}`} onClick={()=>setView('list')}>≡</button></div>
       </div>
       {filtered.length===0
-        ?<div className="empty"><div style={{fontSize:40,marginBottom:16,opacity:.5}}>🌳</div><div style={{fontFamily:'Playfair Display',fontSize:20,color:'var(--forest)',marginBottom:8}}>{ui.no_match}</div><div style={{fontSize:14,color:'var(--text-3)',marginBottom:20}}>{ui.no_match_sub}</div><button className="btn bs" onClick={()=>{setQuery('');setFilters({family:[],genus:[],region:[],endemic:false});}}>{ui.reset}</button></div>
+        ?<div className="empty"><div style={{fontSize:40,marginBottom:16,opacity:.5}}>🌳</div><div style={{fontFamily:'Playfair Display',fontSize:20,color:'var(--forest)',marginBottom:8}}>{ui.no_match}</div><div style={{fontSize:14,color:'var(--text-3)',marginBottom:20}}>{ui.no_match_sub}</div><button className="btn bs" onClick={()=>{setQuery('');setFilters({family:[],genus:[],region:[],endemic:false,nativeStatus:[]});}}>{ui.reset}</button></div>
         :view==='grid'
           ?<div className="cg3">{filtered.map((s,i)=><Card key={s.id} s={s} i={i} onClick={()=>{navigate('detail',s.id);}}/>)}</div>
           :<div className="lt2"><div className="lth"><div/><div>Species</div><div>{lang==='en'?'Local name':'Nama tempatan'}</div><div>Family</div><div>IUCN</div></div>{filtered.map((s,i)=><button key={s.id} className="ltr" onClick={()=>{navigate('detail',s.id);}}><div style={{width:40,height:40,borderRadius:7,overflow:'hidden'}}><SpI src={s.img} seed={i} ratio="1/1" rounded={false}/></div><div><div style={{fontFamily:'Playfair Display',fontSize:14,fontStyle:'italic',fontWeight:500}}><span dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/></div><div style={{fontSize:11,color:'var(--text-3)',fontFamily:'DM Mono'}}>{s.family}</div></div><div style={{fontSize:13}}>{s.preferred||s.allNames&&s.allNames[0]||s.common[0]||'—'}</div><div style={{fontSize:13,fontStyle:'italic',color:'var(--text-2)'}}>{s.family}</div><Pill code={s.iucn} sm/></button>)}</div>
@@ -623,7 +637,7 @@ function Detail({species,detailId,setRoute,setQuery,navigate,lang}){
       <div>
         {s.taxdesc&&<div className="sblock"><div className="stitle">{ui.taxdesc_label}</div><p style={{fontSize:15,lineHeight:1.85,color:'var(--text)',fontFamily:'Georgia,serif'}}>{s.taxdesc}</p></div>}
         {(s.bark||s.leaf)&&<div className="sblock"><div className="stitle">{ui.description}</div><p style={{fontSize:15,lineHeight:1.7}}>{[s.bark,s.leaf].filter(Boolean).join(' ')}</p></div>}
-        <div className="sblock"><div className="stitle">{ui.ecology}</div>{[[lang==='en'?'Habit':'Tabiat',s.habit],[ui.habitat,s.habitat],...(s.eco?[['Notes',s.eco]]:[])].map(([k,v])=><div key={k} className="kv"><span className="kk">{k}</span><span className="kv2">{v}</span></div>)}</div>
+        <div className="sblock"><div className="stitle">{ui.ecology}</div>{[[lang==='en'?'Habit':'Tabiat',s.habit],[ui.habitat,s.habitat]].map(([k,v])=><div key={k} className="kv"><span className="kk">{k}</span><span className="kv2">{v}</span></div>)}{s.eco&&<div style={{marginTop:14,padding:'12px 16px',borderRadius:'var(--r-sm)',background:s.nativeStatus==='verify'?'#FFFBEB':s.nativeStatus==='introduced'?'#F5F3FF':'var(--parch)',border:`1px solid ${s.nativeStatus==='verify'?'#FDE68A':s.nativeStatus==='introduced'?'#DDD6FE':'var(--border)'}`,display:'flex',gap:10,alignItems:'flex-start'}}><span style={{fontSize:16,flexShrink:0}}>{s.nativeStatus==='verify'?'⚠':s.nativeStatus==='introduced'?'🌐':'ℹ'}</span><div><div style={{fontSize:11,fontWeight:700,textTransform:'uppercase',letterSpacing:'.06em',color:s.nativeStatus==='verify'?'#92400E':s.nativeStatus==='introduced'?'#5B21B6':'var(--text-3)',marginBottom:4}}>{s.nativeStatus==='verify'?(lang==='en'?'Occurrence unverified':'Rekod belum disahkan'):s.nativeStatus==='introduced'?(lang==='en'?'Introduced / Cultivated':'Diperkenalkan / Ditanam'):(lang==='en'?'Ecological notes':'Nota ekologi')}</div><div style={{fontSize:13,lineHeight:1.65,color:'var(--text-2)'}}>{s.eco}</div></div></div>}</div>
         {s.uses&&s.uses!=='—'&&<div className="sblock"><div className="stitle">{ui.uses}</div><p style={{fontSize:15,lineHeight:1.7}}>{s.uses}</p></div>}
       </div>
       <aside><div className="qfc"><div style={{fontSize:11,fontWeight:700,color:'var(--text-3)',textTransform:'uppercase',letterSpacing:'.08em',marginBottom:14}}>{ui.quick}</div>{[['Genus',<span style={{fontStyle:'italic'}}>{s.genus}</span>],['Family',<span style={{fontStyle:'italic'}}>{s.family}</span>],[ui.endemic,s.endemic?ui.yes:ui.no],[ui.distribution,s.dist.join(', ')||'—']].map(([k,v])=><div key={k} className="qfr"><span className="qfk">{k}</span><span className="qfv">{v}</span></div>)}</div></aside>
