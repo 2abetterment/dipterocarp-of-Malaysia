@@ -1,426 +1,824 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trees of Malaysia · Portal Preview</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dipterocarps of Peninsular Malaysia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:#0F2411;min-height:100vh;}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:'Space Grotesk',system-ui,sans-serif;background:#F2EFE7;color:#16211B}
+button{font-family:'Space Grotesk',system-ui,sans-serif;cursor:pointer}
+input{font-family:'Space Grotesk',system-ui,sans-serif}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.fade{animation:fadeIn .2s ease}
+.hidden{display:none!important}
 
-/* TOPBAR */
-.topbar{padding:13px 36px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(168,201,179,.1);background:rgba(15,36,17,.88);backdrop-filter:blur(16px);position:sticky;top:0;z-index:50;}
-.logo{display:flex;align-items:center;gap:10px;}
-.logo-mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#2C5A30,#6BAB82);display:flex;align-items:center;justify-content:center;}
-.logo-text{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:500;color:rgba(255,255,255,.9);}
-.logo-text em{font-style:italic;color:#F0B861;}
-.lang-toggle{display:flex;border:1px solid rgba(168,201,179,.2);border-radius:7px;overflow:hidden;}
-.lang-btn{padding:5px 13px;background:none;border:none;cursor:pointer;font-size:11px;font-weight:600;letter-spacing:.06em;color:rgba(168,201,179,.4);text-transform:uppercase;transition:all .15s;font-family:'DM Sans',sans-serif;}
-.lang-btn.on{background:rgba(168,201,179,.15);color:#A8C9B3;}
+/* ── GATE ── */
+#gate{min-height:100vh;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));background:#16211B;color:#FBF9F4}
+.gate-left{padding:clamp(28px,5vw,72px);display:flex;flex-direction:column;justify-content:space-between;gap:40px;position:relative;overflow:hidden}
+.gate-series{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#9BB09F;font-weight:500}
+.gate-h1{font-family:'Newsreader',Georgia,serif;font-weight:300;font-size:clamp(44px,7vw,92px);line-height:.95;margin:22px 0 0;letter-spacing:-.02em}
+.gate-intro{font-family:'Newsreader',Georgia,serif;font-size:clamp(17px,1.5vw,22px);line-height:1.55;font-weight:300;color:#D6DED4;max-width:46ch;margin:24px 0 0}
+.gate-stats{display:flex;gap:clamp(18px,4vw,54px);flex-wrap:wrap}
+.gate-stat-n{font-family:'Newsreader',Georgia,serif;font-size:clamp(34px,4vw,54px);line-height:1;color:#BF5B2E;font-weight:400}
+.gate-stat-l{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#8B9C8E;margin-top:8px}
+.gate-right{background:#FBF9F4;color:#16211B;padding:clamp(28px,4vw,56px);display:flex;flex-direction:column;justify-content:center}
+.gate-form{max-width:400px;width:100%;margin:0 auto}
+.gate-eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#6E7A70;font-weight:500}
+.gate-h2{font-family:'Newsreader',Georgia,serif;font-weight:400;font-size:30px;line-height:1.2;margin:12px 0 28px}
+.gate-guest-btn{width:100%;padding:16px 20px;background:#16211B;color:#FBF9F4;border:none;font-size:15px;font-weight:600;letter-spacing:.01em;display:flex;align-items:center;justify-content:space-between;gap:12px;transition:background .18s}
+.gate-guest-btn:hover{background:#BF5B2E}
+.gate-guest-note{font-size:13px;line-height:1.6;color:#6E7A70;margin:12px 0 0}
+.gate-divider{display:flex;align-items:center;gap:14px;margin:30px 0 26px}
+.gate-divider-line{height:1px;background:#DCD6C8;flex:1}
+.gate-divider-txt{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#A39C8C}
+.gate-label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#6E7A70;display:block;margin-bottom:7px;font-weight:500}
+.gate-input{width:100%;padding:12px 14px;background:#F2EFE7;border:1px solid #DCD6C8;font-size:15px;color:#16211B;outline:none;margin-bottom:16px}
+.gate-input:focus{border-color:#16211B;background:#fff}
+.gate-sign-btn{width:100%;padding:14px;background:transparent;color:#16211B;border:1px solid #16211B;font-size:14px;font-weight:600;transition:all .18s}
+.gate-sign-btn:hover{background:#16211B;color:#FBF9F4}
+.gate-err{font-size:13px;color:#A3282B;min-height:20px;margin-top:10px;line-height:1.5}
+.gate-byline{font-family:'Newsreader',Georgia,serif;font-size:14px;font-style:italic;color:#6E7A70;line-height:1.6;margin:18px 0 0}
 
-/* HERO */
-.hero{padding:56px 36px 44px;text-align:center;background:linear-gradient(160deg,#0F2411 0%,#1A3D1E 40%,#1E4A24 70%,#152E18 100%);}
-.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;background:rgba(168,201,179,.08);border:1px solid rgba(168,201,179,.18);font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#A8C9B3;margin-bottom:22px;}
-.eyebrow-dot{width:6px;height:6px;border-radius:999px;background:#F0B861;}
-.hero-title{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:400;color:white;line-height:1.0;letter-spacing:-.025em;margin-bottom:10px;}
-.hero-title em{font-style:italic;color:#F0B861;}
-.hero-sub{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:300;font-style:italic;color:rgba(255,255,255,.38);margin-bottom:8px;}
-.hero-desc{font-size:13px;color:rgba(255,255,255,.38);max-width:460px;margin:0 auto 44px;line-height:1.75;}
+/* ── APP SHELL ── */
+#app{display:none;grid-template-columns:minmax(0,248px) minmax(0,1fr);min-height:100vh}
+#app.visible{display:grid}
 
-/* CARDS CONTAINER */
-.cards-wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:14px;}
+/* ── SIDEBAR ── */
+.sb{background:#16211B;color:#D6DED4;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;overflow-y:auto}
+.sb-brand{padding:24px 20px 18px;border-bottom:1px solid rgba(155,176,159,.16)}
+.sb-series{font-size:9.5px;letter-spacing:.26em;text-transform:uppercase;color:#8B9C8E;font-weight:500}
+.sb-title{font-family:'Newsreader',Georgia,serif;font-size:22px;line-height:1.15;color:#FBF9F4;margin-top:8px;font-weight:400}
+.sb-title em{color:#9BB09F;font-size:15px;font-style:italic}
+.sb-user{padding:12px 20px;border-bottom:1px solid rgba(155,176,159,.1);background:rgba(0,0,0,.15)}
+.sb-user-email{font-size:13px;font-weight:500;color:#D6DED4}
+.sb-user-tier{font-size:12px;color:#8B9C8E;margin-top:2px}
+.sb-nav{padding:12px 0 6px;display:flex;flex-direction:column;gap:1px}
+.sb-nav-btn{width:100%;text-align:left;background:none;border:none;border-left:2px solid transparent;padding:9px 20px;font-size:15px;color:rgba(203,213,225,.8);display:flex;justify-content:space-between;align-items:center;transition:all .1s}
+.sb-nav-btn:hover{background:rgba(155,176,159,.1);color:#FBF9F4}
+.sb-nav-btn.active{background:rgba(155,176,159,.12);color:#FBF9F4;border-left-color:#9BB09F}
+.sb-nav-num{font-size:10px;color:#6E7A70;width:14px}
+.sb-nav-count{font-size:11px;color:#8B9C8E}
+.sb-genera-hd{font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:#6E7A70;font-weight:500;padding:14px 20px 8px}
+.sb-genera-list{display:flex;flex-direction:column;gap:1px;padding:0 20px}
+.sb-genus-btn{width:100%;text-align:left;background:none;border:none;padding:5px 8px;display:flex;justify-content:space-between;align-items:center;border-radius:1px;transition:all .1s}
+.sb-genus-btn:hover{background:rgba(155,176,159,.1);color:#FBF9F4}
+.sb-genus-btn.active{color:#9BB09F}
+.sb-genus-name{font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:15px}
+.sb-genus-n{font-size:11px;color:#6E7A70}
+.sb-footer{margin-top:auto;padding:16px 20px 22px;border-top:1px solid rgba(155,176,159,.16);display:flex;flex-direction:column;gap:10px}
+.sb-footer-txt{font-size:11px;color:#8B9C8E;line-height:1.5}
+.sb-signout{background:none;border:none;color:#6E7A70;font-size:12px;text-align:left;padding:0;letter-spacing:.04em;transition:color .15s}
+.sb-signout:hover{color:#BF5B2E}
 
-/* MAIN CARD */
-.main-card{background:linear-gradient(150deg,#1E4A24 0%,#163318 100%);border-radius:16px;border:1px solid rgba(198,166,48,.25);overflow:hidden;cursor:pointer;transition:all .2s ease;position:relative;box-shadow:0 8px 32px rgba(0,0,0,.3);}
-.main-card:hover{transform:translateY(-3px);border-color:#F0B861;box-shadow:0 20px 60px rgba(0,0,0,.45);}
-.main-card-top-bar{height:3px;background:linear-gradient(90deg,#C9862A,#F0B861,#C9862A);}
-.main-card-badge{position:absolute;top:18px;right:18px;padding:4px 12px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.1em;background:rgba(201,134,42,.15);color:#F0B861;border:1px solid rgba(201,134,42,.3);text-transform:uppercase;}
-.main-card-inner{padding:30px 34px;display:grid;grid-template-columns:1fr 1fr;gap:40px;}
-.mc-icon-row{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
-.mc-icon{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#C9862A,#F0B861);display:flex;align-items:center;justify-content:center;}
-.mc-icon-label{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#F0B861;margin-bottom:2px;}
-.mc-icon-sub{font-size:10px;color:rgba(168,201,179,.5);}
-.mc-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;color:white;line-height:1.2;margin-bottom:6px;}
-.mc-divider{height:1px;background:rgba(198,166,48,.2);margin:14px 0;}
-.mc-desc{font-size:12.5px;color:rgba(255,255,255,.6);line-height:1.75;margin-bottom:20px;}
-.pricing-box{padding:13px 15px;background:rgba(0,0,0,.25);border-radius:10px;border:1px solid rgba(198,166,48,.15);margin-bottom:20px;}
-.pricing-title{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(240,184,97,.55);margin-bottom:9px;}
-.pricing-row{display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,.55);margin-bottom:5px;}
-.pricing-row span:last-child{color:#F0B861;font-weight:600;}
-.mc-cta{display:flex;align-items:center;justify-content:space-between;padding:12px 17px;background:linear-gradient(90deg,#C9862A,#F0B861);border-radius:9px;font-weight:600;font-size:13px;color:#1A3D1E;cursor:pointer;}
-.mc-features-title{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(168,201,179,.45);margin-bottom:13px;padding-top:4px;}
-.feat-list{display:flex;flex-direction:column;gap:10px;}
-.feat-item{display:flex;align-items:flex-start;gap:10px;font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;}
-.feat-dot-gold{width:16px;height:16px;flex-shrink:0;margin-top:1px;}
+/* ── MAIN ── */
+.main{min-width:0;min-height:100vh;background:#F2EFE7}
+.topbar{position:sticky;top:0;z-index:60;background:rgba(242,239,231,.94);backdrop-filter:blur(10px);border-bottom:1px solid #DCD6C8;padding:12px clamp(16px,3vw,40px);display:flex;gap:14px;align-items:center}
+.search-wrap{position:relative;flex:1;max-width:460px}
+.search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#A39C8C;font-size:15px;pointer-events:none}
+.search-inp{width:100%;padding:11px 14px 11px 34px;background:#FBF9F4;border:1px solid #DCD6C8;font-size:14px;outline:none;color:#16211B}
+.search-inp:focus{border-color:#16211B}
+.search-drop{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#FBF9F4;border:1px solid #DCD6C8;box-shadow:0 18px 40px rgba(22,33,27,.14);max-height:340px;overflow-y:auto;z-index:80;display:none}
+.search-drop.open{display:block}
+.sd-item{width:100%;text-align:left;background:none;border:none;border-bottom:1px solid #ECE7DA;padding:11px 14px;display:flex;gap:12px;align-items:center;transition:background .1s}
+.sd-item:hover{background:#F2EFE7}
+.sd-kind{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#6E7A70;background:#ECE7DA;padding:3px 7px;flex-shrink:0}
+.sd-name{font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:16px;color:#16211B;display:block}
+.sd-sub{font-size:12px;color:#6E7A70}
+.topbar-right{display:flex;gap:8px;align-items:center;margin-left:auto;flex-shrink:0}
+.lang-pill{display:flex;border:0.5px solid #DCD6C8;overflow:hidden}
+.lang-btn{background:transparent;border:none;color:#888;font-size:13px;letter-spacing:1px;padding:5px 12px;transition:all .2s}
+.lang-btn.active{background:#16211B;color:#FBF9F4}
 
-/* SUB CARDS — now 3 columns */
-.sub-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
-.sub-card{border-radius:14px;overflow:hidden;cursor:pointer;transition:all .2s ease;display:flex;flex-direction:column;box-shadow:0 4px 16px rgba(0,0,0,.06);}
-.sub-card:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,0,0,.12);}
-.sub-card-accent{height:2px;}
-.sub-card-inner{padding:22px 24px;flex:1;display:flex;flex-direction:column;}
-.sc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.sc-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;}
-.sc-badge{padding:3px 9px;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:rgba(61,122,87,.1);color:#2C5A30;border:1px solid rgba(61,122,87,.2);}
-.sc-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:500;color:#1C1A17;line-height:1.2;margin-bottom:4px;}
-.sc-subtitle{font-size:11px;color:#8A8278;margin-bottom:10px;font-style:italic;}
-.sc-divider{height:1px;background:#DDD7CE;margin-bottom:12px;}
-.sc-desc{font-size:12px;color:#4A4640;line-height:1.7;margin-bottom:14px;}
-.sc-feat-list{display:flex;flex-direction:column;gap:7px;flex:1;}
-.sc-feat{display:flex;align-items:flex-start;gap:8px;font-size:11.5px;color:#4A4640;line-height:1.5;}
-.sc-nofeat{display:flex;align-items:flex-start;gap:8px;font-size:11.5px;color:#bbb;line-height:1.5;}
-.sc-feat-icon{width:14px;height:14px;flex-shrink:0;margin-top:1px;}
-.sc-cta{margin-top:16px;display:flex;align-items:center;justify-content:space-between;padding:10px 15px;border-radius:8px;font-weight:600;font-size:12px;cursor:pointer;}
+/* ── PAGE CONTENT ── */
+.page{display:none;padding:clamp(20px,3vw,44px) clamp(16px,3vw,40px) 80px;animation:fadeIn .22s ease;max-width:1180px}
+.page.active{display:block}
 
-/* SHARED NOTE */
-.shared-note{max-width:980px;margin:14px auto 0;padding:11px 18px;background:rgba(168,201,179,.06);border:1px solid rgba(168,201,179,.12);border-radius:10px;display:flex;align-items:center;gap:12px;font-size:11.5px;color:rgba(255,255,255,.38);line-height:1.65;}
-.shared-note strong{color:#A8C9B3;}
+/* ── OVERVIEW ── */
+.ov-hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:clamp(20px,3vw,40px);align-items:end;padding-bottom:clamp(24px,3vw,40px);border-bottom:2px solid #16211B}
+.ov-eyebrow{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#6E7A70;font-weight:500}
+.ov-h1{font-family:'Newsreader',Georgia,serif;font-weight:300;font-size:clamp(40px,6vw,80px);line-height:.98;margin:14px 0 0;letter-spacing:-.02em}
+.ov-h1 small{font-size:.32em;font-style:italic;color:#6E7A70;letter-spacing:0}
+.ov-intro{font-family:'Newsreader',Georgia,serif;font-size:clamp(18px,1.7vw,24px);line-height:1.5;font-weight:300;color:#2C3B32;max-width:52ch;margin:20px 0 0}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#DCD6C8;border:1px solid #DCD6C8}
+.stat-cell{background:#FBF9F4;padding:16px 18px}
+.stat-n{font-family:'Newsreader',Georgia,serif;font-size:38px;line-height:1;color:#16211B;font-weight:400}
+.stat-l{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#6E7A70;margin-top:8px;line-height:1.4}
+.three-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:1px;background:#F2EFE7;margin-top:clamp(24px,3vw,44px)}
+.three-cell{background:#FBF9F4;padding:24px 24px 26px;box-shadow:0 0 0 1px #DCD6C8}
+.three-tag{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#BF5B2E;font-weight:600}
+.three-h{font-family:'Newsreader',Georgia,serif;font-size:23px;font-weight:400;margin:12px 0 10px;line-height:1.25}
+.three-p{font-size:14px;line-height:1.7;color:#4A574E}
+.section-hd{display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1px solid #DCD6C8;padding-bottom:10px;margin-bottom:20px}
+.section-h2{font-family:'Newsreader',Georgia,serif;font-size:clamp(26px,3vw,38px);font-weight:400;margin:0}
+.section-link{background:none;border:none;color:#BF5B2E;font-size:13px;padding:0;font-weight:500}
+.section-link:hover{text-decoration:underline}
 
-/* FOOTER */
-.footer{text-align:center;padding:18px 36px 32px;}
-.footer-line1{font-size:10.5px;color:rgba(255,255,255,.2);letter-spacing:.04em;}
-.footer-line2{font-family:'Cormorant Garamond',serif;font-size:12px;font-style:italic;color:rgba(255,255,255,.26);margin-top:5px;}
+/* ── STATUS BARS ── */
+.status-list{display:flex;flex-direction:column;gap:1px}
+.status-row{background:#FBF9F4;border:none;padding:12px 14px;display:flex;align-items:center;gap:14px;text-align:left;width:100%;border-left-width:3px;border-left-style:solid;transition:background .15s}
+.status-row:hover{background:#ECE7DA;cursor:pointer}
+.status-lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#16211B;width:118px;flex-shrink:0;font-weight:500}
+.status-bar{height:6px;background:currentColor;border-radius:0}
+.status-n{font-family:'Newsreader',Georgia,serif;font-size:20px;color:#16211B;margin-left:auto}
 
-svg{display:block;}
-.live-dot{width:7px;height:7px;border-radius:50%;background:#2E6B8A;flex-shrink:0;animation:livepulse 2s ease-in-out infinite;}
-@keyframes livepulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(1.3);}}
+/* ── GENERA GRID (overview) ── */
+.genera-grid-ov{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,236px),1fr));gap:1px;background:#F2EFE7}
+.genus-card-ov{background:#FBF9F4;border:none;padding:20px;text-align:left;display:flex;flex-direction:column;gap:8px;min-height:170px;transition:background .18s;box-shadow:0 0 0 1px #DCD6C8;width:100%}
+.genus-card-ov:hover{background:#16211B;color:#FBF9F4}
+.genus-card-ov:hover .gc-auth-ov,.genus-card-ov:hover .gc-count-ov{color:rgba(155,176,159,.7)}
+.gc-name-ov{font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:24px;line-height:1.1;font-weight:400}
+.gc-auth-ov{font-size:11px;color:#6E7A70;letter-spacing:.04em}
+.gc-malay-ov{font-size:13px;color:#BF5B2E;font-weight:500;margin-top:2px}
+.gc-hook-ov{font-size:12.5px;line-height:1.55;opacity:.72;margin-top:auto}
+.gc-count-ov{font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.6}
+
+/* ── GENERA LIST PAGE ── */
+.genera-list{display:flex;flex-direction:column;gap:1px;background:#DCD6C8;border:1px solid #DCD6C8}
+.genus-row{background:#FBF9F4;border:none;padding:20px 22px;text-align:left;display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr) auto;gap:20px;align-items:center;width:100%;transition:background .15s}
+.genus-row:hover{background:#ECE7DA;cursor:pointer}
+.gr-name{font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:25px;line-height:1.1}
+.gr-auth{font-size:11px;color:#6E7A70;margin-top:4px}
+.gr-malay{font-size:13px;color:#BF5B2E;font-weight:500;margin-top:4px}
+.gr-fruit{font-size:14px;line-height:1.65;color:#4A574E}
+.gr-n{font-family:'Newsreader',Georgia,serif;font-size:26px;line-height:1;text-align:right}
+.gr-n-lbl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#6E7A70;margin-top:5px;text-align:right}
+
+/* ── GENUS DETAIL ── */
+.genus-hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(20px,3vw,44px);border-bottom:2px solid #16211B;padding-bottom:clamp(20px,3vw,34px)}
+.genus-h1{font-family:'Newsreader',Georgia,serif;font-weight:300;font-style:italic;font-size:clamp(38px,5.5vw,72px);line-height:1;margin:12px 0 6px}
+.genus-auth-txt{font-size:14px;color:#6E7A70}
+.genus-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.genus-tag-dark{font-size:12.5px;padding:5px 11px;background:#16211B;color:#FBF9F4;letter-spacing:.02em}
+.genus-tag-outline{font-size:12.5px;padding:5px 11px;border:1px solid #DCD6C8;color:#4A574E}
+.genus-desc{font-family:'Newsreader',Georgia,serif;font-size:clamp(16px,1.5vw,20px);line-height:1.6;color:#2C3B32;margin:20px 0 0;max-width:56ch}
+.genus-chars{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:1px;background:#F2EFE7;margin-top:1px}
+.genus-char{background:#FBF9F4;padding:18px 20px;box-shadow:0 0 0 1px #DCD6C8}
+.genus-char-k{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#BF5B2E;font-weight:600}
+.genus-char-v{font-family:'Newsreader',Georgia,serif;font-size:16px;line-height:1.6;color:#2C3B32;margin-top:8px}
+
+/* ── SPECIES CARDS (in genus) ── */
+.spp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,262px),1fr));gap:1px;background:#F2EFE7}
+.spp-card{background:#FBF9F4;display:flex;flex-direction:column;box-shadow:0 0 0 1px #DCD6C8}
+.spp-card-top{background:none;border:none;text-align:left;padding:18px 18px 14px;flex:1;display:flex;flex-direction:column;gap:7px;width:100%;transition:background .15s}
+.spp-card-top:hover{background:#ECE7DA;cursor:pointer}
+.spp-sci{font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:19px;line-height:1.15}
+.spp-auth{font-size:11px;color:#6E7A70}
+.spp-malay{font-size:13.5px;color:#BF5B2E;font-weight:500}
+.spp-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.spp-status{font-size:11px;padding:3px 8px;font-weight:600;letter-spacing:.04em}
+.spp-h-tag{font-size:11px;padding:3px 8px;background:#ECE7DA;color:#4A574E;letter-spacing:.02em}
+.spp-card-btns{display:flex;border-top:1px solid #ECE7DA}
+.spp-card-btn{flex:1;background:none;border:none;padding:8px;font-size:12px;color:#6E7A70;letter-spacing:.06em;transition:color .15s;border-right:1px solid #ECE7DA}
+.spp-card-btn:last-child{border-right:none}
+.spp-card-btn:hover{color:#BF5B2E}
+
+/* ── SPECIES DETAIL ── */
+.breadcrumb{display:flex;gap:8px;align-items:center;font-size:12px;color:#6E7A70;margin-bottom:18px;flex-wrap:wrap}
+.bc-btn{background:none;border:none;color:#6E7A70;font-size:12px;padding:0;transition:color .15s}
+.bc-btn:hover{color:#BF5B2E}
+.bc-sep{color:#C9C2B2}
+.spp-hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(20px,3vw,40px);align-items:start}
+.spp-timber{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#6E7A70;font-weight:500}
+.spp-h1{font-family:'Newsreader',Georgia,serif;font-weight:300;font-style:italic;font-size:clamp(36px,5.2vw,68px);line-height:1;margin:12px 0 8px;letter-spacing:-.01em}
+.spp-auth-txt{font-size:14px;color:#6E7A70}
+.spp-malay-lg{font-family:'Newsreader',Georgia,serif;font-size:clamp(20px,2vw,26px);color:#BF5B2E;margin-top:10px}
+.spp-diag{font-family:'Newsreader',Georgia,serif;font-size:clamp(17px,1.6vw,21px);line-height:1.55;color:#2C3B32;margin:18px 0 0;max-width:54ch}
+.spp-action-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.spp-act-btn{padding:9px 16px;background:none;border:1px solid #DCD6C8;font-size:12px;color:#16211B;letter-spacing:.06em;transition:all .15s}
+.spp-act-btn:hover{border-color:#16211B}
+.spp-act-btn.saved{background:#16211B;color:#FBF9F4;border-color:#16211B}
+.spp-img-placeholder{width:100%;aspect-ratio:4/5;background:#ECE7DA;display:flex;align-items:center;justify-content:center}
+.spp-img-txt{font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:13px;color:#A39C8C}
+.spp-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#DCD6C8;margin-top:1px}
+.spp-stat-cell{background:#FBF9F4;padding:12px 14px}
+.spp-stat-n{font-family:'Newsreader',Georgia,serif;font-size:19px;line-height:1.2;color:#16211B}
+.spp-stat-l{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#6E7A70;margin-top:5px}
+.tabs{display:flex;border-bottom:1px solid #DCD6C8;margin:clamp(26px,3.5vw,44px) 0 26px;overflow-x:auto}
+.tab-btn{padding:12px 18px;background:none;border:none;border-bottom:2px solid transparent;font-size:13px;color:#6E7A70;letter-spacing:.06em;white-space:nowrap;transition:all .15s;margin-bottom:-1px}
+.tab-btn:hover{color:#16211B}
+.tab-btn.active{color:#16211B;border-bottom-color:#16211B;font-weight:500}
+.chars-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:1px;background:#F2EFE7}
+.char-cell{background:#FBF9F4;padding:20px 22px 22px;display:flex;flex-direction:column;gap:10px;box-shadow:0 0 0 1px #DCD6C8}
+.char-k{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#BF5B2E;font-weight:600}
+.char-bm{font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:13px;color:#A39C8C}
+.char-v{font-family:'Newsreader',Georgia,serif;font-size:16.5px;line-height:1.65;color:#2C3B32}
+.dist-text{font-family:'Newsreader',Georgia,serif;font-size:17px;line-height:1.7;color:#2C3B32;max-width:65ch}
+.synonyms-box{margin-top:20px;padding:18px 20px;background:#FBF9F4;border:1px solid #DCD6C8}
+.synonyms-hd{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#6E7A70;font-weight:500;margin-bottom:12px}
+.synonym-item{font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:15px;color:#4A574E;padding:4px 0;border-bottom:0.5px solid #ECE7DA}
+.synonym-item:last-child{border-bottom:none}
+
+/* ── GLOSSARY ── */
+.glossary-list{display:flex;flex-direction:column;gap:1px}
+.glossary-item{background:#FBF9F4;padding:14px 18px;border-bottom:1px solid #ECE7DA;display:grid;grid-template-columns:minmax(0,160px) 1fr;gap:20px}
+.gl-term{font-weight:600;font-size:14px;color:#16211B}
+.gl-def{font-family:'Newsreader',Georgia,serif;font-size:15px;line-height:1.6;color:#2C3B32}
+
+/* ── BACK BUTTON ── */
+.back-btn{background:none;border:none;color:#6E7A70;font-size:12px;padding:0;margin-bottom:18px;letter-spacing:.06em;display:inline-block;transition:color .15s}
+.back-btn:hover{color:#BF5B2E}
+
+/* ── LOADING ── */
+.loading{padding:40px;text-align:center;font-family:'Newsreader',Georgia,serif;font-size:18px;font-style:italic;color:#8B9C8E}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  #app{grid-template-columns:1fr}
+  .sb{display:none;position:fixed;left:0;top:0;width:248px;z-index:100}
+  .sb.open{display:flex}
+  .genus-row{grid-template-columns:1fr}
+  .gr-fruit,.gr-n,.gr-n-lbl{display:none}
+}
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
-<div class="topbar">
-  <div class="logo">
-    <div class="logo-mark">
-      <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 14C2 7 7 2 14 2C14 9 9 14 2 14Z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/><path d="M2 14L9 7" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
+<!-- ── GATE ── -->
+<div id="gate">
+  <div class="gate-left">
+    <div>
+      <div class="gate-series">Trees of Peninsular Malaysia · Series I</div>
+      <h1 class="gate-h1">Diptero­carpaceae</h1>
+      <p class="gate-intro">The family that built the Malaysian rainforest. Fourteen genera, three hundred and seventy species, and a canopy that stands seventy metres above the forest floor.</p>
     </div>
-    <span class="logo-text">Trees of <em>Malaysia</em></span>
+    <div class="gate-stats">
+      <div><div class="gate-stat-n">14</div><div class="gate-stat-l">Genera</div></div>
+      <div><div class="gate-stat-n">370</div><div class="gate-stat-l">Species (PM)</div></div>
+      <div><div class="gate-stat-n">680+</div><div class="gate-stat-l">Species (World)</div></div>
+    </div>
   </div>
-  <div class="lang-toggle">
-    <button class="lang-btn on" onclick="setLang('en')">EN</button>
-    <button class="lang-btn" onclick="setLang('bm')">BM</button>
+  <div class="gate-right">
+    <div class="gate-form">
+      <div class="gate-eyebrow">Open the field guide</div>
+      <h2 class="gate-h2">Sign in, or start exploring</h2>
+      <button class="gate-guest-btn" onclick="enterGuest()">
+        <span>Explore the public edition</span><span style="font-size:18px">→</span>
+      </button>
+      <p class="gate-guest-note">Full taxonomy, identification key, distribution maps. No account needed.</p>
+      <div class="gate-divider"><div class="gate-divider-line"></div><span class="gate-divider-txt">Licensed edition</span><div class="gate-divider-line"></div></div>
+      <label class="gate-label">Email</label>
+      <input class="gate-input" id="inp-email" type="email" placeholder="you@university.edu.my">
+      <label class="gate-label">Licence key</label>
+      <input class="gate-input" id="inp-key" type="text" placeholder="XXXX-XXXX-XXXX-XXXX" onkeydown="if(event.key==='Enter')signIn()">
+      <button class="gate-sign-btn" id="sign-btn" onclick="signIn()">Access licensed edition</button>
+      <div class="gate-err" id="gate-err"></div>
+      <p class="gate-byline">M. Nazre Saleh · Faculty of Forestry and Environment, Universiti Putra Malaysia</p>
+    </div>
   </div>
 </div>
 
-<!-- HERO -->
-<div class="hero">
-  <div class="eyebrow">
-    <div class="eyebrow-dot"></div>
-    <span id="txt-eyebrow">Malaysian Forest Botany · M. Nazre Saleh · UPM</span>
-  </div>
-  <h1 class="hero-title" id="txt-title">Trees of<br><em>Malaysia</em></h1>
-  <p class="hero-sub" id="txt-sub">Four platforms. One shared database.</p>
-  <p class="hero-desc" id="txt-desc">A botanical initiative by M. Nazre Saleh, Universiti Putra Malaysia — exploring the trees of Malaysia through research, community, and open data.</p>
+<!-- ── APP ── -->
+<div id="app">
+  <aside class="sb">
+    <div class="sb-brand">
+      <div class="sb-series">Series I</div>
+      <div class="sb-title">Dipterocarps<br><em>of Peninsular Malaysia</em></div>
+    </div>
+    <div class="sb-user">
+      <div class="sb-user-email" id="sb-email">—</div>
+      <div class="sb-user-tier" id="sb-tier">—</div>
+    </div>
+    <nav class="sb-nav" id="sb-nav">
+      <button class="sb-nav-btn active" onclick="showPage('overview')" data-page="overview">
+        <span style="display:flex;align-items:baseline;gap:10px"><span class="sb-nav-num">I</span>Family Overview</span>
+      </button>
+      <button class="sb-nav-btn" onclick="showPage('genera')" data-page="genera">
+        <span style="display:flex;align-items:baseline;gap:10px"><span class="sb-nav-num">II</span>All Genera</span>
+        <span class="sb-nav-count" id="sb-genera-count"></span>
+      </button>
+      <button class="sb-nav-btn" onclick="showPage('species')" data-page="species">
+        <span style="display:flex;align-items:baseline;gap:10px"><span class="sb-nav-num">III</span>All Species</span>
+        <span class="sb-nav-count" id="sb-spp-count"></span>
+      </button>
+      <button class="sb-nav-btn" onclick="showPage('glossary')" data-page="glossary">
+        <span style="display:flex;align-items:baseline;gap:10px"><span class="sb-nav-num">IV</span>Glossary</span>
+      </button>
+    </nav>
+    <div class="sb-genera-hd">Genera</div>
+    <div class="sb-genera-list" id="sb-genera-list"></div>
+    <div class="sb-footer">
+      <div class="sb-footer-txt" id="sb-source">M. Nazre Saleh, UPM</div>
+      <button class="sb-signout" onclick="signOut()">← Sign out</button>
+    </div>
+  </aside>
 
-  <div class="cards-wrap">
-
-    <!-- MAIN CARD: Paid Academic Reference -->
-    <a href="trees_peninsular_malaysia_webapp.html" target="_blank" style="text-decoration:none;display:block;" class="main-card">
-      <div class="main-card-top-bar"></div>
-      <div class="main-card-badge" id="txt-badge-paid">PAID · Licence Required</div>
-      <div class="main-card-inner">
-        <!-- LEFT -->
-        <div>
-          <div class="mc-icon-row">
-            <div class="mc-icon">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="#1A3D1E" stroke-width="1.5" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="#1A3D1E" stroke-width="1.5" stroke-linecap="round"/><path d="M9 7h7M9 11h5" stroke="#1A3D1E" stroke-width="1.5" stroke-linecap="round"/></svg>
-            </div>
-            <div>
-              <div class="mc-icon-label" id="txt-badge2">Academic Reference</div>
-              <div class="mc-icon-sub">Series I — Dipterocarpaceae</div>
-            </div>
-          </div>
-          <div class="mc-title" id="txt-card2-title">Trees of Peninsular Malaysia</div>
-          <div class="mc-divider"></div>
-          <p class="mc-desc" id="txt-card2-desc">A structured interactive botanical reference for forestry students and researchers. Family → Genus → Species with full taxonomic descriptions, diagnostic characters, and POWO 2026 nomenclature.</p>
-          <div class="pricing-box">
-            <div class="pricing-title" id="txt-tiers">Access Tiers</div>
-            <div class="pricing-row"><span id="txt-t1">Student (6 months)</span><span>RM 30–50</span></div>
-            <div class="pricing-row"><span id="txt-t2">Individual (1 year)</span><span>RM 80–120</span></div>
-            <div class="pricing-row" style="margin-bottom:0"><span id="txt-t3">Institutional (1 year)</span><span>RM 500–1,000</span></div>
-          </div>
-          <div class="mc-cta">
-            <span id="txt-cta2">Access Interactive Reference</span>
-            <span style="font-size:16px;">→</span>
-          </div>
-        </div>
-        <!-- RIGHT -->
-        <div>
-          <div class="mc-features-title" id="txt-included">What's included</div>
-          <div class="feat-list" id="feat-list-paid"></div>
+  <main class="main">
+    <div class="topbar">
+      <div class="search-wrap">
+        <span class="search-icon">⚲</span>
+        <input class="search-inp" id="search-inp" type="text" placeholder="Search species, genus, Malay name…" oninput="onSearch(this.value)" onblur="setTimeout(()=>closeSearch(),200)">
+        <div class="search-drop" id="search-drop"></div>
+      </div>
+      <div class="topbar-right">
+        <div class="lang-pill">
+          <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+          <button class="lang-btn" id="btn-bm" onclick="setLang('bm')">BM</button>
         </div>
       </div>
-    </a>
-
-    <!-- SUB CARDS: 3 columns -->
-    <div class="sub-cards">
-
-      <!-- Dipterokarp Malaysia -->
-      <a href="index.html" target="_blank" class="sub-card" style="text-decoration:none;display:flex;flex-direction:column;background:#F7F3ED;border:1px solid #DDD7CE;">
-        <div class="sub-card-accent" style="background:#2C5A30;"></div>
-        <div class="sub-card-inner">
-          <div class="sc-header">
-            <div class="sc-icon" style="background:linear-gradient(135deg,#2C5A30,#6BAB82);">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.5"/><path d="M2 12h20M12 3a15 15 0 014 9 15 15 0 01-4 9 15 15 0 01-4-9 15 15 0 014-9z" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
-            </div>
-            <span class="sc-badge" id="txt-badge1">FREE · Open Access</span>
-          </div>
-          <div class="sc-title" id="txt-card1-title">Dipterokarp Malaysia</div>
-          <div class="sc-subtitle" id="txt-card1-sub">Community database · Dipterocarpaceae</div>
-          <div class="sc-divider"></div>
-          <p class="sc-desc" id="txt-card1-desc">Free, publicly accessible database of Malaysian Dipterocarps. Browse species, view community field photographs, IUCN status and distribution records.</p>
-          <div class="sc-feat-list" id="feat-list-dip"></div>
-          <div class="sc-cta" style="background:#1A3D1E;color:white;">
-            <span id="txt-cta1">Open Dipterokarp Malaysia</span><span>→</span>
-          </div>
-        </div>
-      </a>
-
-      <!-- Non-Dipterocarp Trees -->
-      <a href="non_dipterocarp_trees_malaysia.html" target="_blank" class="sub-card" style="text-decoration:none;display:flex;flex-direction:column;background:#F0F6FA;border:1px solid #C5D8E8;">
-        <div class="sub-card-accent" style="background:#2E6B8A;"></div>
-        <div class="sub-card-inner">
-          <div class="sc-header">
-            <div class="sc-icon" style="background:linear-gradient(135deg,#1A3D5C,#2E6B8A);">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 22V13M12 13C10 11 7 9 5 6M12 13C14 11 17 9 19 6" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M5 6C6 4 9 2 12 2C15 2 18 4 19 6" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
-            </div>
-            <span class="sc-badge" style="background:rgba(46,107,138,.1);color:#2E6B8A;border-color:rgba(46,107,138,.2);" id="txt-badge3">FREE · Open Access</span>
-          </div>
-          <div class="sc-title" id="txt-card3-title">Non-Dipterocarp Trees</div>
-          <div class="sc-subtitle" id="txt-card3-sub">Community database · 141+ families</div>
-          <div class="sc-divider" style="background:#C5D8E8;"></div>
-          <p class="sc-desc" id="txt-card3-desc">Free community database covering non-dipterocarp trees of Malaysia — Leguminosae, Moraceae, Myrtaceae, Lauraceae and 137+ more families.</p>
-          <div class="sc-feat-list" id="feat-list-nondip"></div>
-          <div id="nondip-live-stats" style="display:none;align-items:center;gap:6px;font-size:11.5px;color:#2E6B8A;background:rgba(46,107,138,.08);border:1px solid rgba(46,107,138,.18);border-radius:20px;padding:5px 12px;margin:8px 0 4px;font-weight:500;"></div>
-          <div class="sc-cta" style="background:#1A3D5C;color:white;">
-            <span id="txt-cta3">Open Non-Dipterocarp Database</span><span>→</span>
-          </div>
-        </div>
-      </a>
-
-      <!-- Nama Tempatan — Vernacular Names -->
-      <a href="vernacular_names.html" target="_blank" class="sub-card" style="text-decoration:none;display:flex;flex-direction:column;background:#F5F0EC;border:1px solid #D9CDBF;">
-        <div class="sub-card-accent" style="background:#7A5C3A;"></div>
-        <div class="sub-card-inner">
-          <div class="sc-header">
-            <div class="sc-icon" style="background:linear-gradient(135deg,#5A3E28,#9E7A52);">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 10h10M4 14h12M4 18h8" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
-            </div>
-            <span class="sc-badge" style="background:rgba(122,92,58,.1);color:#5A3E28;border-color:rgba(122,92,58,.2);" id="txt-badge4">FREE · Open Access</span>
-          </div>
-          <div class="sc-title" id="txt-card4-title">Nama Tempatan <em style="font-size:15px;color:#8A8278;font-weight:300;">· Local Names</em></div>
-          <div class="sc-subtitle" id="txt-card4-sub">Local name database · All families</div>
-          <div class="sc-divider" style="background:#D9CDBF;"></div>
-          <p class="sc-desc" id="txt-card4-desc">Searchable database of documented local names for all Malaysian trees — Malay, Iban, Kadazan and more. Each name traceable to its published source.</p>
-          <div class="sc-feat-list" id="feat-list-vern"></div>
-          <div id="vern-live-stats" style="display:none;align-items:center;gap:6px;font-size:11.5px;color:#7A5C3A;background:rgba(122,92,58,.08);border:1px solid rgba(122,92,58,.18);border-radius:20px;padding:5px 12px;margin:8px 0 4px;font-weight:500;"></div>
-          <div class="sc-cta" style="background:#3D2810;color:white;">
-            <span id="txt-cta4">Open Nama Tempatan</span><span>→</span>
-          </div>
-        </div>
-      </a>
-
-    </div><!-- /sub-cards -->
-
-    <!-- SHARED NOTE -->
-    <div class="shared-note">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="6.5" stroke="#A8C9B3" stroke-width="1.2"/><path d="M8 5v3l2 2" stroke="#A8C9B3" stroke-width="1.3" stroke-linecap="round"/></svg>
-      <p id="txt-shared"><strong>Shared database:</strong> All four platforms draw from the same Supabase database. Photos approved in either community site and vernacular names curated in Nama Tempatan update across all platforms in real time.</p>
     </div>
 
-  </div><!-- /cards-wrap -->
-</div><!-- /hero -->
+    <!-- OVERVIEW -->
+    <div class="page active" id="pg-overview">
+      <div class="ov-hero">
+        <div>
+          <div class="ov-eyebrow">Family · Malvales</div>
+          <h1 class="ov-h1">Dipterocarpaceae <small>Blume, 1825</small></h1>
+          <p class="ov-intro">Two wings and a nut. <em>Di-pteron-karpos</em> — the winged fruit that spins down out of the canopy is the whole family in one object.</p>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-cell"><div class="stat-n" id="ov-n-gen">—</div><div class="stat-l">Genera in PM</div></div>
+          <div class="stat-cell"><div class="stat-n" id="ov-n-spp">—</div><div class="stat-l">Species in PM</div></div>
+          <div class="stat-cell"><div class="stat-n">670+</div><div class="stat-l">Species worldwide</div></div>
+          <div class="stat-cell"><div class="stat-n">17</div><div class="stat-l">States recorded</div></div>
+        </div>
+      </div>
+      <div class="three-grid">
+        <div class="three-cell"><div class="three-tag">Ecology</div><h3 class="three-h">Canopy dominants</h3><p class="three-p">Dipterocarps form the emergent layer of lowland and hill dipterocarp forest — the signature ecosystem of Sundaland.</p></div>
+        <div class="three-cell"><div class="three-tag">Timber</div><h3 class="three-h">Meranti, Keruing, Balau</h3><p class="three-p">The family supplies most of Malaysia's commercial hardwood. Trade names group dozens of species by weight and working properties.</p></div>
+        <div class="three-cell"><div class="three-tag">Conservation</div><h3 class="three-h">Under pressure</h3><p class="three-p">Slow growth and high commercial value place most of the family on the IUCN Red List. Over half are Vulnerable or worse.</p></div>
+      </div>
 
-<!-- FOOTER -->
-<div class="footer">
-  <div class="footer-line1" id="txt-footer1">Dipterocarpaceae of Peninsular Malaysia · POWO 2026 · APG IV · CC-BY 4.0</div>
-  <div class="footer-line2">M. Nazre Saleh · Universiti Putra Malaysia · 2025–2026</div>
+      <section style="margin-top:clamp(34px,4vw,60px)">
+        <div class="section-hd">
+          <h2 class="section-h2">Under pressure</h2>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:clamp(20px,3vw,40px)">
+          <div>
+            <p style="font-size:14px;line-height:1.75;color:#4A574E;margin:0 0 20px">Click a band to filter species by conservation status.</p>
+            <div class="status-list" id="status-bars"></div>
+            <p style="font-family:'Newsreader',Georgia,serif;font-size:12px;font-style:italic;color:#6E7A70;margin:16px 0 0;line-height:1.6">Counts for species in this edition. Verify against current IUCN Red List before citing.</p>
+          </div>
+          <div>
+            <h3 style="font-family:'Newsreader',Georgia,serif;font-size:22px;font-weight:400;margin:0 0 14px">The nine* genera</h3>
+            <p style="font-size:14px;line-height:1.75;color:#4A574E;margin:0 0 0">*Fourteen genera reach Peninsular Malaysia. They are told apart mainly by the fruit — how many calyx lobes grow into wings, and how those wings sit on the nut.</p>
+          </div>
+        </div>
+      </section>
+
+      <section style="margin-top:clamp(34px,4vw,60px)">
+        <div class="section-hd">
+          <h2 class="section-h2">The genera</h2>
+          <button class="section-link" onclick="showPage('genera')">All genera →</button>
+        </div>
+        <div class="genera-grid-ov" id="genera-cards-ov"></div>
+      </section>
+
+      <p style="font-family:'Newsreader',Georgia,serif;font-size:13.5px;font-style:italic;color:#6E7A70;line-height:1.7;margin:clamp(28px,3vw,44px) 0 0;max-width:70ch;border-top:1px solid #DCD6C8;padding-top:16px">Blume (1825), <em>Bijdr. fl. Ned. Ind.</em> 13: 222. — Symington (1943), <em>Foresters' Manual of Dipterocarps.</em> — Ashton (1982), <em>Flora Malesiana</em> 9(2). — Plants of the World Online, Kew.</p>
+    </div>
+
+    <!-- GENERA LIST -->
+    <div class="page" id="pg-genera">
+      <div style="border-bottom:2px solid #16211B;padding-bottom:18px;margin-bottom:24px">
+        <div class="ov-eyebrow">Browse</div>
+        <h1 style="font-family:'Newsreader',Georgia,serif;font-weight:300;font-size:clamp(34px,4.6vw,58px);line-height:1;margin:12px 0 0">Genera</h1>
+        <p style="font-size:14.5px;line-height:1.7;color:#4A574E;max-width:60ch;margin:14px 0 0">Fourteen genera reach Peninsular Malaysia. They are told apart mainly by the fruit.</p>
+      </div>
+      <div class="genera-list" id="genera-list"></div>
+    </div>
+
+    <!-- ALL SPECIES -->
+    <div class="page" id="pg-species">
+      <div style="border-bottom:2px solid #16211B;padding-bottom:18px;margin-bottom:24px">
+        <div class="ov-eyebrow">Browse</div>
+        <h1 style="font-family:'Newsreader',Georgia,serif;font-weight:300;font-size:clamp(34px,4.6vw,58px);line-height:1;margin:12px 0 0">All Species</h1>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px" id="spp-filter-chips"></div>
+      </div>
+      <div class="spp-grid" id="all-spp-grid"></div>
+    </div>
+
+    <!-- GENUS DETAIL -->
+    <div class="page" id="pg-genus">
+      <button class="back-btn" onclick="showPage('genera')">← All genera</button>
+      <div class="genus-hero" id="genus-hero"></div>
+      <div class="genus-chars" id="genus-chars" style="margin-top:clamp(20px,3vw,34px)"></div>
+      <div style="margin-top:clamp(28px,3.5vw,48px)">
+        <h2 style="font-family:'Newsreader',Georgia,serif;font-size:clamp(24px,2.6vw,32px);font-weight:400;margin:0 0 4px">Species in this edition</h2>
+        <div style="font-size:13px;color:#6E7A70;margin-bottom:18px" id="genus-spp-label"></div>
+        <div class="spp-grid" id="genus-spp-grid"></div>
+      </div>
+    </div>
+
+    <!-- SPECIES DETAIL -->
+    <div class="page" id="pg-spp">
+      <div class="breadcrumb" id="spp-breadcrumb"></div>
+      <div class="spp-hero" id="spp-hero"></div>
+      <div class="tabs" id="spp-tabs"></div>
+      <div id="spp-tab-content"></div>
+    </div>
+
+    <!-- GLOSSARY -->
+    <div class="page" id="pg-glossary">
+      <div style="border-bottom:2px solid #16211B;padding-bottom:18px;margin-bottom:24px">
+        <div class="ov-eyebrow">Reference</div>
+        <h1 style="font-family:'Newsreader',Georgia,serif;font-weight:300;font-size:clamp(34px,4.6vw,58px);line-height:1;margin:12px 0 0">Glossary</h1>
+      </div>
+      <div class="glossary-list" id="glossary-list"></div>
+    </div>
+
+  </main>
 </div>
 
 <script>
-const content = {
-  en: {
-    eyebrow:    "Malaysian Forest Botany · M. Nazre Saleh · UPM",
-    title:      "Trees of<br><em>Malaysia</em>",
-    sub:        "Four platforms. One shared database.",
-    desc:       "A botanical initiative by M. Nazre Saleh, Universiti Putra Malaysia — exploring the trees of Malaysia through research, community, and open data.",
-    badgePaid:  "PAID · Licence Required",
-    badge2:     "Academic Reference",
-    card2title: "Trees of Peninsular Malaysia",
-    card2desc:  "A structured interactive botanical reference for forestry students and researchers. Family → Genus → Species with full taxonomic descriptions, diagnostic characters, and POWO 2026 nomenclature.",
-    tiers:      "Access Tiers",
-    t1: "Student (6 months)", t2: "Individual (1 year)", t3: "Institutional (1 year)",
-    cta2:       "Access Interactive Reference",
-    included:   "What's included",
-    paidFeats:  ["Full taxonomic & morphological descriptions","Diagnostic characters & identification keys","POWO 2026 accepted nomenclature","Etymology of genus & species epithets","Synonym history with full publications","Family → Genus → Species hierarchy","Time-limited access — renew annually"],
-    badge1: "FREE · Open Access",
-    card1title: "Dipterokarp Malaysia",
-    card1sub:   "Community database · Dipterocarpaceae",
-    card1desc:  "Free, publicly accessible database of Malaysian Dipterocarps. Browse species, view community field photographs, IUCN status and distribution records.",
-    cta1:       "Open Dipterokarp Malaysia",
-    dip_feats:  ["Browse 160+ species with field photos","IUCN status · state-level distribution","Filter by genus, IUCN, endemism","Contribute field photographs","English & Bahasa Malaysia"],
-    dip_no:     ["Full taxonomic descriptions","Diagnostic keys"],
-    badge3: "FREE · Open Access",
-    card3title: "Non-Dipterocarp Trees",
-    card3sub:   "Community database · 141+ families",
-    card3desc:  "Free community database covering non-dipterocarp trees of Malaysia — Leguminosae, Moraceae, Myrtaceae, Lauraceae and 137+ more families.",
-    cta3:       "Open Non-Dipterocarp Database",
-    nondip_feats: ["Browse 141+ tree families with photos","IUCN status · state-level distribution","Filter by family, genus, endemism","Contribute field photographs","English & Bahasa Malaysia"],
-    nondip_no:  ["Full taxonomic descriptions","Diagnostic keys"],
-    badge4: "FREE · Open Access",
-    card4title: "Nama Tempatan <em style=\"font-size:15px;color:#8A8278;font-weight:300;\">· Local Names</em>",
-    card4sub:   "Local name database · All families",
-    card4desc:  "Searchable database of documented local names for all Malaysian trees — Malay, Iban, Kadazan and more. Each name traceable to its published source.",
-    cta4:       "Open Nama Tempatan",
-    vern_feats: ["Search by species or local name","Malay · Iban · Kadazan languages","Names linked to published sources","Covers Dipterocarp & Non-Dipterocarp","Peninsular · Sabah · Sarawak"],
-    vern_no:    [],
-    shared:     "<strong>Shared database:</strong> All four platforms draw from the same Supabase database. Photos approved in either community site and vernacular names curated in Nama Tempatan update across all platforms in real time.",
-    footer1:    "Dipterocarpaceae of Peninsular Malaysia · POWO 2026 · APG IV · CC-BY 4.0",
-  },
-  bm: {
-    eyebrow:    "Botani Hutan Malaysia · M. Nazre Saleh · UPM",
-    title:      "Pokok<br><em>Malaysia</em>",
-    sub:        "Empat platform. Satu pangkalan data.",
-    desc:       "Inisiatif botani oleh M. Nazre Saleh, UPM — meneroka pokok Malaysia melalui penyelidikan, komuniti, dan data terbuka.",
-    badgePaid:  "BERBAYAR · Lesen Diperlukan",
-    badge2:     "Rujukan Akademik",
-    card2title: "Pokok Semenanjung Malaysia",
-    card2desc:  "Rujukan botani interaktif berstruktur untuk pelajar dan penyelidik perhutanan. Famili → Genus → Spesies dengan huraian taksonomi penuh dan tatanama POWO 2026.",
-    tiers:      "Peringkat Akses",
-    t1: "Pelajar (6 bulan)", t2: "Individu (1 tahun)", t3: "Institusi (1 tahun)",
-    cta2:       "Akses Rujukan Interaktif",
-    included:   "Yang disertakan",
-    paidFeats:  ["Huraian taksonomi & morfologi penuh","Ciri diagnostik & kunci pengenalpastian","Tatanama diterima POWO 2026","Etimologi epitet genus & spesies","Sejarah sinonim dengan penerbitan penuh","Hierarki Famili → Genus → Spesies","Akses terhad masa — perbaharui setiap tahun"],
-    badge1: "PERCUMA · Akses Terbuka",
-    card1title: "Dipterokarp Malaysia",
-    card1sub:   "Pangkalan data komuniti · Dipterocarpaceae",
-    card1desc:  "Pangkalan data percuma Dipterokarp Malaysia. Layari spesies, lihat gambar lapangan komuniti, status IUCN dan rekod taburan.",
-    cta1:       "Buka Dipterokarp Malaysia",
-    dip_feats:  ["Layari 160+ spesies dengan gambar","Status IUCN · taburan mengikut negeri","Tapis mengikut genus, IUCN, endemisma","Sumbang gambar lapangan","Bahasa Malaysia & Inggeris"],
-    dip_no:     ["Huraian taksonomi penuh","Kunci diagnostik"],
-    badge3: "PERCUMA · Akses Terbuka",
-    card3title: "Pokok Bukan Dipterokarp",
-    card3sub:   "Pangkalan data komuniti · 141+ famili",
-    card3desc:  "Pangkalan data komuniti percuma merangkumi pokok bukan dipterocarp Malaysia — Leguminosae, Moraceae, Myrtaceae dan 137+ famili lagi.",
-    cta3:       "Buka Pangkalan Data Bukan Dipterokarp",
-    nondip_feats: ["Layari 141+ famili pokok dengan gambar","Status IUCN · taburan mengikut negeri","Tapis mengikut famili, genus, endemisma","Sumbang gambar lapangan","Bahasa Malaysia & Inggeris"],
-    nondip_no:  ["Huraian taksonomi penuh","Kunci diagnostik"],
-    badge4: "PERCUMA · Akses Terbuka",
-    card4title: "Nama Tempatan <em style=\"font-size:15px;color:#8A8278;font-weight:300;\">· Local Names</em>",
-    card4sub:   "Pangkalan data nama tempatan · Semua famili",
-    card4desc:  "Pangkalan data nama tempatan pokok Malaysia yang boleh dicari — Melayu, Iban, Kadazan dan lain-lain. Setiap nama boleh dikesan ke sumber asal.",
-    cta4:       "Buka Nama Tempatan",
-    vern_feats: ["Cari mengikut spesies atau nama tempatan","Bahasa Melayu · Iban · Kadazan","Nama dikaitkan dengan sumber diterbitkan","Merangkumi Dipterokarp & Bukan Dipterokarp","Semenanjung · Sabah · Sarawak"],
-    vern_no:    [],
-    shared:     "<strong>Pangkalan data dikongsi:</strong> Keempat-empat platform menggunakan pangkalan data Supabase yang sama. Gambar yang diluluskan dan nama tempatan yang dikurasi dikemas kini secara automatik merentasi semua platform.",
-    footer1:    "Dipterocarpaceae Semenanjung Malaysia · POWO 2026 · APG IV · CC-BY 4.0",
-  }
-};
+const SB_URL = "https://xrntnarchlglhllvlrnv.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhybnRuYXJjaGxnbGhsbHZscm52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTU4MzksImV4cCI6MjA4MDk5MTgzOX0.Q0PjW5dMU07EDoR-GGDpIjATlSC5AJxNeEdOlYaO96w";
+const SPP_T  = "dipterocarp_species_2025_12_11_02_08";
+const GEN_T  = "dipterocarp_genera_2025_12_11_02_08";
 
-function checkSVG(color){ return `<svg class="sc-feat-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="${color}" stroke-width="1"/><path d="M4 7l2 2 4-4" stroke="${color}" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`; }
-function crossSVG(){ return `<svg class="sc-feat-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="#ccc" stroke-width="1"/><path d="M5 5l4 4M9 5l-4 4" stroke="#ccc" stroke-width="1.4" stroke-linecap="round"/></svg>`; }
+let SESSION = null;
+let GENERA  = [];
+let SPECIES = [];
+let lang = 'en';
+let savedIds = new Set();
+let currentGenus = null;
+let currentSpp = null;
+let activeTab = 'chars';
 
-let currentLang = 'en';
-
-function setLang(lang) {
-  currentLang = lang;
-  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.textContent.toLowerCase() === lang));
-  const c = content[lang];
-  document.getElementById('txt-eyebrow').textContent    = c.eyebrow;
-  document.getElementById('txt-title').innerHTML         = c.title;
-  document.getElementById('txt-sub').textContent         = c.sub;
-  document.getElementById('txt-desc').textContent        = c.desc;
-  document.getElementById('txt-badge-paid').textContent  = c.badgePaid;
-  document.getElementById('txt-badge2').textContent      = c.badge2;
-  document.getElementById('txt-card2-title').textContent = c.card2title;
-  document.getElementById('txt-card2-desc').textContent  = c.card2desc;
-  document.getElementById('txt-tiers').textContent       = c.tiers;
-  document.getElementById('txt-t1').textContent          = c.t1;
-  document.getElementById('txt-t2').textContent          = c.t2;
-  document.getElementById('txt-t3').textContent          = c.t3;
-  document.getElementById('txt-cta2').textContent        = c.cta2;
-  document.getElementById('txt-included').textContent    = c.included;
-  document.getElementById('txt-badge1').textContent      = c.badge1;
-  document.getElementById('txt-card1-title').textContent = c.card1title;
-  document.getElementById('txt-card1-sub').textContent   = c.card1sub;
-  document.getElementById('txt-card1-desc').textContent  = c.card1desc;
-  document.getElementById('txt-cta1').textContent        = c.cta1;
-  document.getElementById('txt-badge3').textContent      = c.badge3;
-  document.getElementById('txt-card3-title').textContent = c.card3title;
-  document.getElementById('txt-card3-sub').textContent   = c.card3sub;
-  document.getElementById('txt-card3-desc').textContent  = c.card3desc;
-  document.getElementById('txt-cta3').textContent        = c.cta3;
-  document.getElementById('txt-badge4').textContent      = c.badge4;
-  document.getElementById('txt-card4-title').innerHTML = c.card4title;
-  document.getElementById('txt-card4-sub').textContent   = c.card4sub;
-  document.getElementById('txt-card4-desc').textContent  = c.card4desc;
-  document.getElementById('txt-cta4').textContent        = c.cta4;
-  document.getElementById('txt-shared').innerHTML        = c.shared;
-  document.getElementById('txt-footer1').textContent     = c.footer1;
-
-  document.getElementById('feat-list-paid').innerHTML = c.paidFeats.map(f =>
-    `<div class="feat-item">${checkSVG('#F0B861')}<span>${f}</span></div>`).join('');
-
-  document.getElementById('feat-list-dip').innerHTML =
-    c.dip_feats.map(f => `<div class="sc-feat">${checkSVG('#2C5A30')}<span>${f}</span></div>`).join('') +
-    c.dip_no.map(f => `<div class="sc-nofeat">${crossSVG()}<span>${f}</span></div>`).join('');
-
-  document.getElementById('feat-list-nondip').innerHTML =
-    c.nondip_feats.map(f => `<div class="sc-feat">${checkSVG('#2E6B8A')}<span>${f}</span></div>`).join('') +
-    c.nondip_no.map(f => `<div class="sc-nofeat">${crossSVG()}<span>${f}</span></div>`).join('');
-
-  document.getElementById('feat-list-vern').innerHTML =
-    c.vern_feats.map(f => `<div class="sc-feat">${checkSVG('#7A5C3A')}<span>${f}</span></div>`).join('') +
-    c.vern_no.map(f => `<div class="sc-nofeat">${crossSVG()}<span>${f}</span></div>`).join('');
+async function sbGet(table, params='') {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?${params}`, {
+    headers: {'apikey': SB_KEY, 'Authorization': 'Bearer '+SB_KEY}
+  });
+  return r.json();
 }
 
-setLang('en');
-
-// ── Live stats: Non-Dipterocarp ──
-(function loadNonDipStats() {
-  const SUPA_URL = 'https://xrntnarchlglhllvlrnv.supabase.co';
-  const SUPA_KEY = 'sb_publishable_N968wHizQmuFaPYlHwDxhw_WXCOs32h';
-  const headers  = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY };
-  Promise.all([
-    fetch(SUPA_URL + '/rest/v1/non_dipterocarp_species?select=id', { headers: { ...headers, 'Prefer': 'count=exact', 'Range': '0-0' } }),
-    fetch(SUPA_URL + '/rest/v1/non_dipterocarp_families?select=id', { headers: { ...headers, 'Prefer': 'count=exact', 'Range': '0-0' } }),
-    fetch(SUPA_URL + '/rest/v1/non_dipterocarp_genera?select=id',   { headers: { ...headers, 'Prefer': 'count=exact', 'Range': '0-0' } }),
-  ]).then(([sr, fr, gr]) => {
-    const pc = r => { const m = (r.headers.get('Content-Range')||'').match(/\/(\d+)$/); return m ? parseInt(m[1]) : null; };
-    const nS = pc(sr), nF = pc(fr), nG = pc(gr);
-    if (!nS) return;
-    const sub3 = document.getElementById('txt-card3-sub');
-    if (sub3) sub3.textContent = currentLang === 'bm'
-      ? `Pangkalan data komuniti · ${nF} famili · ${nG} genera · ${nS.toLocaleString()} spesies`
-      : `Community database · ${nF} families · ${nG} genera · ${nS.toLocaleString()} species`;
-    const el = document.getElementById('nondip-live-stats');
-    if (el) { el.innerHTML = `<span class="live-dot"></span><strong>${nS.toLocaleString()}</strong> species &nbsp;·&nbsp; <strong>${nG}</strong> genera &nbsp;·&nbsp; <strong>${nF}</strong> families`; el.style.display = 'flex'; }
-    if (typeof content !== 'undefined') {
-      content.en.card3sub = `Community database · ${nF} families · ${nG} genera · ${nS.toLocaleString()} species`;
-      content.bm.card3sub = `Pangkalan data komuniti · ${nF} famili · ${nG} genera · ${nS.toLocaleString()} spesies`;
+/* ── AUTH ── */
+async function signIn() {
+  const email = document.getElementById('inp-email').value.trim();
+  const key   = document.getElementById('inp-key').value.trim();
+  const err   = document.getElementById('gate-err');
+  const btn   = document.getElementById('sign-btn');
+  if (!email || !key) { err.textContent = 'Please enter your email and licence key.'; return; }
+  btn.textContent = 'Checking…'; btn.disabled = true;
+  try {
+    const data = await sbGet('user_access',
+      `email=eq.${encodeURIComponent(email)}&licence_key=eq.${encodeURIComponent(key)}&is_active=eq.true&select=*`);
+    if (!data || data.length === 0) {
+      err.textContent = 'Invalid email or licence key. Please check and try again.';
+    } else {
+      const u = data[0];
+      const exp = new Date(u.access_expiry);
+      if (exp < new Date()) { err.textContent = 'Your licence has expired. Please contact the publisher.'; }
+      else {
+        SESSION = {email: u.email, tier: u.access_tier, expiry: u.access_expiry, guest: false};
+        launchApp();
+      }
     }
-  }).catch(()=>{});
-})();
+  } catch(e) { err.textContent = 'Connection error. Please try again.'; }
+  btn.textContent = 'Access licensed edition'; btn.disabled = false;
+}
 
-// ── Live stats: Vernacular Names ──
-(function loadVernStats() {
-  const SUPA_URL = 'https://xrntnarchlglhllvlrnv.supabase.co';
-  const SUPA_KEY = 'sb_publishable_N968wHizQmuFaPYlHwDxhw_WXCOs32h';
-  const headers  = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY };
-  fetch(SUPA_URL + '/rest/v1/vernacular_names?select=id', { headers: { ...headers, 'Prefer': 'count=exact', 'Range': '0-0' } })
-  .then(r => {
-    const m = (r.headers.get('Content-Range')||'').match(/\/(\d+)$/);
-    const n = m ? parseInt(m[1]) : null;
-    if (!n) return;
-    const el = document.getElementById('vern-live-stats');
-    if (el) { el.innerHTML = `<span class="live-dot" style="background:#7A5C3A;"></span><strong>${n.toLocaleString()}</strong> documented names`; el.style.display = 'flex'; }
-    const sub4 = document.getElementById('txt-card4-sub');
-    if (sub4) sub4.textContent = currentLang === 'bm'
-      ? `Pangkalan data nama tempatan · ${n.toLocaleString()} nama`
-      : `Local name database · ${n.toLocaleString()} names`;
-  }).catch(()=>{});
-})();
+function enterGuest() {
+  SESSION = {email: 'Guest', tier: 'Public', expiry: null, guest: true};
+  launchApp();
+}
+
+function signOut() {
+  SESSION = null; GENERA = []; SPECIES = [];
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('gate').style.display = 'grid';
+  document.getElementById('gate-err').textContent = '';
+  document.getElementById('inp-email').value = '';
+  document.getElementById('inp-key').value = '';
+}
+
+/* ── APP INIT ── */
+async function launchApp() {
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  document.getElementById('sb-email').textContent = SESSION.email;
+  document.getElementById('sb-tier').textContent = SESSION.tier + (SESSION.expiry ? ' · ' + SESSION.expiry.slice(0,10) : '');
+  await loadData();
+}
+
+async function loadData() {
+  document.getElementById('pg-overview').innerHTML = '<div class="loading">Loading…</div>';
+  [GENERA, SPECIES] = await Promise.all([
+    sbGet(GEN_T, 'order=genus_name&select=*'),
+    sbGet(SPP_T, 'distribution_peninsular=eq.true&order=genus,species&select=*')
+  ]);
+  document.getElementById('ov-n-gen').textContent  = GENERA.length;
+  document.getElementById('ov-n-spp').textContent  = SPECIES.length;
+  document.getElementById('sb-genera-count').textContent = GENERA.length;
+  document.getElementById('sb-spp-count').textContent    = SPECIES.length;
+  rebuildOverview();
+  buildSidebarGenera();
+  buildGeneraList();
+  buildAllSpecies();
+  buildGlossary();
+}
+
+/* ── NAVIGATION ── */
+function showPage(id, data=null) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-nav-btn').forEach(b => b.classList.remove('active'));
+  const pg = document.getElementById('pg-'+id);
+  if (pg) pg.classList.add('active');
+  const navBtn = document.querySelector(`[data-page="${id}"]`);
+  if (navBtn) navBtn.classList.add('active');
+  window.scrollTo(0,0);
+  if (id === 'genus' && data) { buildGenusPage(data); currentGenus = data; }
+  if (id === 'spp'   && data) { buildSppPage(data);   currentSpp   = data; }
+}
+
+/* ── OVERVIEW ── */
+function rebuildOverview() {
+  document.getElementById('pg-overview').innerHTML = '';
+  // Status bars
+  const statusCfg = [
+    {k:'EX',  label:'Extinct (EX)',                color:'#3D1515'},
+    {k:'CR',  label:'Critically Endangered (CR)',   color:'#C62828'},
+    {k:'EN',  label:'Endangered (EN)',              color:'#E64A19'},
+    {k:'VU',  label:'Vulnerable (VU)',              color:'#F9A825'},
+    {k:'NT',  label:'Near Threatened (NT)',         color:'#558B2F'},
+    {k:'LC',  label:'Least Concern (LC)',           color:'#2E7D32'},
+    {k:'DD',  label:'Data Deficient (DD)',          color:'#78909C'},
+    {k:'NE',  label:'Not Evaluated (NE)',           color:'#BDBDBD'},
+  ];
+  const maxN = Math.max(...statusCfg.map(s => SPECIES.filter(sp => sp.conservation_status===s.k).length), 1);
+  const sbEl = document.getElementById('status-bars');
+  if (sbEl) sbEl.innerHTML = statusCfg.map(s => {
+    const n = SPECIES.filter(sp => sp.conservation_status===s.k).length;
+    if (!n) return '';
+    const w = Math.round((n/maxN)*180);
+    return `<button class="status-row" style="border-left-color:${s.color}" onclick="filterByStatus('${s.k}')">
+      <span class="status-lbl">${s.label}</span>
+      <span class="status-bar" style="width:${w}px;background:${s.color};height:6px;display:block"></span>
+      <span class="status-n">${n}</span>
+    </button>`;
+  }).join('');
+
+  // Genera cards overview
+  const gcEl = document.getElementById('genera-cards-ov');
+  if (gcEl) gcEl.innerHTML = GENERA.map(g => {
+    const n = SPECIES.filter(s => s.genus===g.genus_name).length;
+    return `<button class="genus-card-ov" onclick="showPage('genus',${JSON.stringify(g).replace(/"/g,'&quot;')})">
+      <div class="gc-name-ov">${g.genus_name}</div>
+      <div class="gc-auth-ov">${g.authority||''}</div>
+      <div class="gc-malay-ov">${g.local_name||g.common_name||''}</div>
+      <div class="gc-hook-ov">${(g.description||'').slice(0,90)}…</div>
+      <div class="gc-count-ov">${n} spp. in PM · ${g.species_count_world||'?'} worldwide</div>
+    </button>`;
+  }).join('');
+}
+
+/* ── SIDEBAR GENERA ── */
+function buildSidebarGenera() {
+  const el = document.getElementById('sb-genera-list');
+  el.innerHTML = GENERA.map(g => {
+    const n = SPECIES.filter(s => s.genus===g.genus_name).length;
+    return `<button class="sb-genus-btn" onclick="showPage('genus',${JSON.stringify(g).replace(/"/g,'&quot;')})">
+      <span class="sb-genus-name">${g.genus_name}</span>
+      <span class="sb-genus-n">${n}</span>
+    </button>`;
+  }).join('');
+}
+
+/* ── GENERA LIST ── */
+function buildGeneraList() {
+  const el = document.getElementById('genera-list');
+  el.innerHTML = GENERA.map(g => {
+    const n = SPECIES.filter(s => s.genus===g.genus_name).length;
+    return `<button class="genus-row" onclick="showPage('genus',${JSON.stringify(g).replace(/"/g,'&quot;')})">
+      <div>
+        <div class="gr-name">${g.genus_name}</div>
+        <div class="gr-auth">${g.authority||''}</div>
+        <div class="gr-malay">${g.local_name||g.common_name||''}</div>
+      </div>
+      <div class="gr-fruit">${(g.description||'').slice(0,120)}…</div>
+      <div>
+        <div class="gr-n">${n}</div>
+        <div class="gr-n-lbl">spp. in PM</div>
+      </div>
+    </button>`;
+  }).join('');
+}
+
+/* ── ALL SPECIES ── */
+function buildAllSpecies(filter=null) {
+  const list = filter ? SPECIES.filter(filter) : SPECIES;
+  const el = document.getElementById('all-spp-grid');
+  if (el) el.innerHTML = list.length ? list.map(s => sppCardHtml(s)).join('') : '<div class="loading">No species match this filter.</div>';
+  // filter chips
+  const chips = document.getElementById('spp-filter-chips');
+  if (chips) {
+    const statuses = [...new Set(SPECIES.map(s=>s.conservation_status).filter(Boolean))].sort();
+    chips.innerHTML = `<button style="padding:5px 12px;border:1px solid #16211B;background:#16211B;color:#FBF9F4;font-size:12px;letter-spacing:.04em" onclick="buildAllSpecies()">All</button>` +
+    statuses.map(st => `<button style="padding:5px 12px;border:1px solid #DCD6C8;background:#FBF9F4;color:#16211B;font-size:12px;letter-spacing:.04em;transition:all .15s" onmouseover="this.style.background='#16211B';this.style.color='#FBF9F4'" onmouseout="this.style.background='#FBF9F4';this.style.color='#16211B'" onclick="buildAllSpecies(s=>s.conservation_status==='${st}')">${st}</button>`).join('');
+  }
+}
+
+function filterByStatus(st) {
+  showPage('species');
+  buildAllSpecies(s => s.conservation_status === st);
+}
+
+/* ── SPP CARD HTML ── */
+function statusColor(st) {
+  const m={CR:'#C62828',EN:'#E64A19',VU:'#F9A825',NT:'#558B2F',LC:'#2E7D32',DD:'#78909C',EX:'#3D1515'};
+  return m[st]||'#9E9E9E';
+}
+
+function sppCardHtml(s) {
+  const saved = savedIds.has(s.id);
+  const gc = encodeURIComponent(JSON.stringify(s));
+  return `<div class="spp-card">
+    <button class="spp-card-top" onclick="showPage('spp',${JSON.stringify(s).replace(/"/g,'&quot;')})">
+      <div class="spp-sci">${s.genus} ${s.species}</div>
+      <div class="spp-auth">${s.author||''}</div>
+      <div class="spp-malay">${s.local_name||''}</div>
+      <div class="spp-tags">
+        ${s.conservation_status ? `<span class="spp-status" style="background:${statusColor(s.conservation_status)}20;color:${statusColor(s.conservation_status)}">${s.conservation_status}</span>` : ''}
+        ${s.height_max ? `<span class="spp-h-tag">to ${s.height_max} m</span>` : ''}
+      </div>
+    </button>
+    <div class="spp-card-btns">
+      <button class="spp-card-btn" id="save-${s.id}" onclick="toggleSave('${s.id}','${s.genus} ${s.species}')">${saved?'★ Saved':'☆ Save'}</button>
+      <button class="spp-card-btn" onclick="showPage('spp',${JSON.stringify(s).replace(/"/g,'&quot;')})">Open →</button>
+    </div>
+  </div>`;
+}
+
+/* ── GENUS PAGE ── */
+function buildGenusPage(g) {
+  const sppList = SPECIES.filter(s => s.genus === g.genus_name);
+  document.getElementById('genus-hero').innerHTML = `
+    <div>
+      <div class="ov-eyebrow">Genus</div>
+      <h1 class="genus-h1">${g.genus_name}</h1>
+      <div class="genus-auth-txt">${g.authority||''}</div>
+      <div class="genus-tags">
+        <span class="genus-tag-dark">${g.local_name||g.common_name||'—'}</span>
+        ${g.etymology ? `<span class="genus-tag-outline">${g.etymology.slice(0,60)}</span>` : ''}
+      </div>
+      <p class="genus-desc">${g.description||''}</p>
+    </div>
+    <div class="stat-grid" style="align-self:start">
+      <div class="stat-cell"><div class="stat-n">${g.species_count_peninsular||sppList.length}</div><div class="stat-l">Spp. in PM</div></div>
+      <div class="stat-cell"><div class="stat-n">${g.species_count_malaysia||'—'}</div><div class="stat-l">Spp. in Malaysia</div></div>
+      <div class="stat-cell"><div class="stat-n">${g.species_count_world||'—'}</div><div class="stat-l">Spp. worldwide</div></div>
+      <div class="stat-cell"><div class="stat-n">${sppList.length}</div><div class="stat-l">In this edition</div></div>
+    </div>`;
+  const chars = [
+    {k:'Habit', v: g.habit||'Large trees'},
+    {k:'Fruit', v: g.fruit||'Winged nut (samara)'},
+    {k:'Etymology', v: g.etymology||'—'},
+    {k:'Type species', v: g.type_species||'—'},
+  ].filter(c => c.v && c.v !== '—');
+  document.getElementById('genus-chars').innerHTML = chars.map(c =>
+    `<div class="genus-char"><div class="genus-char-k">${c.k}</div><div class="genus-char-v">${c.v}</div></div>`
+  ).join('');
+  document.getElementById('genus-spp-label').textContent = `${sppList.length} species recorded in Peninsular Malaysia`;
+  document.getElementById('genus-spp-grid').innerHTML = sppList.map(s => sppCardHtml(s)).join('');
+}
+
+/* ── SPECIES PAGE ── */
+function buildSppPage(s) {
+  const genObj = GENERA.find(g => g.genus_name === s.genus) || {};
+  // Breadcrumb
+  document.getElementById('spp-breadcrumb').innerHTML = `
+    <button class="bc-btn" onclick="showPage('overview')">Dipterocarpaceae</button>
+    <span class="bc-sep">/</span>
+    <button class="bc-btn" style="font-style:italic;font-family:'Newsreader',Georgia,serif" onclick="showPage('genus',${JSON.stringify(genObj).replace(/"/g,'&quot;')})">${s.genus}</button>
+    <span class="bc-sep">/</span>
+    <span style="font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:14px;color:#16211B">${s.genus} ${s.species}</span>`;
+  // Hero
+  const saved = savedIds.has(s.id);
+  document.getElementById('spp-hero').innerHTML = `
+    <div>
+      <div class="spp-timber">${genObj.common_name||genObj.local_name||''}</div>
+      <h1 class="spp-h1">${s.genus} ${s.species}</h1>
+      <div class="spp-auth-txt">${s.author||''}</div>
+      <div class="spp-malay-lg">${s.local_name||''}</div>
+      <p class="spp-diag">${s.diagnostic_characters||s.description||''}</p>
+      <div class="spp-action-btns">
+        <button class="spp-act-btn${saved?' saved':''}" id="spp-save-btn" onclick="toggleSave('${s.id}','${s.genus} ${s.species}',true)">${saved?'★ Saved':'☆ Save'}</button>
+      </div>
+    </div>
+    <div>
+      <div class="spp-img-placeholder"><span class="spp-img-txt">${s.genus} ${s.species}</span></div>
+      <div class="spp-stat-grid">
+        <div class="spp-stat-cell"><div class="spp-stat-n">${s.conservation_status||'—'}</div><div class="spp-stat-l">IUCN Status</div></div>
+        <div class="spp-stat-cell"><div class="spp-stat-n">${s.height_max ? s.height_max+' m' : '—'}</div><div class="spp-stat-l">Max height</div></div>
+        <div class="spp-stat-cell"><div class="spp-stat-n">${s.distribution_peninsular?'Yes':'No'}</div><div class="spp-stat-l">Peninsular MY</div></div>
+        <div class="spp-stat-cell"><div class="spp-stat-n">${s.distribution_sabah||s.distribution_sarawak?'Yes':'No'}</div><div class="spp-stat-l">Borneo</div></div>
+      </div>
+    </div>`;
+  // Tabs
+  activeTab = 'chars';
+  document.getElementById('spp-tabs').innerHTML = [
+    {id:'chars', label:'Characters'},
+    {id:'diag',  label:'Diagnostic'},
+    {id:'dist',  label:'Distribution'},
+    {id:'syn',   label:'Synonyms'},
+  ].map(t => `<button class="tab-btn${t.id===activeTab?' active':''}" onclick="setTab('${t.id}',${JSON.stringify(s).replace(/"/g,'&quot;')})">${t.label}</button>`).join('');
+  renderTab('chars', s);
+}
+
+function setTab(id, s) {
+  activeTab = id;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().startsWith(id.slice(0,4))));
+  renderTab(id, s);
+}
+
+function renderTab(id, s) {
+  const el = document.getElementById('spp-tab-content');
+  if (id === 'chars') {
+    const chars = [
+      {k:'Bark',        bm:'Kulit kayu', v: s.bark},
+      {k:'Leaf',        bm:'Daun',       v: s.leaf},
+      {k:'Fruit',       bm:'Buah',       v: s.fruit},
+      {k:'Habitat',     bm:'Habitat',    v: s.habitat},
+      {k:'Description', bm:'Deskripsi',  v: s.description},
+    ].filter(c => c.v);
+    el.innerHTML = chars.length ?
+      `<div class="chars-grid">${chars.map(c=>`<div class="char-cell"><div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><span class="char-k">${c.k}</span><span class="char-bm">${c.bm}</span></div><div class="char-v">${c.v}</div></div>`).join('')}</div>` :
+      '<div class="loading" style="font-style:italic;color:#8B9C8E">Morphological data not yet available for this species.</div>';
+  } else if (id === 'diag') {
+    el.innerHTML = s.diagnostic_characters ?
+      `<div class="chars-grid"><div class="char-cell" style="grid-column:1/-1"><div class="char-k">Diagnostic Characters</div><div class="char-v">${s.diagnostic_characters}</div></div></div>` :
+      '<div class="loading" style="font-style:italic;color:#8B9C8E">Diagnostic characters not yet recorded.</div>';
+  } else if (id === 'dist') {
+    const states = ['Perlis','Kedah','Penang','Perak','Kelantan','Terengganu','Pahang','Selangor','N. Sembilan','Melaka','Johor'];
+    const distText = s.distribution || '';
+    el.innerHTML = `<div class="dist-text">${distText || '<em style="color:#8B9C8E">Distribution data not yet recorded.</em>'}</div>
+    <div style="margin-top:20px;display:flex;flex-wrap:wrap;gap:6px">
+      ${states.map(st => {
+        const present = distText.toLowerCase().includes(st.toLowerCase());
+        return `<span style="padding:5px 12px;font-size:12px;background:${present?'#16211B':'#FBF9F4'};color:${present?'#FBF9F4':'#A39C8C'};border:1px solid ${present?'#16211B':'#DCD6C8'}">${st}</span>`;
+      }).join('')}
+    </div>`;
+  } else if (id === 'syn') {
+    el.innerHTML = `<div class="synonyms-box"><div class="synonyms-hd">Synonyms</div>
+      <div style="font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:15px;color:#6E7A70">No synonyms recorded for this species.</div>
+    </div>`;
+  }
+}
+
+/* ── SAVE ── */
+function toggleSave(id, name, updateDetail=false) {
+  if (savedIds.has(id)) savedIds.delete(id);
+  else savedIds.add(id);
+  const saved = savedIds.has(id);
+  const cardBtn = document.getElementById('save-'+id);
+  if (cardBtn) cardBtn.textContent = saved ? '★ Saved' : '☆ Save';
+  if (updateDetail) {
+    const detBtn = document.getElementById('spp-save-btn');
+    if (detBtn) { detBtn.textContent = saved ? '★ Saved' : '☆ Save'; detBtn.classList.toggle('saved', saved); }
+  }
+}
+
+/* ── SEARCH ── */
+function onSearch(q) {
+  const drop = document.getElementById('search-drop');
+  if (!q.trim()) { drop.classList.remove('open'); drop.innerHTML=''; return; }
+  const lq = q.toLowerCase();
+  const gHits = GENERA.filter(g => g.genus_name.toLowerCase().includes(lq) || (g.local_name||'').toLowerCase().includes(lq)).slice(0,3);
+  const sHits = SPECIES.filter(s => (s.genus+' '+s.species).toLowerCase().includes(lq) || (s.local_name||'').toLowerCase().includes(lq)).slice(0,6);
+  if (!gHits.length && !sHits.length) { drop.classList.remove('open'); return; }
+  drop.innerHTML = [
+    ...gHits.map(g => `<button class="sd-item" onclick="showPage('genus',${JSON.stringify(g).replace(/"/g,'&quot;')});closeSearch()"><span class="sd-kind">Genus</span><span><span class="sd-name">${g.genus_name}</span><span class="sd-sub">${g.local_name||''}</span></span></button>`),
+    ...sHits.map(s => `<button class="sd-item" onclick="showPage('spp',${JSON.stringify(s).replace(/"/g,'&quot;')});closeSearch()"><span class="sd-kind">Species</span><span><span class="sd-name">${s.genus} ${s.species}</span><span class="sd-sub">${s.local_name||''} · ${s.conservation_status||''}</span></span></button>`),
+  ].join('');
+  drop.classList.add('open');
+}
+function closeSearch() {
+  document.getElementById('search-drop').classList.remove('open');
+  document.getElementById('search-inp').value = '';
+}
+
+/* ── LANG ── */
+function setLang(l) {
+  lang = l;
+  document.getElementById('btn-en').classList.toggle('active', l==='en');
+  document.getElementById('btn-bm').classList.toggle('active', l==='bm');
+}
+
+/* ── GLOSSARY ── */
+function buildGlossary() {
+  const terms = [
+    {t:'Calyx',       d:'The collective term for the sepals of a flower; in dipterocarps, calyx lobes often enlarge into wings on the fruit.'},
+    {t:'Samara',      d:'A winged fruit in which part of the pericarp forms a flat papery wing that aids wind dispersal.'},
+    {t:'Coriaceous',  d:'Leathery in texture; used to describe leaf surfaces that are thick and stiff.'},
+    {t:'Stipule',     d:'A leaf-like appendage at the base of the petiole, often used in dipterocarp identification.'},
+    {t:'Domatia',     d:'Small cavities or pockets in the axils of leaf veins, often associated with mites.'},
+    {t:'Emergent',    d:'A tree that grows above the general canopy level of the surrounding forest.'},
+    {t:'Panicle',     d:'A loose, branched flower cluster (inflorescence) in which the flowers develop on stalks.'},
+    {t:'Resin',       d:'A sticky organic substance produced by dipterocarp trees, used commercially as damar.'},
+    {t:'Venation',    d:'The arrangement of veins in a leaf blade; secondary and tertiary venation patterns aid identification.'},
+    {t:'Bole',        d:'The trunk of a tree, especially the straight unbranched lower portion.'},
+    {t:'Buttress',    d:'Root flanges that radiate from the base of the trunk, providing structural support for large trees.'},
+    {t:'Lenticel',    d:'A pore in the bark of woody plants that allows gas exchange between the atmosphere and inner tissues.'},
+    {t:'Sessile',     d:'Attached directly by the base without a stalk (petiole or peduncle).'},
+    {t:'Serrate',     d:'Having a toothed margin, like a saw; used to describe leaf edges.'},
+    {t:'Tomentose',   d:'Densely covered with matted hairs or down.'},
+  ].sort((a,b) => a.t.localeCompare(b.t));
+  document.getElementById('glossary-list').innerHTML = terms.map(t =>
+    `<div class="glossary-item"><div class="gl-term">${t.t}</div><div class="gl-def">${t.d}</div></div>`
+  ).join('');
+}
 </script>
 </body>
 </html>
