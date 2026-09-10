@@ -373,6 +373,18 @@ function Browse({species,query,setQuery,setRoute,setDetailId}){
           ?<div className="cg3">{filtered.map((s,i)=><Card key={s.id} s={s} i={i} onClick={()=>{setDetailId(s.id);setRoute('detail');}}/>)}</div>
           :<div className="lt2"><div className="lth"><div/><div>Species</div><div>{lang==='en'?'Local name':'Nama tempatan'}</div><div>Genus</div><div>IUCN</div></div>{filtered.map((s,i)=><button key={s.id} className="ltr" onClick={()=>{setDetailId(s.id);setRoute('detail');}}><div style={{width:40,height:40,borderRadius:7,overflow:'hidden'}}><SpI src={s.img} seed={i} ratio="1/1" rounded={false}/></div><div><div style={{fontFamily:'Playfair Display',fontSize:14,fontStyle:'italic',fontWeight:500}}><span dangerouslySetInnerHTML={{__html:formatSci(s.sci)}}/></div><div style={{fontSize:11,color:'var(--text-3)',fontFamily:'DM Mono'}}>{s.family}</div></div><div style={{fontSize:13}}>{s.common[0]||'—'}</div><div style={{fontSize:13,fontStyle:'italic',color:'var(--text-2)'}}>{s.genus}</div><Pill code={s.iucn} sm/></button>)}</div>
       }
+      {filtered.length > 0 && hasMore && (
+  <div style={{display:'flex',justifyContent:'center',marginTop:48,paddingBottom:32}}>
+    <button 
+      className="btn ba" 
+      onClick={loadMore}
+      disabled={loadingMore}
+      style={{padding:'12px 32px',minWidth:200}}
+    >
+      {loadingMore ? '⟳ Loading...' : '📖 Load more species'}
+    </button>
+  </div>
+)}
     </main>
   </div>;
 }
