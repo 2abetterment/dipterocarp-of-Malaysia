@@ -13,19 +13,19 @@
   --font-ui:   'Plus Jakarta Sans', system-ui, sans-serif;
   --font-mono: 'DM Mono', monospace;
 
-  /* ── New clean minimal palette ── */
-  --dark:    #1A1F2E;        /* deep navy — sidebar, login bg   */
-  --green:   #2563EB;        /* primary blue — headers, cards   */
-  --mid:     #3B82F6;        /* mid blue — hover states         */
-  --accent:  #60A5FA;        /* light blue — active, pills      */
-  --pale:    #BFDBFE;        /* very pale blue — sidebar text   */
-  --cream:   #F8FAFF;        /* near-white with blue tint       */
-  --gold:    #F59E0B;        /* amber — expiry badge, warnings  */
-  --light:   #F1F5F9;        /* light grey — feature cells bg   */
-  --txt:     #1E293B;        /* slate dark — main text          */
-  --border:  #E2E8F0;        /* slate 200 — all borders         */
-  --bg:      #F8FAFC;        /* page background — off-white     */
-  --red:     #DC2626;        /* error red                       */
+  /* ── Agreed clean palette — Steel Blue ── */
+  --dark:    #1A202C;
+  --green:   #2B6CB0;
+  --mid:     #2B6CB0;
+  --accent:  #2B6CB0;
+  --pale:    #EBF4FF;
+  --cream:   #FFFFFF;
+  --gold:    #F59E0B;
+  --light:   #EBF4FF;
+  --txt:     #1A202C;
+  --border:  #E2E8F0;
+  --bg:      #F7F9FC;
+  --red:     #C53030;
   --white:   #FFFFFF;
 
   /* kept for backward compat — map to new palette */
@@ -65,11 +65,11 @@ body { font-size:16px; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; 
 }
 .login-brand { text-align: center; margin-bottom: 32px; }
 .login-series { font-family:'Plus Jakarta Sans',sans-serif; font-size:13px; font-weight:400; letter-spacing:0.22em; text-transform:uppercase; color:#718096; margin-bottom:10px; }
-.login-title { font-family:'Playfair Display','Georgia',serif; font-size:30px; font-weight:400; color:#1A202C; line-height:1.2; margin-bottom:4px; }
+.login-title { font-family:'Playfair Display','Georgia',serif; font-size:30px; font-weight:400; color:#2D3748; line-height:1.2; margin-bottom:4px; }
 .login-title em { font-style:italic; color:#2B6CB0; }
 .login-sub { font-size:14px; font-weight:300; color:#718096; letter-spacing:0.06em; }
 .login-divider { height:1px; background:#E2E8F0; margin:24px 0; }
-.login-label { font-size:13px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#4A5568; display:block; margin-bottom:6px; }
+.login-label { font-size:13px; font-weight:500; letter-spacing:0.14em; text-transform:uppercase; color:#718096; display:block; margin-bottom:6px; }
 .login-input { width:100%; padding:11px 14px; background:#F7F9FC; border:1px solid #CBD5E0; border-radius:6px; font-family:'Plus Jakarta Sans',sans-serif; font-size:16px; color:#1A202C; outline:none; margin-bottom:14px; transition:border-color 0.15s; }
 .login-input::placeholder { color:#A0AEC0; }
 .login-input:focus { border-color:#2B6CB0; background:#FFFFFF; box-shadow:0 0 0 3px rgba(43,108,176,0.1); }
@@ -93,11 +93,11 @@ body { font-size:16px; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; 
 #screen-app { background:#F8FAFC; flex-direction:row; min-height:100vh; }
 
 /* SIDEBAR */
-.sidebar { width:268px; min-width:268px; background:linear-gradient(180deg,#0F172A 0%,#1A1F2E 100%); display:flex; flex-direction:column; height:100vh; position:sticky; top:0; overflow-y:auto; }
-.sidebar-brand { padding:20px 18px 16px; border-bottom:0.5px solid rgba(96,165,250,0.15); }
+.sidebar { width:268px; min-width:268px; background:#FFFFFF; border-right:2px solid #2B6CB0; display:flex; flex-direction:column; height:100vh; position:sticky; top:0; overflow-y:auto; }
+.sidebar-brand { padding:20px 18px 16px; border-bottom:1px solid #E2E8F0; }
 .sb-series { font-size:12px; font-weight:400; letter-spacing:0.2em; text-transform:uppercase; color:#93C5FD; margin-bottom:5px; }
 .sb-title { font-family:'Playfair Display','Georgia',serif; font-size:18px; font-weight:400; color:var(--cream); line-height:1.3; }
-.sb-title em { font-style:italic; color:var(--accent); }
+.sb-title em { font-style:italic; color:#2B6CB0; }
 .sb-user { padding:12px 18px; border-bottom:0.5px solid rgba(96,165,250,0.1); background:rgba(0,0,0,0.2); }
 .sb-user-name { font-size:14px; font-weight:500; color:#1A202C; margin-bottom:2px; }
 .sb-user-tier { font-size:13px; color:var(--pale); letter-spacing:0.06em; }
@@ -106,7 +106,7 @@ body { font-size:16px; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; 
 .sb-section-hd { font-size:12px; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; color:rgba(148,163,184,0.7); padding:8px 18px 4px; }
 .sb-item { padding:8px 18px; font-size:15px; font-weight:400; color:rgba(203,213,225,0.8); cursor:pointer; display:flex; justify-content:space-between; align-items:center; transition:all 0.1s; border-left:2px solid transparent; }
 .sb-item:hover { background:rgba(96,165,250,0.08); color:white; }
-.sb-item.active { background:rgba(96,165,250,0.15); color:white; border-left-color:var(--accent); }
+.sb-item.active { background:#EBF4FF; color:#2B6CB0; font-weight:600; border-left-color:#2B6CB0; }
 .sb-count { font-size:13px; background:rgba(96,165,250,0.15); padding:1px 6px; border-radius:10px; color:var(--pale); }
 .sb-genus-list { padding-left:12px; border-left:0.5px solid rgba(96,165,250,0.1); margin:0 18px; }
 .sb-genus-item { padding:5px 8px; font-size:14px; font-style:italic; color:rgba(148,163,184,0.7); cursor:pointer; border-radius:3px; transition:all 0.1s; display:flex; justify-content:space-between; }
@@ -117,7 +117,7 @@ body { font-size:16px; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; 
 .sb-filter-chips { padding:6px 18px 10px; display:flex; flex-direction:column; gap:4px; }
 .sb-chip { display:flex; align-items:center; gap:8px; padding:4px 8px; border-radius:4px; cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif; font-size:14px; color:rgba(148,163,184,0.7); border:1px solid transparent; transition:all 0.15s; }
 .sb-chip:hover { background:rgba(96,165,250,0.06); }
-.sb-chip.active { background:rgba(96,165,250,0.15); border-color:rgba(96,165,250,0.4); color:var(--accent); }
+.sb-chip.active { background:#EBF4FF; border-color:#2B6CB0; color:#2B6CB0; font-weight:500; }
 .sb-chip-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
 
 .sb-logout { padding:14px 18px; border-top:0.5px solid rgba(96,165,250,0.1); font-size:14px; color:rgba(148,163,184,0.6); cursor:pointer; transition:color 0.1s; }
@@ -157,12 +157,12 @@ body { font-size:16px; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; 
 .page.active { animation:fadeIn 0.18s ease; }
 
 /* ENTITY HEADER */
-.entity-header { background:linear-gradient(120deg,#1E3A5F 0%,#2563EB 100%); border-radius:8px; padding:20px 24px 18px; margin-bottom:20px; display:grid; grid-template-columns:1fr auto; gap:16px; align-items:start; }
-.eh-rank { font-size:12px; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; color:#A0AEC0; margin-bottom:6px; }
+.entity-header { background:#FFFFFF; border:1px solid #E2E8F0; border-top:4px solid #2B6CB0; border-radius:8px; padding:20px 24px 18px; margin-bottom:20px; display:grid; grid-template-columns:1fr auto; gap:16px; align-items:start; box-shadow:0 2px 8px rgba(43,108,176,0.08); }
+.eh-rank { font-size:12px; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; color:#718096; margin-bottom:6px; }
 .eh-name { font-family:'Playfair Display','Georgia',serif; font-size:32px; font-weight:400; font-style:italic; color:#1A202C; line-height:1.1; margin-bottom:3px; }
 .eh-authority { font-size:15px; font-weight:300; color:#718096; margin-bottom:3px; }
-.eh-publication { font-family:'Playfair Display','Georgia',serif; font-size:14px; font-style:italic; color:rgba(191,219,254,0.7); margin-bottom:6px; }
-.eh-etymology { font-family:'Playfair Display','Georgia',serif; font-size:15px; font-style:italic; color:#D4EED4; line-height:1.5; margin-bottom:10px; }
+.eh-publication { font-family:'Playfair Display','Georgia',serif; font-size:14px; font-style:italic; color:#718096; margin-bottom:6px; }
+.eh-etymology { font-family:'Playfair Display','Georgia',serif; font-size:15px; font-style:italic; color:#4A5568; line-height:1.5; margin-bottom:10px; }
 .eh-pills { display:flex; flex-wrap:wrap; gap:5px; }
 .eh-pill { font-size:13px; font-weight:300; padding:3px 10px; border-radius:20px; border:0.5px solid #E2E8F0; color:#4A5568; }
 .eh-pill.malay { background:#EBF4FF; border-color:#2B6CB0; color:#2B6CB0; }
@@ -188,9 +188,9 @@ body { font-size:16px; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; 
 
 /* SPECIES CARDS GRID */
 .species-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:10px; margin-top:14px; }
-.spp-card { background:white; border:0.5px solid #E2E8F0; border-top:3px solid #2B6CB0; border-radius:8px; overflow:hidden; cursor:pointer; transition:all 0.12s; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+.spp-card { background:#FFFFFF; border:1px solid #E2E8F0; border-top:3px solid #2B6CB0; border-radius:8px; overflow:hidden; cursor:pointer; transition:all 0.12s; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
 .spp-card:hover { border-color:var(--green); box-shadow:0 4px 16px rgba(37,99,235,0.12); transform:translateY(-2px); }
-.spp-card-header { background:linear-gradient(120deg,#1E3A5F 0%,#2563EB 100%); padding:10px 12px 8px; }
+.spp-card-header { background:#2B6CB0; padding:10px 12px 8px; }
 .spp-card-name { font-family:'Playfair Display','Georgia',serif; font-size:17px; font-style:italic; font-weight:400; color:var(--cream); line-height:1.2; margin-bottom:2px; }
 .spp-card-auth { font-size:13px; font-weight:300; color:var(--pale); }
 .spp-card-body { padding:9px 12px; }
@@ -212,13 +212,13 @@ body { font-size:16px; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; 
 .spp-breadcrumb .current:hover { text-decoration:none; }
 
 /* SYNONYM BOX */
-.synonym-box { background:#EFF6FF; border:0.5px solid #BFDBFE; border-radius:4px; padding:10px 14px; font-family:'Source Serif 4','Georgia',serif; font-size:15px; font-style:italic; color:#1E3A5F; line-height:1.6; margin-bottom:4px; }
+.synonym-box { background:#EFF6FF; border:0.5px solid #E2E8F0; border-radius:4px; padding:10px 14px; font-family:'Source Serif 4','Georgia',serif; font-size:15px; font-style:italic; color:#1A202C; line-height:1.6; margin-bottom:4px; }
 
 /* GENERA GRID */
 .genera-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; margin-top:14px; }
 .genus-card { background:white; border:0.5px solid #E2E8F0; border-top:3px solid #2B6CB0; border-radius:8px; overflow:hidden; cursor:pointer; transition:all 0.12s; }
 .genus-card:hover { border-color:var(--green); transform:translateY(-2px); box-shadow:0 4px 16px rgba(37,99,235,0.12); }
-.genus-card-hd { background:linear-gradient(120deg,#1E3A5F 0%,#2563EB 100%); padding:10px 12px 8px; }
+.genus-card-hd { background:#2B6CB0; padding:10px 12px 8px; }
 .gc-name { font-family:'Playfair Display','Georgia',serif; font-size:18px; font-style:italic; color:var(--cream); }
 .gc-auth { font-size:13px; color:var(--pale); margin-top:2px; }
 .genus-card-bd { padding:9px 12px; }
