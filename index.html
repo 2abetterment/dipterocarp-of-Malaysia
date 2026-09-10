@@ -566,7 +566,11 @@ function App(){
   const[route,setRoute]=useState('home');
   const[detailId,setDetailId]=useState(null);
   const[query,setQuery]=useState('');
-  const[species,setSpecies]=useState([]);
+ const[species,setSpecies]=useState([]);
+const[offset,setOffset]=useState(0);
+const[hasMore,setHasMore]=useState(true);
+const[loadingMore,setLoadingMore]=useState(false);
+const LIMIT=50; // Load 50 at a time;
   const[loading,setLoading]=useState(true);
   const[error,setError]=useState('');
   const[lang,setLang]=useState('en');
