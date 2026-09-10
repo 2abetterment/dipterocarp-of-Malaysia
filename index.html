@@ -581,11 +581,52 @@ const LIMIT=50; // Load 50 at a time;
     const id = new URLSearchParams(window.location.search).get('id');
     if(id){setDetailId(id);setRoute('detail');}
   },[]);
-  useEffect(()=>{
-    fetch(`${SB}/rest/v1/${TBL}?select=*&order=scientific_name`,{headers:H})
-      .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
-      .then(rows=>{setSpecies(rows.map(mr));setLoading(false);})
-      .catch(e=>{setError(e.message);setLoading(false);});
+  // Load initial batch of species
+useEffect(()=>{
+  setLoading(true);
+  setOffset(0);
+  setSpecies([]);
+  
+  fetch(`${SB}/rest/v1/rpc/get_trees_paginated`, {
+    method: 'POST',
+    headers: H,
+    body: JSON.stringify({
+      p_limit: LIMIT,
+      p_offset: 0
+    })
+  })
+    .then(r => {if(!r.ok) throw new Error('HTTP ' + r.status); return r.json();})
+    .then(rows => {
+      const mapped = rows.map(mr);
+      setSpecies(mapped);
+      setHasMore(rows.length === LIMIT); // If got full batch, there's more
+      setOffset(LIMIT);
+      setLoading(false);
+    })
+    .catch(e => {setError(e.message); setLoading(false);});
+}, []);
+
+// Load more function
+const loadMore = () => {
+  setLoadingMore(true);
+  fetch(`${SB}/rest/v1/rpc/get_trees_paginated`, {
+    method: 'POST',
+    headers: H,
+    body: JSON.stringify({
+      p_limit: LIMIT,
+      p_offset: offset
+    })
+  })
+    .then(r => {if(!r.ok) throw new Error('HTTP ' + r.status); return r.json();})
+    .then(rows => {
+      const mapped = rows.map(mr);
+      setSpecies(prev => [...prev, ...mapped]);
+      setHasMore(rows.length === LIMIT);
+      setOffset(prev => prev + LIMIT);
+      setLoadingMore(false);
+    })
+    .catch(e => {setError(e.message); setLoadingMore(false);});
+};
   },[]);
   useEffect(()=>{window.scrollTo({top:0});},[route,detailId]);
   return <LC.Provider value={lang}>
