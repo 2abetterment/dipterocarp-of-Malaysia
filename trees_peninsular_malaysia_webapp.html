@@ -692,7 +692,7 @@ function statusColor(st) {
   return {CR:'#C62828',EN:'#E64A19',VU:'#F9A825',NT:'#558B2F',LC:'#2E7D32',DD:'#78909C',EX:'#3D1515'}[st]||'#9E9E9E';
 }
 function esc(obj) {
-  return JSON.stringify(obj).replace(/\\/g,'\\\\').replace(/"/g,'&quot;').replace(/'/g,'\\'');
+  return JSON.stringify(obj).replace(/"/g,'&quot;');
 }
 function sppCardHtml(s) {
   const uid = (s.genus+'_'+s.species).replace(/\s/g,'_');
@@ -888,12 +888,10 @@ function renderTab(id, s) {
   } else if (id === 'syn') {
     /* Query synonyms from loaded SYNONYMS table */
     const syns = SYNONYMS.filter(r => r.genus===s.genus && r.species===s.species);
-    el.innerHTML = `<div class="synonyms-box">
-      <div class="synonyms-hd">Synonyms</div>
-      ${syns.length
-        ? syns.map(r=>`<div class="synonym-item">${r.synonym_genus||''} ${r.synonym_species||''} ${r.synonym_author?'<span style="font-style:normal;font-size:13px;color:#6E7A70">'+r.synonym_author+'</span>':''}</div>`).join('')
-        : '<div style="font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:15px;color:#6E7A70">No synonyms recorded for this species.</div>'}
-    </div>`;
+    const synHtml = syns.length
+      ? syns.map(r => '<div class="synonym-item">'+(r.synonym_genus||'')+' '+(r.synonym_species||'')+(r.synonym_author?' <span style="font-style:normal;font-size:13px;color:#6E7A70">'+r.synonym_author+'</span>':'')+'</div>').join('')
+      : '<div style="font-family:Newsreader,Georgia,serif;font-style:italic;font-size:15px;color:#6E7A70">No synonyms recorded for this species.</div>';
+    el.innerHTML = '<div class="synonyms-box"><div class="synonyms-hd">Synonyms</div>'+synHtml+'</div>';
   }
 }
 
