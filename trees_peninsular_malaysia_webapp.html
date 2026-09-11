@@ -403,16 +403,25 @@ input{font-family:'Space Grotesk',system-ui,sans-serif}
         <div class="section-hd">
           <h2 class="section-h2">Conservation status</h2>
         </div>
+        <p style="font-size:14px;line-height:1.75;color:#4A574E;margin:0 0 20px">Click any band to browse species by that category.</p>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(20px,3vw,40px)">
+          <!-- IUCN -->
           <div>
-            <p style="font-size:14px;line-height:1.75;color:#4A574E;margin:0 0 16px">Click any band to browse species by status.</p>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+              <div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:#16211B">IUCN Red List</div>
+              <div style="height:1px;background:#DCD6C8;flex:1"></div>
+            </div>
             <div class="status-list" id="status-bars"></div>
-            <p style="font-family:'Newsreader',Georgia,serif;font-size:12px;font-style:italic;color:#6E7A70;margin:14px 0 0;line-height:1.6">IUCN Red List categories. Verify against current assessments before citing in publications.</p>
+            <p style="font-family:'Newsreader',Georgia,serif;font-size:12px;font-style:italic;color:#6E7A70;margin:12px 0 0;line-height:1.6">Global IUCN Red List. Verify against current assessments before citing.</p>
           </div>
-          <div style="background:#FBF9F4;padding:20px 22px;box-shadow:0 0 0 1px #DCD6C8">
-            <div class="char-k" style="margin-bottom:12px">13 genera in Peninsular Malaysia</div>
-            <p style="font-size:14px;line-height:1.8;color:#4A574E">Thirteen genera are recorded in Peninsular Malaysia, out of 16 genera worldwide. Genera are distinguished primarily by the number and relative size of calyx wings on the fruit. <em>Upuna</em> is confined to Sarawak and is not included here.</p>
-            <div style="margin-top:16px;font-size:13px;color:#6E7A70;font-style:italic;font-family:'Newsreader',Georgia,serif">Ashton (2014) recognised additional segregate genera from <em>Shorea</em> — Anthoshorea, Richetia and Rubroshorea — now accepted by POWO.</div>
+          <!-- Malaysian Red List -->
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+              <div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:#BF5B2E">Malaysian Red List</div>
+              <div style="height:1px;background:#DCD6C8;flex:1"></div>
+            </div>
+            <div class="status-list" id="status-bars-myrl"></div>
+            <p style="font-family:'Newsreader',Georgia,serif;font-size:12px;font-style:italic;color:#6E7A70;margin:12px 0 0;line-height:1.6">National Malaysian Red List assessment. May differ from global IUCN status.</p>
           </div>
         </div>
       </section>
@@ -656,26 +665,47 @@ function _showPage(id, data=null) {
 /* ── OVERVIEW ── */
 function populateOverview() {
   const statusCfg = [
-    {k:'Critically', label:'Critically Endangered', color:'#C62828'},
-    {k:'Endangered',  label:'Endangered',            color:'#E64A19'},
-    {k:'Vulnerable',  label:'Vulnerable',              color:'#F9A825'},
-    {k:'Near',        label:'Near Threatened',         color:'#558B2F'},
-    {k:'Least',       label:'Least Concern',           color:'#2E7D32'},
-    {k:'Deficient',   label:'Data Deficient',          color:'#78909C'},
+    {k:'Critically Endangered', label:'Critically Endangered', color:'#C62828'},
+    {k:'Endangered',            label:'Endangered',            color:'#E64A19'},
+    {k:'Vulnerable',            label:'Vulnerable',            color:'#F9A825'},
+    {k:'Near Threatened',       label:'Near Threatened',       color:'#558B2F'},
+    {k:'Least Concern',         label:'Least Concern',         color:'#2E7D32'},
+    {k:'Data Deficient',        label:'Data Deficient',        color:'#78909C'},
   ];
-  const maxN = Math.max(...statusCfg.map(s => SPECIES.filter(sp => sp.conservation_status===s.k).length), 1);
+
+  /* ── IUCN bars ── */
+  const iucnCounts = statusCfg.map(s => SPECIES.filter(sp => sp.conservation_status===s.k).length);
+  const maxIUCN = Math.max(...iucnCounts, 1);
   const sbEl = document.getElementById('status-bars');
-  if (sbEl) sbEl.innerHTML = statusCfg.map(s => {
-    const n = SPECIES.filter(sp => sp.conservation_status===s.k).length;
+  if (sbEl) sbEl.innerHTML = statusCfg.map((s,i) => {
+    const n = iucnCounts[i];
     if (!n) return '';
-    const w = Math.round((n/maxN)*180);
-    const fullSt = ['Critically Endangered','Endangered','Vulnerable','Near Threatened','Least Concern','Data Deficient'].find(x=>x.toLowerCase().includes(s.k.toLowerCase()))||s.k;
-    return `<button class="status-row" style="border-left-color:${s.color}" onclick="filterByStatus('${s.label.replace(/\s*\(.*\)/,'')}')">
+    const w = Math.round((n/maxIUCN)*160);
+    return `<button class="status-row" style="border-left-color:${s.color}" onclick="filterByStatus('${s.k}','iucn')">
       <span class="status-lbl">${s.label}</span>
       <span style="display:block;width:${w}px;height:6px;background:${s.color}"></span>
       <span class="status-n">${n}</span>
     </button>`;
   }).join('');
+
+  /* ── Malaysian Red List bars ── */
+  const myrlCounts = statusCfg.map(s => SPECIES.filter(sp => sp.my_redlist_status===s.k).length);
+  const maxMYRL = Math.max(...myrlCounts, 1);
+  const myrlEl = document.getElementById('status-bars-myrl');
+  if (myrlEl) {
+    const myrlRows = statusCfg.map((s,i) => {
+      const n = myrlCounts[i];
+      if (!n) return '';
+      const w = Math.round((n/maxMYRL)*160);
+      return `<button class="status-row" style="border-left-color:${s.color}" onclick="filterByStatus('${s.k}','myrl')">
+        <span class="status-lbl">${s.label}</span>
+        <span style="display:block;width:${w}px;height:6px;background:${s.color}"></span>
+        <span class="status-n">${n}</span>
+      </button>`;
+    }).join('');
+    myrlEl.innerHTML = myrlRows ||
+      `<p style="font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:14px;color:#A39C8C;padding:10px 0">Malaysian Red List data not yet entered for this edition.</p>`;
+  }
 
   const gcEl = document.getElementById('genera-cards-ov');
   if (gcEl) gcEl.innerHTML = GENERA.map(g => {
@@ -800,7 +830,14 @@ function renderFilterChips() {
       }).join('');
 }
 
-function filterByStatus(st) { showPage('species'); buildAllSpecies(s => s.conservation_status === st, st); }
+function filterByStatus(st, source='iucn') {
+  showPage('species');
+  if (source === 'myrl') {
+    buildAllSpecies(s => s.my_redlist_status === st, 'myrl:'+st);
+  } else {
+    buildAllSpecies(s => s.conservation_status === st, st);
+  }
+}
 
 /* ── SPP CARD ── */
 
