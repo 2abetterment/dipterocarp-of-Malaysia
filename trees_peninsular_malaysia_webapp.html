@@ -456,10 +456,27 @@ input{font-family:'Space Grotesk',system-ui,sans-serif}
     <div class="page" id="pg-genus">
       <button class="back-btn" onclick="showPage('genera')">← All genera</button>
       <div class="genus-hero" id="genus-hero"></div>
-      <div class="genus-chars" id="genus-chars" style="margin-top:clamp(20px,3vw,34px)"></div>
+
+      <!-- Description -->
+      <div id="genus-desc-section" style="margin-top:clamp(20px,3vw,34px)"></div>
+
+      <!-- Diagnostic characters -->
+      <div id="genus-chars-hd" style="display:none;margin-top:clamp(24px,3vw,40px)">
+        <div class="section-hd" style="margin-bottom:16px">
+          <h2 class="section-h2" style="font-size:clamp(20px,2vw,26px)">Characters</h2>
+        </div>
+      </div>
+      <div class="genus-chars" id="genus-chars"></div>
+
+      <!-- Conservation & Economic -->
+      <div id="genus-notes-section" style="margin-top:clamp(20px,3vw,34px)"></div>
+
+      <!-- Species grid -->
       <div style="margin-top:clamp(28px,3.5vw,48px)">
-        <h2 style="font-family:'Newsreader',Georgia,serif;font-size:clamp(24px,2.6vw,32px);font-weight:400;margin:0 0 4px">Species in this edition</h2>
-        <div style="font-size:13px;color:#6E7A70;margin-bottom:18px" id="genus-spp-label"></div>
+        <div class="section-hd" style="margin-bottom:6px">
+          <h2 style="font-family:'Newsreader',Georgia,serif;font-size:clamp(22px,2.4vw,30px);font-weight:400;margin:0">Species in Peninsular Malaysia</h2>
+          <span style="font-size:13px;color:#6E7A70" id="genus-spp-label"></span>
+        </div>
         <div id="genus-spp-grid"></div>
       </div>
     </div>
@@ -823,16 +840,18 @@ function sppCardHtml(s) {
 /* ── GENUS PAGE ── */
 function buildGenusPage(g) {
   const sppList = SPECIES.filter(s => s.genus === g.genus_name);
+
+  /* HERO */
+  const localPills = (g.local_names||'').split(',').map(n=>n.trim()).filter(Boolean)
+    .map(n=>`<span class="genus-tag-dark">${n}</span>`).join('');
   document.getElementById('genus-hero').innerHTML = `
     <div>
-      <div class="ov-eyebrow">Genus</div>
+      <div class="ov-eyebrow">Family Dipterocarpaceae · Genus</div>
       <h1 class="genus-h1">${g.genus_name}</h1>
       <div class="genus-auth-txt">${g.authority||''}</div>
-      <div class="genus-tags">
-        <span class="genus-tag-dark">${g.local_names||'—'}</span>
-        ${g.etymology?`<span class="genus-tag-outline">${g.etymology.slice(0,80)}</span>`:''}
-      </div>
-      <p class="genus-desc">${g.description||''}</p>
+      ${g.publication?`<div style="font-size:13px;font-style:italic;color:#6E7A70;margin-top:4px">${g.publication}</div>`:''}
+      ${g.etymology?`<div style="font-family:'Newsreader',Georgia,serif;font-size:15px;font-style:italic;color:#BF5B2E;margin:12px 0 8px;line-height:1.5">"${g.etymology}"</div>`:''}
+      ${localPills?`<div class="genus-tags" style="margin-top:10px">${localPills}</div>`:''}
     </div>
     <div class="stat-grid" style="align-self:start">
       <div class="stat-cell"><div class="stat-n">${g.species_count_peninsular||sppList.length}</div><div class="stat-l">Spp. in PM</div></div>
@@ -841,20 +860,61 @@ function buildGenusPage(g) {
       <div class="stat-cell"><div class="stat-n">${sppList.length}</div><div class="stat-l">In this edition</div></div>
     </div>`;
 
-  const chars = [
-    {k:'Etymology', v: g.etymology},
-    {k:'Habit',     v: g.habit},
-    {k:'Fruit',     v: g.fruit},
-    {k:'Type species', v: g.type_species},
-  ].filter(c => c.v);
-  document.getElementById('genus-chars').innerHTML = chars.map(c =>
-    `<div class="genus-char"><div class="genus-char-k">${c.k}</div><div class="genus-char-v">${c.v}</div></div>`
-  ).join('');
+  /* DESCRIPTION */
+  const descEl = document.getElementById('genus-desc-section');
+  descEl.innerHTML = g.description
+    ? `<p style="font-family:'Newsreader',Georgia,serif;font-size:clamp(16px,1.5vw,20px);line-height:1.7;color:#2C3B32;max-width:72ch">${g.description}</p>`
+    : '';
 
-  document.getElementById('genus-spp-label').textContent = `${sppList.length} species recorded in Peninsular Malaysia`;
+  /* DIAGNOSTIC CHARACTERS */
+  const chars = [
+    {k:'Habit',               bm:'Tabiat',        v: g.habit},
+    {k:'Bark',                bm:'Kulit kayu',    v: g.bark},
+    {k:'Leaves',              bm:'Daun',          v: g.leaves},
+    {k:'Fruit',               bm:'Buah',          v: g.fruit},
+    {k:'Forest type',         bm:'Jenis hutan',   v: g.forest_type},
+    {k:'Distribution in PM',  bm:'Taburan di SM', v: g.distribution_pm},
+    {k:'Key characteristics', bm:'Ciri utama',    v: g.key_characteristics},
+  ].filter(c => c.v);
+  const hd = document.getElementById('genus-chars-hd');
+  const gc = document.getElementById('genus-chars');
+  if (chars.length) {
+    hd.style.display = 'block';
+    gc.innerHTML = chars.map(c => `
+      <div class="genus-char">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+          <div class="genus-char-k">${c.k}</div>
+          <div style="font-size:11px;font-style:italic;color:#A39C8C">${lang==='bm'?c.bm:''}</div>
+        </div>
+        <div class="genus-char-v">${c.v}</div>
+      </div>`).join('');
+  } else {
+    hd.style.display = 'none';
+    gc.innerHTML = '';
+  }
+
+  /* CONSERVATION & ECONOMIC NOTES */
+  const notesEl = document.getElementById('genus-notes-section');
+  const hasCon  = g.conservation_notes;
+  const hasEcon = g.economic_importance;
+  notesEl.innerHTML = (hasCon||hasEcon) ? `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:1px;background:#F2EFE7">
+      ${hasCon?`<div style="background:#FBF9F4;padding:18px 20px;box-shadow:0 0 0 1px #DCD6C8">
+        <div class="char-k" style="margin-bottom:8px">Conservation</div>
+        <div style="font-family:'Newsreader',Georgia,serif;font-size:15px;line-height:1.65;color:#2C3B32">${g.conservation_notes}</div>
+      </div>`:''}
+      ${hasEcon?`<div style="background:#FBF9F4;padding:18px 20px;box-shadow:0 0 0 1px #DCD6C8">
+        <div class="char-k" style="margin-bottom:8px">Economic importance</div>
+        <div style="font-family:'Newsreader',Georgia,serif;font-size:15px;line-height:1.65;color:#2C3B32">${g.economic_importance}</div>
+      </div>`:''}
+    </div>` : '';
+
+  /* SPECIES GRID */
+  document.getElementById('genus-spp-label').textContent = `${sppList.length} species`;
   const grid = document.getElementById('genus-spp-grid');
-  grid.innerHTML = viewToggleHtml('genus-spp-inner') +
-    `<div class="spp-grid" id="genus-spp-inner">${sppList.map(s => sppCardHtml(s)).join('')}</div>`;
+  grid.innerHTML = sppList.length
+    ? viewToggleHtml('genus-spp-inner') + `<div class="spp-grid" id="genus-spp-inner">${sppList.map(s=>sppCardHtml(s)).join('')}</div>`
+    : `<p style="font-style:italic;color:#8B9C8E;font-size:15px;padding:20px 0">No species recorded for this genus in Peninsular Malaysia.</p>`;
 }
 
 /* ── SPECIES PAGE ── */
