@@ -323,11 +323,14 @@ input{font-family:'Space Grotesk',system-ui,sans-serif}
 
     <!-- OVERVIEW -->
     <div class="page active" id="pg-overview">
+
+      <!-- ── FAMILY HEADER ── -->
       <div class="ov-hero">
         <div>
-          <div class="ov-eyebrow">Family · Malvales</div>
+          <div class="ov-eyebrow">Order Malvales · Family</div>
           <h1 class="ov-h1">Dipterocarpaceae <small>Blume, 1825</small></h1>
-          <p class="ov-intro">Two wings and a nut. <em>Di-pteron-karpos</em> — the winged fruit that spins down out of the canopy is the whole family in one object.</p>
+          <div style="font-size:13px;color:#6E7A70;margin:10px 0 0;font-style:italic">Bijdr. fl. Ned. Ind. 13: 222 (1825)</div>
+          <p class="ov-intro" style="margin-top:18px">Trees, rarely shrubs, with resinous or balsamic secretions. Leaves simple, alternate, stipulate. Flowers bisexual, 5-merous. Fruit a 1-seeded nut subtended or enclosed by the enlarged, wing-like calyx lobes — the diagnostic character from which the family takes its name: <em>di-pteron-karpos</em>, two-winged fruit.</p>
         </div>
         <div class="stat-grid">
           <div class="stat-cell"><div class="stat-n" id="ov-n-gen">—</div><div class="stat-l">Genera in PM</div></div>
@@ -336,30 +339,86 @@ input{font-family:'Space Grotesk',system-ui,sans-serif}
           <div class="stat-cell"><div class="stat-n">11</div><div class="stat-l">States in PM</div></div>
         </div>
       </div>
-      <div class="three-grid">
-        <div class="three-cell"><div class="three-tag">Ecology</div><h3 class="three-h">Canopy dominants</h3><p class="three-p">Dipterocarps form the emergent layer of lowland and hill dipterocarp forest — the signature ecosystem of Sundaland.</p></div>
-        <div class="three-cell"><div class="three-tag">Timber</div><h3 class="three-h">Meranti, Keruing, Balau</h3><p class="three-p">The family supplies most of Malaysia's commercial hardwood. Trade names group dozens of species by weight and working properties.</p></div>
-        <div class="three-cell"><div class="three-tag">Conservation</div><h3 class="three-h">Under pressure</h3><p class="three-p">Slow growth and high commercial value place most of the family on the IUCN Red List. Over half are Vulnerable or worse.</p></div>
-      </div>
 
-      <section style="margin-top:clamp(34px,4vw,60px)">
+      <!-- ── DIAGNOSTIC CHARACTERS ── -->
+      <section style="margin-top:clamp(28px,3.5vw,48px)">
         <div class="section-hd">
-          <h2 class="section-h2">Under pressure</h2>
+          <h2 class="section-h2">Diagnostic characters</h2>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:clamp(20px,3vw,40px)">
-          <div>
-            <p style="font-size:14px;line-height:1.75;color:#4A574E;margin:0 0 20px">Click a band to filter species by conservation status.</p>
-            <div class="status-list" id="status-bars"></div>
-            <p style="font-family:'Newsreader',Georgia,serif;font-size:12px;font-style:italic;color:#6E7A70;margin:16px 0 0;line-height:1.6">Counts for species in this edition. Verify against current IUCN Red List before citing.</p>
+        <div class="chars-grid">
+          <div class="char-cell">
+            <div class="char-k">Habit</div>
+            <div class="char-bm">Tabiat</div>
+            <div class="char-v">Large trees, often emergent, reaching 70 m; bole straight and cylindrical, frequently with plank buttresses at the base.</div>
           </div>
-          <div>
-            <h3 style="font-family:'Newsreader',Georgia,serif;font-size:22px;font-weight:400;margin:0 0 14px">13 genera in Peninsular Malaysia</h3>
-            <p style="font-size:14px;line-height:1.75;color:#4A574E;margin:0 0 0">Thirteen genera reach Peninsular Malaysia. They are told apart mainly by the fruit — how many calyx lobes grow into wings, and how those wings sit on the nut. Upuna is confined to Sarawak.</p>
+          <div class="char-cell">
+            <div class="char-k">Bark &amp; Resin</div>
+            <div class="char-bm">Kulit kayu &amp; Resin</div>
+            <div class="char-v">Bark fissured or scaly, inner bark often laminated and reddish. All species possess resin canals secreting aromatic resins (damar); some produce camphor.</div>
+          </div>
+          <div class="char-cell">
+            <div class="char-k">Leaves</div>
+            <div class="char-bm">Daun</div>
+            <div class="char-v">Simple, alternate, coriaceous; stipules present, often large and caducous leaving conspicuous scars. Secondary venation pinnate; domatia sometimes present in vein axils.</div>
+          </div>
+          <div class="char-cell">
+            <div class="char-k">Flowers</div>
+            <div class="char-bm">Bunga</div>
+            <div class="char-v">Bisexual, actinomorphic, 5-merous; petals contorted in bud, usually white to cream or pink; stamens 5 to many, anthers with a prolonged connective appendage.</div>
+          </div>
+          <div class="char-cell">
+            <div class="char-k">Fruit</div>
+            <div class="char-bm">Buah</div>
+            <div class="char-v">1-seeded nut; calyx lobes persistent and enlarging into wings (0, 2, 3, or 5) which aid wind dispersal. Wing number and size are primary characters for genus identification.</div>
+          </div>
+          <div class="char-cell">
+            <div class="char-k">Timber</div>
+            <div class="char-bm">Kayu balak</div>
+            <div class="char-v">The most commercially important timber family in Malaysia. Trade names — Meranti, Keruing, Kapur, Balau, Selangan Batu — each encompass multiple species grouped by density and working properties.</div>
           </div>
         </div>
       </section>
 
-      <section style="margin-top:clamp(34px,4vw,60px)">
+      <!-- ── ECOLOGY / TIMBER / CONSERVATION ── -->
+      <div class="three-grid" style="margin-top:clamp(24px,3vw,40px)">
+        <div class="three-cell">
+          <div class="three-tag">Ecology</div>
+          <h3 class="three-h">Canopy dominants</h3>
+          <p class="three-p">Dipterocarps form the emergent and main canopy layers of lowland and hill mixed dipterocarp forest — the signature forest type of Sundaland and the richest in the world by timber volume.</p>
+        </div>
+        <div class="three-cell">
+          <div class="three-tag">Timber</div>
+          <h3 class="three-h">Meranti, Keruing, Balau</h3>
+          <p class="three-p">The family supplies the majority of Malaysia's commercial hardwood export. Species are grouped into trade classes by density: light, medium and heavy hardwood.</p>
+        </div>
+        <div class="three-cell">
+          <div class="three-tag">Conservation</div>
+          <h3 class="three-h">Under pressure</h3>
+          <p class="three-p">Slow growth rates (30–80 years to maturity) and high timber value have placed most species on the IUCN Red List. Habitat loss remains the primary threat across the region.</p>
+        </div>
+      </div>
+
+      <!-- ── CONSERVATION STATUS ── -->
+      <section style="margin-top:clamp(34px,4vw,56px)">
+        <div class="section-hd">
+          <h2 class="section-h2">Conservation status</h2>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(20px,3vw,40px)">
+          <div>
+            <p style="font-size:14px;line-height:1.75;color:#4A574E;margin:0 0 16px">Click any band to browse species by status.</p>
+            <div class="status-list" id="status-bars"></div>
+            <p style="font-family:'Newsreader',Georgia,serif;font-size:12px;font-style:italic;color:#6E7A70;margin:14px 0 0;line-height:1.6">IUCN Red List categories. Verify against current assessments before citing in publications.</p>
+          </div>
+          <div style="background:#FBF9F4;padding:20px 22px;box-shadow:0 0 0 1px #DCD6C8">
+            <div class="char-k" style="margin-bottom:12px">13 genera in Peninsular Malaysia</div>
+            <p style="font-size:14px;line-height:1.8;color:#4A574E">Thirteen genera are recorded in Peninsular Malaysia, out of 16 genera worldwide. Genera are distinguished primarily by the number and relative size of calyx wings on the fruit. <em>Upuna</em> is confined to Sarawak and is not included here.</p>
+            <div style="margin-top:16px;font-size:13px;color:#6E7A70;font-style:italic;font-family:'Newsreader',Georgia,serif">Ashton (2014) recognised additional segregate genera from <em>Shorea</em> — Anthoshorea, Richetia and Rubroshorea — now accepted by POWO.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── GENERA CARDS ── -->
+      <section style="margin-top:clamp(34px,4vw,56px)">
         <div class="section-hd">
           <h2 class="section-h2">The genera</h2>
           <button class="section-link" onclick="showPage('genera')">All genera →</button>
@@ -367,7 +426,10 @@ input{font-family:'Space Grotesk',system-ui,sans-serif}
         <div class="genera-grid-ov" id="genera-cards-ov"></div>
       </section>
 
-      <p style="font-family:'Newsreader',Georgia,serif;font-size:13.5px;font-style:italic;color:#6E7A70;line-height:1.7;margin:clamp(28px,3vw,44px) 0 0;max-width:70ch;border-top:1px solid #DCD6C8;padding-top:16px">Blume (1825), <em>Bijdr. fl. Ned. Ind.</em> 13: 222. — Symington (1943), <em>Foresters' Manual of Dipterocarps.</em> — Ashton (1982), <em>Flora Malesiana</em> 9(2). — Plants of the World Online, Kew.</p>
+      <!-- ── CITATION ── -->
+      <p style="font-family:'Newsreader',Georgia,serif;font-size:13px;font-style:italic;color:#6E7A70;line-height:1.8;margin:clamp(28px,3vw,44px) 0 0;max-width:72ch;border-top:1px solid #DCD6C8;padding-top:16px">
+        Blume (1825), <em>Bijdr. fl. Ned. Ind.</em> 13: 222. — Symington (1943), <em>Foresters' Manual of Dipterocarps.</em> Malayan Forest Records 16. — Ashton (1982), <em>Flora Malesiana</em> 9(2): 237–552. — Ashton (2014), <em>Flora of the Malaysian Peninsula</em> Vol. 1. — POWO (2024), Plants of the World Online, Royal Botanic Gardens, Kew.
+      </p>
     </div>
 
     <!-- GENERA LIST -->
