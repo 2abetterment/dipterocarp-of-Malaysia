@@ -332,8 +332,8 @@ input{font-family:'Space Grotesk',system-ui,sans-serif}
         <div class="stat-grid">
           <div class="stat-cell"><div class="stat-n" id="ov-n-gen">—</div><div class="stat-l">Genera in PM</div></div>
           <div class="stat-cell"><div class="stat-n" id="ov-n-spp">—</div><div class="stat-l">Species in PM</div></div>
-          <div class="stat-cell"><div class="stat-n">670+</div><div class="stat-l">Species worldwide</div></div>
-          <div class="stat-cell"><div class="stat-n">17</div><div class="stat-l">States recorded</div></div>
+          <div class="stat-cell"><div class="stat-n">680+</div><div class="stat-l">Species worldwide</div></div>
+          <div class="stat-cell"><div class="stat-n">11</div><div class="stat-l">States in PM</div></div>
         </div>
       </div>
       <div class="three-grid">
@@ -353,8 +353,8 @@ input{font-family:'Space Grotesk',system-ui,sans-serif}
             <p style="font-family:'Newsreader',Georgia,serif;font-size:12px;font-style:italic;color:#6E7A70;margin:16px 0 0;line-height:1.6">Counts for species in this edition. Verify against current IUCN Red List before citing.</p>
           </div>
           <div>
-            <h3 style="font-family:'Newsreader',Georgia,serif;font-size:22px;font-weight:400;margin:0 0 14px">The nine* genera</h3>
-            <p style="font-size:14px;line-height:1.75;color:#4A574E;margin:0 0 0">*Fourteen genera reach Peninsular Malaysia. They are told apart mainly by the fruit — how many calyx lobes grow into wings, and how those wings sit on the nut.</p>
+            <h3 style="font-family:'Newsreader',Georgia,serif;font-size:22px;font-weight:400;margin:0 0 14px">13 genera in Peninsular Malaysia</h3>
+            <p style="font-size:14px;line-height:1.75;color:#4A574E;margin:0 0 0">Thirteen genera reach Peninsular Malaysia. They are told apart mainly by the fruit — how many calyx lobes grow into wings, and how those wings sit on the nut. Upuna is confined to Sarawak.</p>
           </div>
         </div>
       </section>
@@ -375,7 +375,7 @@ input{font-family:'Space Grotesk',system-ui,sans-serif}
       <div style="border-bottom:2px solid #16211B;padding-bottom:18px;margin-bottom:24px">
         <div class="ov-eyebrow">Browse</div>
         <h1 style="font-family:'Newsreader',Georgia,serif;font-weight:300;font-size:clamp(34px,4.6vw,58px);line-height:1;margin:12px 0 0">Genera</h1>
-        <p style="font-size:14.5px;line-height:1.7;color:#4A574E;max-width:60ch;margin:14px 0 0">Fourteen genera reach Peninsular Malaysia. They are told apart mainly by the fruit.</p>
+        <p style="font-size:14.5px;line-height:1.7;color:#4A574E;max-width:60ch;margin:14px 0 0">Thirteen genera are recorded in Peninsular Malaysia. They are told apart mainly by the fruit.</p>
       </div>
       <div class="genera-list" id="genera-list"></div>
     </div>
@@ -503,8 +503,8 @@ async function loadData() {
     '<style>@keyframes progress{0%{transform:scaleX(0);transform-origin:left}50%{transform:scaleX(1);transform-origin:left}51%{transform:scaleX(1);transform-origin:right}100%{transform:scaleX(0);transform-origin:right}}</style>');
 
   [GENERA, SPECIES, SYNONYMS, DIST_DETAILS] = await Promise.all([
-    sbGet(GEN_T,  'order=genus_name&select=*'),
-    sbGet(SPP_T,  'distribution_peninsular=eq.true&order=genus,species&select=*'),
+    sbGet(GEN_T,  'species_count_peninsular=gt.0&order=genus_name&select=*'),
+    sbGet(SPP_T,  'distribution_peninsular=eq.true&order=genus,scientific_name&select=id,scientific_name,genus,authority,publication,local_name_malay,conservation_status,my_redlist_status,height_range,trunk_diameter,bark_description,leaf_description,fruit_description,flower_description,habitat,elevation_range,ecological_notes,economic_importance,diagnostic_characters,forest_type,distribution_pm,synonym_notes,distribution_peninsular,distribution_sabah,distribution_sarawak,endemic_to_malaysia'),
     sbGet(SYN_T,  'select=*'),
     sbGet(DIST_T, 'select=*'),
   ]);
@@ -574,12 +574,12 @@ function _showPage(id, data=null) {
 /* ── OVERVIEW ── */
 function populateOverview() {
   const statusCfg = [
-    {k:'CR', label:'Critically Endangered (CR)', color:'#C62828'},
-    {k:'EN', label:'Endangered (EN)',             color:'#E64A19'},
-    {k:'VU', label:'Vulnerable (VU)',             color:'#F9A825'},
-    {k:'NT', label:'Near Threatened (NT)',        color:'#558B2F'},
-    {k:'LC', label:'Least Concern (LC)',          color:'#2E7D32'},
-    {k:'DD', label:'Data Deficient (DD)',         color:'#78909C'},
+    {k:'Critically', label:'Critically Endangered', color:'#C62828'},
+    {k:'Endangered',  label:'Endangered',            color:'#E64A19'},
+    {k:'Vulnerable',  label:'Vulnerable',              color:'#F9A825'},
+    {k:'Near',        label:'Near Threatened',         color:'#558B2F'},
+    {k:'Least',       label:'Least Concern',           color:'#2E7D32'},
+    {k:'Deficient',   label:'Data Deficient',          color:'#78909C'},
   ];
   const maxN = Math.max(...statusCfg.map(s => SPECIES.filter(sp => sp.conservation_status===s.k).length), 1);
   const sbEl = document.getElementById('status-bars');
@@ -613,7 +613,7 @@ function buildSidebarGenera() {
   document.getElementById('sb-genera-list').innerHTML = GENERA.map(g => {
     const n = SPECIES.filter(s => s.genus===g.genus_name).length;
     return `<button class="sb-genus-btn" onclick="showPage('genus',${esc(g)})">
-      <span class="sb-genus-name">${g.genus_name}</span>
+      <span class="sb-genus-name" style="font-style:italic">${g.genus_name}</span>
       <span class="sb-genus-n">${n}</span>
     </button>`;
   }).join('');
@@ -679,37 +679,80 @@ function buildAllSpecies(filter=null) {
   // chips
   const chips = document.getElementById('spp-filter-chips');
   if (chips) {
-    const statuses = ['CR','EN','VU','NT','LC','DD'].filter(st => SPECIES.some(s=>s.conservation_status===st));
+    const statusOrder = ['Critically Endangered','Endangered','Vulnerable','Near Threatened','Least Concern','Data Deficient'];
+    const statuses = statusOrder.filter(st => SPECIES.some(s=>s.conservation_status===st));
     chips.innerHTML = `<button onclick="buildAllSpecies()" style="padding:5px 12px;border:1px solid #16211B;background:#16211B;color:#FBF9F4;font-size:12px">All</button>` +
-      statuses.map(st => `<button onclick="buildAllSpecies(s=>s.conservation_status==='${st}')" style="padding:5px 12px;border:1px solid #DCD6C8;background:#FBF9F4;color:#16211B;font-size:12px">${st}</button>`).join('');
+      statuses.map(st => `<button onclick="buildAllSpecies(s=>s.conservation_status==='${st}')" style="padding:5px 12px;border:1px solid ${statusColor(st)};background:${statusColor(st)}18;color:${statusColor(st)};font-size:12px;font-weight:600">${statusShort(st)}</button>`).join('');
   }
 }
 
-function filterByStatus(st) { showPage('species'); buildAllSpecies(s => s.conservation_status === st); }
+function filterByStatus(st) { showPage('species'); buildAllSpecies(s => s.conservation_status && s.conservation_status.toLowerCase().includes(st.toLowerCase())); }
 
 /* ── SPP CARD ── */
-function statusColor(st) {
-  return {CR:'#C62828',EN:'#E64A19',VU:'#F9A825',NT:'#558B2F',LC:'#2E7D32',DD:'#78909C',EX:'#3D1515'}[st]||'#9E9E9E';
-}
+
 function esc(obj) {
   return JSON.stringify(obj).replace(/"/g,'&quot;');
 }
+
+/* Parse "Genus species Author" → epithet only */
+function epithet(s) {
+  const parts = s.scientific_name.split(' ');
+  return parts.length >= 2 ? parts[1] : '';
+}
+/* Full binomial without author */
+function binomial(s) {
+  const parts = s.scientific_name.split(' ');
+  return parts.length >= 2 ? parts[0]+' '+parts[1] : s.scientific_name;
+}
+/* UID from scientific_name */
+function uid(s) {
+  return s.scientific_name.replace(/[^a-zA-Z0-9]/g,'_');
+}
+
+/* Map full conservation status text → colour */
+function statusColor(st) {
+  if (!st) return '#9E9E9E';
+  const s = st.toLowerCase();
+  if (s.includes('critically')) return '#C62828';
+  if (s.includes('endangered'))  return '#E64A19';
+  if (s.includes('vulnerable'))  return '#F9A825';
+  if (s.includes('near'))        return '#558B2F';
+  if (s.includes('least'))       return '#2E7D32';
+  if (s.includes('deficient'))   return '#78909C';
+  return '#9E9E9E';
+}
+/* Short label for conservation status */
+function statusShort(st) {
+  if (!st) return '';
+  const s = st.toLowerCase();
+  if (s.includes('critically')) return 'CR';
+  if (s.includes('endangered'))  return 'EN';
+  if (s.includes('vulnerable'))  return 'VU';
+  if (s.includes('near'))        return 'NT';
+  if (s.includes('least'))       return 'LC';
+  if (s.includes('deficient'))   return 'DD';
+  return st.slice(0,2).toUpperCase();
+}
 function sppCardHtml(s) {
-  const uid = (s.genus+'_'+s.species).replace(/\s/g,'_');
-  const saved = savedIds.has(uid);
-  const sj = esc(s);
+  const id  = uid(s);
+  const saved = savedIds.has(id);
+  const sj  = esc(s);
+  const bin = binomial(s);
+  const cs  = s.conservation_status || '';
+  const ep  = epithet(s);
   return `<div class="spp-card">
     <button class="spp-card-top" onclick="showPage('spp',${sj})">
-      <div class="spp-sci">${s.genus} ${s.species}</div>
-      <div class="spp-auth">${s.author||''}</div>
-      <div class="spp-malay">${lang==='bm'&&s.local_name_bm ? s.local_name_bm : s.local_name||''}</div>
+      <div class="spp-sci">${bin}</div>
+      <div class="spp-auth">${s.authority||''}</div>
+      <div class="spp-malay">${s.local_name_malay||''}</div>
       <div class="spp-tags">
-        ${s.conservation_status?`<span class="spp-status" style="background:${statusColor(s.conservation_status)}20;color:${statusColor(s.conservation_status)}">${s.conservation_status}</span>`:''}
-        ${s.height_max?`<span class="spp-h-tag">to ${s.height_max} m</span>`:''}
+        ${cs?`<span class="spp-status" style="background:${statusColor(cs)}22;color:${statusColor(cs)};font-weight:600">${statusShort(cs)}</span>`:''}
+        ${s.height_range?`<span class="spp-h-tag">${s.height_range}</span>`:''}
+        ${s.endemic_to_malaysia?`<span class="spp-h-tag">Endemic</span>`:''}
       </div>
     </button>
     <div class="spp-card-btns">
-      <button class="spp-card-btn" id="save-${uid}" onclick="toggleSave('${uid}',true)">${saved?'★ Saved':'☆ Save'}</button>
+      <button class="spp-card-btn" id="save-${id}" onclick="toggleSave('${id}',true)">${saved?'★ Saved':'☆ Save'}</button>
       <button class="spp-card-btn" onclick="showPage('spp',${sj})">Open →</button>
     </div>
   </div>`;
@@ -724,7 +767,7 @@ function buildGenusPage(g) {
       <h1 class="genus-h1">${g.genus_name}</h1>
       <div class="genus-auth-txt">${g.authority||''}</div>
       <div class="genus-tags">
-        <span class="genus-tag-dark">${g.local_name||g.common_name||'—'}</span>
+        <span class="genus-tag-dark">${g.local_names||'—'}</span>
         ${g.etymology?`<span class="genus-tag-outline">${g.etymology.slice(0,80)}</span>`:''}
       </div>
       <p class="genus-desc">${g.description||''}</p>
@@ -755,7 +798,7 @@ function buildGenusPage(g) {
 /* ── SPECIES PAGE ── */
 function buildSppPage(s) {
   const genObj = GENERA.find(g => g.genus_name === s.genus) || {};
-  const uid = (s.genus+'_'+s.species).replace(/\s/g,'_');
+  const id  = uid(s);
 
   // Breadcrumb
   document.getElementById('spp-breadcrumb').innerHTML = `
@@ -766,23 +809,23 @@ function buildSppPage(s) {
     <span style="font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:14px;color:#16211B">${s.genus} ${s.species}</span>`;
 
   // Hero
-  const saved = savedIds.has(uid);
+  const saved = savedIds.has(id);
   document.getElementById('spp-hero').innerHTML = `
     <div>
       <div class="spp-timber">${genObj.common_name||genObj.local_name||''}</div>
-      <h1 class="spp-h1">${s.genus} ${s.species}</h1>
-      <div class="spp-auth-txt">${s.author||''}</div>
-      <div class="spp-malay-lg">${s.local_name||''}</div>
-      <p class="spp-diag">${s.diagnostic_characters||s.description||''}</p>
+      <h1 class="spp-h1">${binomial(s)}</h1>
+      <div class="spp-auth-txt">${s.authority||''}</div>
+      <div class="spp-malay-lg">${s.local_name_malay||''}</div>
+      <p class="spp-diag">${s.diagnostic_characters||s.ecological_notes||''}</p>
       <div class="spp-action-btns">
-        <button class="spp-act-btn${saved?' saved':''}" id="spp-save-btn" onclick="toggleSave('${uid}',false,true)">${saved?'★ Saved':'☆ Save'}</button>
+        <button class="spp-act-btn${saved?' saved':''}" id="spp-save-btn" onclick="toggleSave('${id}',false,true)">${saved?'★ Saved':'☆ Save'}</button>
       </div>
     </div>
     <div>
-      <div class="spp-img-placeholder"><span class="spp-img-txt" style="font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:13px;color:#A39C8C">${s.genus} ${s.species}</span></div>
+      <div class="spp-img-placeholder"><span class="spp-img-txt" style="font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:13px;color:#A39C8C">${binomial(s)}</span></div>
       <div class="spp-stat-grid">
-        <div class="spp-stat-cell"><div class="spp-stat-n" style="color:${statusColor(s.conservation_status)}">${s.conservation_status||'—'}</div><div class="spp-stat-l">IUCN Status</div></div>
-        <div class="spp-stat-cell"><div class="spp-stat-n">${s.height_max?s.height_max+' m':'—'}</div><div class="spp-stat-l">Max height</div></div>
+        <div class="spp-stat-cell"><div class="spp-stat-n" style="color:${statusColor(s.conservation_status)};font-size:13px">${s.conservation_status||'—'}</div><div class="spp-stat-l">IUCN Status</div></div>
+        <div class="spp-stat-cell"><div class="spp-stat-n">${s.height_range||'—'}</div><div class="spp-stat-l">Height</div></div>
         <div class="spp-stat-cell"><div class="spp-stat-n">${s.distribution_peninsular?'Yes':'No'}</div><div class="spp-stat-l">Peninsular MY</div></div>
         <div class="spp-stat-cell"><div class="spp-stat-n">${s.distribution_sabah||s.distribution_sarawak?'Yes':'No'}</div><div class="spp-stat-l">Borneo</div></div>
       </div>
@@ -807,11 +850,13 @@ function renderTab(id, s) {
 
   if (id === 'chars') {
     const chars = [
-      {k:'Bark',        bm:'Kulit kayu', v: s.bark},
-      {k:'Leaf',        bm:'Daun',       v: s.leaf},
-      {k:'Fruit',       bm:'Buah',       v: s.fruit},
+      {k:'Bark',        bm:'Kulit kayu', v: s.bark_description},
+      {k:'Leaf',        bm:'Daun',       v: s.leaf_description},
+      {k:'Fruit',       bm:'Buah',       v: s.fruit_description},
+      {k:'Flower',      bm:'Bunga',      v: s.flower_description},
       {k:'Habitat',     bm:'Habitat',    v: s.habitat},
-      {k:'Description', bm:'Penerangan', v: s.description},
+      {k:'Ecology',     bm:'Ekologi',    v: s.ecological_notes},
+      {k:'Economic use',bm:'Kegunaan',   v: s.economic_importance},
     ].filter(c => c.v);
     el.innerHTML = chars.length
       ? `<div class="chars-grid">${chars.map(c=>`<div class="char-cell">
@@ -839,8 +884,8 @@ function renderTab(id, s) {
 
   } else if (id === 'dist') {
     /* State dot-map + distribution details from table */
-    const distText = s.distribution || '';
-    const detailRows = DIST_DETAILS.filter(d => d.genus===s.genus && d.species===s.species);
+    const distText = s.distribution_pm || '';
+    const detailRows = DIST_DETAILS.filter(d => d.scientific_name===s.scientific_name || (d.genus===s.genus && d.species===epithet(s)));
     const PM_STATES = [
       {name:'Perlis',  abbr:'PLS', x:62,  y:18},
       {name:'Kedah',   abbr:'KDH', x:70,  y:50},
@@ -912,8 +957,8 @@ function onSearch(q) {
   const drop = document.getElementById('search-drop');
   if (!q.trim()) { drop.classList.remove('open'); drop.innerHTML=''; return; }
   const lq = q.toLowerCase();
-  const gHits = GENERA.filter(g => g.genus_name.toLowerCase().includes(lq)||(g.local_name||'').toLowerCase().includes(lq)).slice(0,3);
-  const sHits = SPECIES.filter(s => (s.genus+' '+s.species).toLowerCase().includes(lq)||(s.local_name||'').toLowerCase().includes(lq)).slice(0,6);
+  const gHits = GENERA.filter(g => g.genus_name.toLowerCase().includes(lq)||(g.local_names||'').toLowerCase().includes(lq)).slice(0,3);
+  const sHits = SPECIES.filter(s => binomial(s).toLowerCase().includes(lq)||(s.local_name_malay||'').toLowerCase().includes(lq)).slice(0,6);
   if (!gHits.length && !sHits.length) { drop.classList.remove('open'); return; }
   drop.innerHTML = [
     ...gHits.map(g => `<button class="sd-item" onclick="showPage('genus',${esc(g)});closeSearch()"><span class="sd-kind">Genus</span><span><span class="sd-name">${g.genus_name}</span><span class="sd-sub">${g.local_name||''}</span></span></button>`),
