@@ -485,6 +485,8 @@ input{font-family:'Space Grotesk',system-ui,sans-serif}
     <div class="page" id="pg-spp">
       <div class="breadcrumb" id="spp-breadcrumb"></div>
       <div class="spp-hero" id="spp-hero"></div>
+      <!-- Synonym box shown directly on page, not in a tab -->
+      <div id="spp-synonym-box" style="margin-top:clamp(16px,2vw,26px)"></div>
       <div class="tabs" id="spp-tabs"></div>
       <div id="spp-tab-content"></div>
     </div>
@@ -920,145 +922,242 @@ function buildGenusPage(g) {
 /* ── SPECIES PAGE ── */
 function buildSppPage(s) {
   const genObj = GENERA.find(g => g.genus_name === s.genus) || {};
-  const id  = uid(s);
+  const id = uid(s);
+  const bin = binomial(s);
+  const cs  = s.conservation_status || '';
+  const saved = savedIds.has(id);
 
-  // Breadcrumb
+  /* ── BREADCRUMB ── */
   document.getElementById('spp-breadcrumb').innerHTML = `
     <button class="bc-btn" onclick="showPage('overview')">Dipterocarpaceae</button>
     <span class="bc-sep">/</span>
     <button class="bc-btn" style="font-style:italic;font-family:'Newsreader',Georgia,serif" onclick="showPage('genus',${esc(genObj)})">${s.genus}</button>
     <span class="bc-sep">/</span>
-    <span style="font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:14px;color:#16211B">${s.genus} ${s.species}</span>`;
+    <span style="font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:14px;color:#16211B">${bin}</span>`;
 
-  // Hero
-  const saved = savedIds.has(id);
+  /* ── HERO ── */
+  const genLocalNames = (genObj.local_names||'').split(',').map(n=>n.trim()).filter(Boolean);
+  const timberLabel   = genLocalNames.length ? genLocalNames[0] : '';
+  const etymology     = s['maksud epitet'] || '';
+
   document.getElementById('spp-hero').innerHTML = `
     <div>
-      <div class="spp-timber">${genObj.common_name||genObj.local_name||''}</div>
-      <h1 class="spp-h1">${binomial(s)}</h1>
+      <div class="spp-timber">${timberLabel}</div>
+      <h1 class="spp-h1">${bin}</h1>
       <div class="spp-auth-txt">${s.authority||''}</div>
+      ${s.publication ? `<div style="font-size:13px;font-style:italic;color:#6E7A70;margin-top:3px">${s.publication}</div>` : ''}
+      ${etymology ? `<div style="font-family:'Newsreader',Georgia,serif;font-size:15px;font-style:italic;color:#BF5B2E;margin:12px 0 4px;line-height:1.5">
+        <span style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-style:normal;color:#A39C8C;font-family:'Space Grotesk',sans-serif">Etymology · </span>${etymology}</div>` : ''}
       <div class="spp-malay-lg">${s.local_name_malay||''}</div>
-      <p class="spp-diag">${s.diagnostic_characters||s.ecological_notes||''}</p>
       <div class="spp-action-btns">
         <button class="spp-act-btn${saved?' saved':''}" id="spp-save-btn" onclick="toggleSave('${id}',false,true)">${saved?'★ Saved':'☆ Save'}</button>
+        ${s.distribution_peninsular ? '<span style="font-size:12px;padding:5px 10px;border:1px solid #DCD6C8;color:#4A574E">✓ Peninsular Malaysia</span>' : ''}
       </div>
     </div>
     <div>
-      <div class="spp-img-placeholder"><span class="spp-img-txt" style="font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:13px;color:#A39C8C">${binomial(s)}</span></div>
+      <div class="spp-img-placeholder"><span class="spp-img-txt">${bin}</span></div>
       <div class="spp-stat-grid">
-        <div class="spp-stat-cell"><div class="spp-stat-n" style="color:${statusColor(s.conservation_status)};font-size:13px">${s.conservation_status||'—'}</div><div class="spp-stat-l">IUCN Status</div></div>
-        <div class="spp-stat-cell"><div class="spp-stat-n">${s.height_range||'—'}</div><div class="spp-stat-l">Height</div></div>
-        <div class="spp-stat-cell"><div class="spp-stat-n">${s.distribution_peninsular?'Yes':'No'}</div><div class="spp-stat-l">Peninsular MY</div></div>
-        <div class="spp-stat-cell"><div class="spp-stat-n">${s.distribution_sabah||s.distribution_sarawak?'Yes':'No'}</div><div class="spp-stat-l">Borneo</div></div>
+        <div class="spp-stat-cell">
+          <div class="spp-stat-n" style="color:${statusColor(cs)};font-size:12px;line-height:1.3">${cs||'—'}</div>
+          <div class="spp-stat-l">IUCN</div>
+        </div>
+        <div class="spp-stat-cell">
+          <div class="spp-stat-n" style="font-size:12px;line-height:1.3">${s.my_redlist_status||'—'}</div>
+          <div class="spp-stat-l">Malaysian RL</div>
+        </div>
+        <div class="spp-stat-cell">
+          <div class="spp-stat-n">${s.height_range||'—'}</div>
+          <div class="spp-stat-l">Height</div>
+        </div>
+        <div class="spp-stat-cell">
+          <div class="spp-stat-n" style="font-size:12px">${s.forest_type||'—'}</div>
+          <div class="spp-stat-l">Forest type</div>
+        </div>
       </div>
     </div>`;
 
-  // Tabs
+  /* ── SYNONYM BOX (shown directly on page) ── */
+  const synBox = document.getElementById('spp-synonym-box');
+  const syns   = SYNONYMS.filter(r => r.accepted_name === s.scientific_name);
+  const hasSynNote = s.synonym_notes;
+  if (syns.length || hasSynNote) {
+    const synItems = syns.map(r =>
+      `<div class="synonym-item"><em>${r.synonym_name||''}</em>${r.synonym_author ? ' <span style="font-style:normal;font-size:12px;color:#6E7A70">'+r.synonym_author+'</span>' : ''}${r.synonym_type ? ' <span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#A39C8C;font-style:normal"> · '+r.synonym_type+'</span>' : ''}</div>`
+    ).join('');
+    synBox.innerHTML = `<div class="synonyms-box">
+      <div class="synonyms-hd">Synonyms</div>
+      ${synItems}
+      ${hasSynNote ? `<div style="font-size:13px;color:#6E7A70;font-style:italic;margin-top:8px;line-height:1.6">${s.synonym_notes}</div>` : ''}
+    </div>`;
+  } else {
+    synBox.innerHTML = '';
+  }
+
+  /* ── TABS ── */
   activeTab = 'chars';
-  document.getElementById('spp-tabs').innerHTML =
-    [{id:'chars',label:'Characters'},{id:'diag',label:'Diagnostic'},{id:'dist',label:'Distribution'},{id:'syn',label:'Synonyms'}]
+  const tabDefs = [
+    {id:'chars', label:'Characters'},
+    {id:'diag',  label:'Diagnostic'},
+    {id:'dist',  label:'Distribution'},
+    {id:'cons',  label:'Conservation'},
+    {id:'bm',    label:'Bahasa Malaysia'},
+  ];
+  document.getElementById('spp-tabs').innerHTML = tabDefs
     .map(t => `<button class="tab-btn${t.id===activeTab?' active':''}" onclick="setTab('${t.id}',${esc(s)})">${t.label}</button>`).join('');
   renderTab('chars', s);
 }
 
 function setTab(id, s) {
   activeTab = id;
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().startsWith(id.slice(0,3))));
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick').includes(`'${id}'`));
+  });
   renderTab(id, s);
 }
 
 function renderTab(id, s) {
   const el = document.getElementById('spp-tab-content');
 
+  /* ── TAB 1: CHARACTERS ── */
   if (id === 'chars') {
     const chars = [
-      {k:'Bark',        bm:'Kulit kayu', v: s.bark_description},
-      {k:'Leaf',        bm:'Daun',       v: s.leaf_description},
-      {k:'Fruit',       bm:'Buah',       v: s.fruit_description},
-      {k:'Flower',      bm:'Bunga',      v: s.flower_description},
-      {k:'Habitat',     bm:'Habitat',    v: s.habitat},
-      {k:'Ecology',     bm:'Ekologi',    v: s.ecological_notes},
-      {k:'Economic use',bm:'Kegunaan',   v: s.economic_importance},
+      {k:'Bark',        bm:'Kulit kayu',   v: s.bark_description},
+      {k:'Leaf',        bm:'Daun',         v: s.leaf_description},
+      {k:'Fruit',       bm:'Buah',         v: s.fruit_description},
+      {k:'Flower',      bm:'Bunga',        v: s.flower_description},
+      {k:'Habit',       bm:'Tabiat',       v: s.height_range ? `Height ${s.height_range}${s.trunk_diameter ? '; DBH '+s.trunk_diameter : ''}` : null},
+      {k:'Habitat',     bm:'Habitat',      v: s.habitat},
     ].filter(c => c.v);
     el.innerHTML = chars.length
       ? `<div class="chars-grid">${chars.map(c=>`<div class="char-cell">
           <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
             <span class="char-k">${c.k}</span>
-            <span class="char-bm">${lang==='bm'?c.bm:''}</span>
+            <span class="char-bm">${c.bm}</span>
           </div>
           <div class="char-v">${c.v}</div>
         </div>`).join('')}</div>`
-      : '<p class="loading" style="font-style:italic;color:#8B9C8E;font-size:15px">Morphological data not yet available for this species.</p>';
+      : '<p style="font-style:italic;color:#8B9C8E;font-size:15px;padding:20px 0">Morphological data not yet available for this species.</p>';
 
+  /* ── TAB 2: DIAGNOSTIC ── */
   } else if (id === 'diag') {
-    const diag = s.diagnostic_characters || '';
-    /* Icon timeline for diagnostic characters */
-    const parts = diag ? diag.split(/[.;]/).map(p=>p.trim()).filter(Boolean) : [];
-    const icons = ['🌿','🌱','🌳','🪨','🍂','🍁','🌺','🪵'];
-    el.innerHTML = diag
+    const diag  = s.diagnostic_characters || '';
+    const parts = diag.split(/[.;]/).map(p=>p.trim()).filter(Boolean);
+    const icons = ['🌿','🌱','🌳','🪨','🍂','🍁','🌺','🪵','🔬','📍'];
+    el.innerHTML = parts.length
       ? `<div style="display:flex;flex-direction:column;gap:1px">
           ${parts.map((p,i) => `<div style="display:flex;gap:16px;align-items:flex-start;background:#FBF9F4;padding:14px 18px;box-shadow:0 0 0 1px #DCD6C8">
-            <span style="font-size:18px;flex-shrink:0;margin-top:2px">${icons[i%icons.length]}</span>
-            <p style="font-family:'Newsreader',Georgia,serif;font-size:16px;line-height:1.6;color:#2C3B32;margin:0">${p}.</p>
+            <span style="font-size:20px;flex-shrink:0;margin-top:1px">${icons[i%icons.length]}</span>
+            <p style="font-family:'Newsreader',Georgia,serif;font-size:16px;line-height:1.65;color:#2C3B32;margin:0">${p}.</p>
           </div>`).join('')}
         </div>`
-      : '<p class="loading" style="font-style:italic;color:#8B9C8E">Diagnostic characters not yet recorded.</p>';
+      : '<p style="font-style:italic;color:#8B9C8E;font-size:15px;padding:20px 0">Diagnostic characters not yet recorded for this species.</p>';
 
+  /* ── TAB 3: DISTRIBUTION ── */
   } else if (id === 'dist') {
-    /* State dot-map + distribution details from table */
-    const distText = s.distribution_pm || '';
-    const detailRows = DIST_DETAILS.filter(d => d.scientific_name===s.scientific_name || (d.genus===s.genus && d.species===epithet(s)));
+    const distText  = s.distribution_pm || '';
+    const detailRows = DIST_DETAILS.filter(d => d.accepted_name===s.scientific_name || d.scientific_name===s.scientific_name);
     const PM_STATES = [
-      {name:'Perlis',  abbr:'PLS', x:62,  y:18},
-      {name:'Kedah',   abbr:'KDH', x:70,  y:50},
-      {name:'Penang',  abbr:'PNG', x:44,  y:72},
-      {name:'Perak',   abbr:'PRK', x:80,  y:120},
-      {name:'Kelantan',abbr:'KEL', x:162, y:55},
-      {name:'Terengganu',abbr:'TRG',x:180,y:115},
-      {name:'Pahang',  abbr:'PHG', x:155, y:175},
-      {name:'Selangor',abbr:'SEL', x:80,  y:195},
-      {name:'N.Sembilan',abbr:'NSN',x:100,y:240},
-      {name:'Melaka',  abbr:'MLK', x:90,  y:270},
-      {name:'Johor',   abbr:'JHR', x:130, y:315},
+      {name:'Perlis',       abbr:'PLS', x:62,  y:22},
+      {name:'Kedah',        abbr:'KDH', x:74,  y:54},
+      {name:'Penang',       abbr:'PNG', x:46,  y:74},
+      {name:'Perak',        abbr:'PRK', x:84,  y:124},
+      {name:'Kelantan',     abbr:'KEL', x:164, y:56},
+      {name:'Terengganu',   abbr:'TRG', x:182, y:118},
+      {name:'Pahang',       abbr:'PHG', x:156, y:178},
+      {name:'Selangor',     abbr:'SEL', x:82,  y:198},
+      {name:'N.Sembilan',   abbr:'NSN', x:102, y:242},
+      {name:'Melaka',       abbr:'MLK', x:92,  y:272},
+      {name:'Johor',        abbr:'JHR', x:130, y:318},
     ];
     const present = name => {
-      const n = name.toLowerCase().replace('n.sembilan','negeri sembilan').replace('nsn','negeri sembilan');
-      return distText.toLowerCase().includes(n) ||
+      const n = name.toLowerCase().replace('n.sembilan','negeri sembilan');
+      return distText.toLowerCase().includes(n.split('.').pop().trim()) ||
              detailRows.some(d => (d.state||'').toLowerCase().includes(n.split('.').pop().trim()));
     };
     const dots = PM_STATES.map(st => {
       const p = present(st.name);
-      return `<circle cx="${st.x}" cy="${st.y}" r="10" fill="${p?'#BF5B2E':'#ECE7DA'}" stroke="${p?'#A04020':'#DCD6C8'}" stroke-width="1.5"/>
-              <text x="${st.x}" y="${st.y+4}" text-anchor="middle" font-size="7" font-family="Space Grotesk,sans-serif" fill="${p?'#FBF9F4':'#A39C8C'}">${st.abbr}</text>`;
+      return `<circle cx="${st.x}" cy="${st.y}" r="11" fill="${p?'#BF5B2E':'#ECE7DA'}" stroke="${p?'#8B3010':'#C9C2B2'}" stroke-width="1.5"/>
+              <text x="${st.x}" y="${st.y+4}" text-anchor="middle" font-size="7" font-family="Space Grotesk,sans-serif" fill="${p?'#FBF9F4':'#A39C8C'}" font-weight="500">${st.abbr}</text>`;
     }).join('');
     el.innerHTML = `
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:clamp(20px,3vw,40px);align-items:start">
         <div>
-          <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#BF5B2E;font-weight:600;margin-bottom:10px">Distribution</div>
+          <div class="char-k" style="margin-bottom:10px">Distribution in Peninsular Malaysia</div>
           <p class="dist-text">${distText||'<em style="color:#8B9C8E">Distribution data not yet recorded.</em>'}</p>
-          ${detailRows.length ? `<div style="margin-top:16px;display:flex;flex-direction:column;gap:4px">
-            ${detailRows.map(d=>`<div style="font-size:13px;color:#4A574E;padding:6px 10px;background:#FBF9F4;border-left:2px solid #BF5B2E"><strong>${d.state||''}</strong>${d.notes?' — '+d.notes:''}</div>`).join('')}
-          </div>` : ''}
+          ${s.elevation_range ? `<div style="margin-top:12px;display:flex;gap:8px;align-items:baseline"><span class="char-k">Altitude</span><span style="font-family:'Newsreader',Georgia,serif;font-size:15px;color:#2C3B32">${s.elevation_range}</span></div>` : ''}
+          ${s.forest_type ? `<div style="margin-top:8px;display:flex;gap:8px;align-items:baseline"><span class="char-k">Forest type</span><span style="font-family:'Newsreader',Georgia,serif;font-size:15px;color:#2C3B32">${s.forest_type}</span></div>` : ''}
+          ${detailRows.length ? `<div style="margin-top:14px;display:flex;flex-direction:column;gap:3px">${detailRows.map(d=>`<div style="font-size:13px;color:#4A574E;padding:6px 10px;background:#FBF9F4;border-left:2px solid #BF5B2E"><strong>${d.state||''}</strong>${d.notes?' — '+d.notes:''}</div>`).join('')}</div>` : ''}
         </div>
         <div>
-          <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#BF5B2E;font-weight:600;margin-bottom:10px">Peninsular Malaysia</div>
-          <svg viewBox="0 0 230 360" style="width:100%;max-width:200px;display:block;background:#F2EFE7;border:1px solid #DCD6C8;padding:8px">
+          <div class="char-k" style="margin-bottom:10px">State records</div>
+          <svg viewBox="0 0 240 370" style="width:100%;max-width:210px;display:block;background:#F2EFE7;border:1px solid #DCD6C8;padding:6px">
             ${dots}
           </svg>
-          <div style="margin-top:8px;display:flex;gap:12px;font-size:11px;color:#6E7A70">
-            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#BF5B2E;margin-right:4px"></span>Recorded</span>
-            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ECE7DA;margin-right:4px"></span>Not recorded</span>
+          <div style="margin-top:10px;display:flex;gap:14px;font-size:11px;color:#6E7A70">
+            <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#BF5B2E;margin-right:5px;vertical-align:middle"></span>Recorded</span>
+            <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#ECE7DA;border:1px solid #C9C2B2;margin-right:5px;vertical-align:middle"></span>Not recorded</span>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            ${s.distribution_peninsular ? '<span style="font-size:11px;padding:3px 9px;background:#16211B;color:#FBF9F4">Peninsular MY</span>' : ''}
+            ${s.distribution_sabah ? '<span style="font-size:11px;padding:3px 9px;background:#ECE7DA;color:#4A574E">Sabah</span>' : ''}
+            ${s.distribution_sarawak ? '<span style="font-size:11px;padding:3px 9px;background:#ECE7DA;color:#4A574E">Sarawak</span>' : ''}
           </div>
         </div>
       </div>`;
 
-  } else if (id === 'syn') {
-    /* Query synonyms from loaded SYNONYMS table */
-    const syns = SYNONYMS.filter(r => r.genus===s.genus && r.species===s.species);
-    const synHtml = syns.length
-      ? syns.map(r => '<div class="synonym-item">'+(r.synonym_genus||'')+' '+(r.synonym_species||'')+(r.synonym_author?' <span style="font-style:normal;font-size:13px;color:#6E7A70">'+r.synonym_author+'</span>':'')+'</div>').join('')
-      : '<div style="font-family:Newsreader,Georgia,serif;font-style:italic;font-size:15px;color:#6E7A70">No synonyms recorded for this species.</div>';
-    el.innerHTML = '<div class="synonyms-box"><div class="synonyms-hd">Synonyms</div>'+synHtml+'</div>';
+  /* ── TAB 4: CONSERVATION ── */
+  } else if (id === 'cons') {
+    const cs = s.conservation_status || '';
+    el.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:1px;background:#F2EFE7;margin-bottom:clamp(20px,2.5vw,32px)">
+        <div style="background:#FBF9F4;padding:20px 22px;box-shadow:0 0 0 1px #DCD6C8">
+          <div class="char-k" style="margin-bottom:8px">IUCN Red List</div>
+          <div style="font-family:'Newsreader',Georgia,serif;font-size:22px;font-weight:400;color:${statusColor(cs)||'#16211B'}">${cs||'Not evaluated'}</div>
+          ${s.my_redlist_status ? '' : ''}
+        </div>
+        <div style="background:#FBF9F4;padding:20px 22px;box-shadow:0 0 0 1px #DCD6C8">
+          <div class="char-k" style="margin-bottom:8px">Malaysian Red List</div>
+          <div style="font-family:'Newsreader',Georgia,serif;font-size:22px;font-weight:400;color:#16211B">${s.my_redlist_status||'—'}</div>
+        </div>
+      </div>
+      ${s.ecological_notes ? `<div style="margin-bottom:clamp(16px,2vw,26px)">
+        <div class="char-k" style="margin-bottom:10px">Ecology &amp; threats</div>
+        <p style="font-family:'Newsreader',Georgia,serif;font-size:16px;line-height:1.7;color:#2C3B32;max-width:68ch">${s.ecological_notes}</p>
+      </div>` : ''}
+      ${s.economic_importance ? `<div>
+        <div class="char-k" style="margin-bottom:10px">Economic importance</div>
+        <p style="font-family:'Newsreader',Georgia,serif;font-size:16px;line-height:1.7;color:#2C3B32;max-width:68ch">${s.economic_importance}</p>
+      </div>` : ''}
+      ${!s.ecological_notes && !s.economic_importance ? '<p style="font-style:italic;color:#8B9C8E;font-size:15px;padding:20px 0">Conservation data not yet recorded for this species.</p>' : ''}`;
+
+  /* ── TAB 5: BAHASA MALAYSIA ── */
+  } else if (id === 'bm') {
+    const pairs = [
+      {en:'Bark',         bm:'Kulit kayu',   ve: s.bark_description,    vb: s.bark_description},
+      {en:'Leaf',         bm:'Daun',         ve: s.leaf_description,    vb: s.leaf_description},
+      {en:'Fruit',        bm:'Buah',         ve: s.fruit_description,   vb: s.fruit_description},
+      {en:'Habitat',      bm:'Habitat',      ve: s.habitat,             vb: s.habitat},
+      {en:'Distribution', bm:'Taburan',      ve: s.distribution_pm,     vb: s.distribution_pm},
+      {en:'Ecology',      bm:'Ekologi',      ve: s.ecological_notes,    vb: s.ecological_notes},
+    ].filter(p => p.ve || p.vb);
+    el.innerHTML = pairs.length
+      ? `<div style="display:flex;flex-direction:column;gap:1px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#DCD6C8;font-size:10px;letter-spacing:.18em;text-transform:uppercase;font-weight:600">
+            <div style="background:#16211B;color:#FBF9F4;padding:8px 14px">English</div>
+            <div style="background:#BF5B2E;color:#FBF9F4;padding:8px 14px">Bahasa Malaysia</div>
+          </div>
+          ${pairs.map(p=>`<div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#DCD6C8">
+            <div style="background:#FBF9F4;padding:14px 16px">
+              <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#BF5B2E;font-weight:600;margin-bottom:6px">${p.en}</div>
+              <div style="font-family:'Newsreader',Georgia,serif;font-size:15px;line-height:1.65;color:#2C3B32">${p.ve||'—'}</div>
+            </div>
+            <div style="background:#FBF9F4;padding:14px 16px">
+              <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#BF5B2E;font-weight:600;margin-bottom:6px">${p.bm}</div>
+              <div style="font-family:'Newsreader',Georgia,serif;font-size:15px;line-height:1.65;color:#2C3B32;font-style:italic">${p.vb||'—'}</div>
+            </div>
+          </div>`).join('')}
+        </div>`
+      : '<p style="font-style:italic;color:#8B9C8E;font-size:15px;padding:20px 0">Bilingual content not yet available for this species.</p>';
   }
 }
 
