@@ -515,6 +515,7 @@ let SESSION = null, GENERA = [], SPECIES = [], SYNONYMS = [], DIST_DETAILS = [];
 let lang = 'en', savedIds = new Set();
 let currentGenus = null, currentSpp = null, activeTab = 'chars';
 let viewMode = 'card';   /* card | list */
+let activeFilter = null;  /* current conservation status filter */
 
 /* ── SUPABASE ── */
 async function sbGet(table, params='') {
@@ -668,7 +669,8 @@ function populateOverview() {
     const n = SPECIES.filter(sp => sp.conservation_status===s.k).length;
     if (!n) return '';
     const w = Math.round((n/maxN)*180);
-    return `<button class="status-row" style="border-left-color:${s.color}" onclick="filterByStatus('${s.k}')">
+    const fullSt = ['Critically Endangered','Endangered','Vulnerable','Near Threatened','Least Concern','Data Deficient'].find(x=>x.toLowerCase().includes(s.k.toLowerCase()))||s.k;
+    return `<button class="status-row" style="border-left-color:${s.color}" onclick="filterByStatus('${s.label.replace(/\s*\(.*\)/,'')}')">
       <span class="status-lbl">${s.label}</span>
       <span style="display:block;width:${w}px;height:6px;background:${s.color}"></span>
       <span class="status-n">${n}</span>
@@ -749,25 +751,56 @@ function setView(mode, gridId) {
 }
 
 /* ── ALL SPECIES ── */
-function buildAllSpecies(filter=null) {
+function buildAllSpecies(filter=null, filterKey=null) {
+  activeFilter = filterKey;
   const list = filter ? SPECIES.filter(filter) : SPECIES;
   const wrap = document.getElementById('all-spp-wrap');
   if (!wrap) return;
   wrap.innerHTML = viewToggleHtml('all-spp-grid') +
     `<div class="spp-grid" id="all-spp-grid">` +
-    (list.length ? list.map(s => sppCardHtml(s)).join('') : '<div class="loading">No species match this filter.</div>') +
+    (list.length ? list.map(s => sppCardHtml(s)).join('') :
+      `<div style="padding:40px 20px;font-family:'Newsreader',Georgia,serif;font-style:italic;color:#8B9C8E;font-size:16px">${lang==='bm'?'Tiada spesies sepadan.':'No species match this filter.'}</div>`) +
     '</div>';
-  // chips
-  const chips = document.getElementById('spp-filter-chips');
-  if (chips) {
-    const statusOrder = ['Critically Endangered','Endangered','Vulnerable','Near Threatened','Least Concern','Data Deficient'];
-    const statuses = statusOrder.filter(st => SPECIES.some(s=>s.conservation_status===st));
-    chips.innerHTML = `<button onclick="buildAllSpecies()" style="padding:5px 12px;border:1px solid #16211B;background:#16211B;color:#FBF9F4;font-size:12px">All</button>` +
-      statuses.map(st => `<button onclick="buildAllSpecies(s=>s.conservation_status==='${st}')" style="padding:5px 12px;border:1px solid ${statusColor(st)};background:${statusColor(st)}18;color:${statusColor(st)};font-size:12px;font-weight:600">${statusShort(st)}</button>`).join('');
-  }
+  renderFilterChips();
 }
 
-function filterByStatus(st) { showPage('species'); buildAllSpecies(s => s.conservation_status && s.conservation_status.toLowerCase().includes(st.toLowerCase())); }
+function renderFilterChips() {
+  const chips = document.getElementById('spp-filter-chips');
+  if (!chips) return;
+  const statusOrder = [
+    'Critically Endangered','Endangered','Vulnerable',
+    'Near Threatened','Least Concern','Data Deficient'
+  ];
+  const allLabel = lang==='bm' ? 'Semua' : 'All';
+  const allActive = !activeFilter;
+  chips.innerHTML =
+    `<button onclick="buildAllSpecies(null,null)" style="
+      padding:5px 14px;font-size:12px;font-weight:600;letter-spacing:.04em;
+      border:1px solid #16211B;
+      background:${allActive?'#16211B':'transparent'};
+      color:${allActive?'#FBF9F4':'#16211B'};
+      cursor:pointer;transition:all .15s">
+      ${allLabel} <span style="font-size:10px;opacity:.7">(${SPECIES.length})</span>
+    </button>` +
+    statusOrder
+      .filter(st => SPECIES.some(s => s.conservation_status===st))
+      .map(st => {
+        const n     = SPECIES.filter(s => s.conservation_status===st).length;
+        const col   = statusColor(st);
+        const abbr  = statusShort(st);
+        const isActive = activeFilter === st;
+        return `<button onclick="filterByStatus('${st}')" style="
+          padding:5px 14px;font-size:12px;font-weight:600;letter-spacing:.04em;
+          border:1px solid ${col};
+          background:${isActive ? col : col+'22'};
+          color:${isActive ? '#FBF9F4' : col};
+          cursor:pointer;transition:all .15s">
+          ${abbr} <span style="font-size:10px;opacity:${isActive?'.8':'.7'}">(${n})</span>
+        </button>`;
+      }).join('');
+}
+
+function filterByStatus(st) { showPage('species'); buildAllSpecies(s => s.conservation_status === st, st); }
 
 /* ── SPP CARD ── */
 
@@ -1298,6 +1331,7 @@ function setLang(l) {
       if (pg==='genus'   && currentGenus) buildGenusPage(currentGenus);
       if (pg==='spp'     && currentSpp)   buildSppPage(currentSpp);
       if (pg==='overview') { populateOverview(); }
+      if (pg==='species')  { renderFilterChips(); }
       break;
     }
   }
