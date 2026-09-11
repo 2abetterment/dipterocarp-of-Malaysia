@@ -387,7 +387,7 @@ input{font-family:'Space Grotesk',system-ui,sans-serif}
         <h1 style="font-family:'Newsreader',Georgia,serif;font-weight:300;font-size:clamp(34px,4.6vw,58px);line-height:1;margin:12px 0 0">All Species</h1>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px" id="spp-filter-chips"></div>
       </div>
-      <div class="spp-grid" id="all-spp-grid"></div>
+      <div id="all-spp-wrap"></div>
     </div>
 
     <!-- GENUS DETAIL -->
@@ -398,7 +398,7 @@ input{font-family:'Space Grotesk',system-ui,sans-serif}
       <div style="margin-top:clamp(28px,3.5vw,48px)">
         <h2 style="font-family:'Newsreader',Georgia,serif;font-size:clamp(24px,2.6vw,32px);font-weight:400;margin:0 0 4px">Species in this edition</h2>
         <div style="font-size:13px;color:#6E7A70;margin-bottom:18px" id="genus-spp-label"></div>
-        <div class="spp-grid" id="genus-spp-grid"></div>
+        <div id="genus-spp-grid"></div>
       </div>
     </div>
 
@@ -423,24 +423,24 @@ input{font-family:'Space Grotesk',system-ui,sans-serif}
 </div>
 
 <script>
-const SB_URL = "https://xrntnarchlglhllvlrnv.supabase.co";
-const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhybnRuYXJjaGxnbGhsbHZscm52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTU4MzksImV4cCI6MjA4MDk5MTgzOX0.Q0PjW5dMU07EDoR-GGDpIjATlSC5AJxNeEdOlYaO96w";
-const SPP_T  = "dipterocarp_species_2025_12_11_02_08";
-const GEN_T  = "dipterocarp_genera_2025_12_11_02_08";
+const SB_URL  = "https://xrntnarchlglhllvlrnv.supabase.co";
+const SB_KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhybnRuYXJjaGxnbGhsbHZscm52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTU4MzksImV4cCI6MjA4MDk5MTgzOX0.Q0PjW5dMU07EDoR-GGDpIjATlSC5AJxNeEdOlYaO96w";
+const SPP_T   = "dipterocarp_species_2025_12_11_02_08";
+const GEN_T   = "dipterocarp_genera_2025_12_11_02_08";
+const SYN_T   = "dipterocarp_synonyms_2025_12_13_08_35";
+const DIST_T  = "distribution_details_2025_12_11_02_08";
 
-let SESSION = null;
-let GENERA  = [];
-let SPECIES = [];
-let lang = 'en';
-let savedIds = new Set();
-let currentGenus = null;
-let currentSpp = null;
-let activeTab = 'chars';
+let SESSION = null, GENERA = [], SPECIES = [], SYNONYMS = [], DIST_DETAILS = [];
+let lang = 'en', savedIds = new Set();
+let currentGenus = null, currentSpp = null, activeTab = 'chars';
+let viewMode = 'card';   /* card | list */
 
+/* ── SUPABASE ── */
 async function sbGet(table, params='') {
   const r = await fetch(`${SB_URL}/rest/v1/${table}?${params}`, {
     headers: {'apikey': SB_KEY, 'Authorization': 'Bearer '+SB_KEY}
   });
+  if (!r.ok) return [];
   return r.json();
 }
 
@@ -456,12 +456,12 @@ async function signIn() {
     const data = await sbGet('user_access',
       `email=eq.${encodeURIComponent(email)}&licence_key=eq.${encodeURIComponent(key)}&is_active=eq.true&select=*`);
     if (!data || data.length === 0) {
-      err.textContent = 'Invalid email or licence key. Please check and try again.';
+      err.textContent = 'Invalid email or licence key.';
     } else {
       const u = data[0];
-      const exp = new Date(u.access_expiry);
-      if (exp < new Date()) { err.textContent = 'Your licence has expired. Please contact the publisher.'; }
-      else {
+      if (new Date(u.access_expiry) < new Date()) {
+        err.textContent = 'Your licence has expired. Please contact the publisher.';
+      } else {
         SESSION = {email: u.email, tier: u.access_tier, expiry: u.access_expiry, guest: false};
         launchApp();
       }
@@ -476,12 +476,11 @@ function enterGuest() {
 }
 
 function signOut() {
-  SESSION = null; GENERA = []; SPECIES = [];
+  SESSION = null; GENERA = []; SPECIES = []; SYNONYMS = []; DIST_DETAILS = [];
+  history.replaceState(null,'',window.location.pathname);
   document.getElementById('app').classList.remove('visible');
   document.getElementById('gate').style.display = 'grid';
   document.getElementById('gate-err').textContent = '';
-  document.getElementById('inp-email').value = '';
-  document.getElementById('inp-key').value = '';
 }
 
 /* ── APP INIT ── */
@@ -489,29 +488,78 @@ async function launchApp() {
   document.getElementById('gate').style.display = 'none';
   document.getElementById('app').classList.add('visible');
   document.getElementById('sb-email').textContent = SESSION.email;
-  document.getElementById('sb-tier').textContent = SESSION.tier + (SESSION.expiry ? ' · ' + SESSION.expiry.slice(0,10) : '');
+  document.getElementById('sb-tier').textContent  = SESSION.tier + (SESSION.expiry ? ' · ' + SESSION.expiry.slice(0,10) : '');
   await loadData();
+  handleHash();
 }
 
 async function loadData() {
-  document.getElementById('pg-overview').innerHTML = '<div class="loading">Loading…</div>';
-  [GENERA, SPECIES] = await Promise.all([
-    sbGet(GEN_T, 'order=genus_name&select=*'),
-    sbGet(SPP_T, 'distribution_peninsular=eq.true&order=genus,species&select=*')
+  /* show spinner in topbar only — do NOT wipe pg-overview DOM */
+  const spinner = document.createElement('div');
+  spinner.id = '__spin';
+  spinner.style.cssText = 'position:fixed;top:0;left:0;right:0;height:2px;background:#BF5B2E;animation:progress 1.5s ease-in-out infinite;z-index:999';
+  document.body.appendChild(spinner);
+  document.head.insertAdjacentHTML('beforeend',
+    '<style>@keyframes progress{0%{transform:scaleX(0);transform-origin:left}50%{transform:scaleX(1);transform-origin:left}51%{transform:scaleX(1);transform-origin:right}100%{transform:scaleX(0);transform-origin:right}}</style>');
+
+  [GENERA, SPECIES, SYNONYMS, DIST_DETAILS] = await Promise.all([
+    sbGet(GEN_T,  'order=genus_name&select=*'),
+    sbGet(SPP_T,  'distribution_peninsular=eq.true&order=genus,species&select=*'),
+    sbGet(SYN_T,  'select=*'),
+    sbGet(DIST_T, 'select=*'),
   ]);
-  document.getElementById('ov-n-gen').textContent  = GENERA.length;
-  document.getElementById('ov-n-spp').textContent  = SPECIES.length;
-  document.getElementById('sb-genera-count').textContent = GENERA.length;
-  document.getElementById('sb-spp-count').textContent    = SPECIES.length;
-  rebuildOverview();
+
+  spinner.remove();
+  const el = id => document.getElementById(id);
+  el('ov-n-gen').textContent  = GENERA.length;
+  el('ov-n-spp').textContent  = SPECIES.length;
+  el('sb-genera-count').textContent = GENERA.length;
+  el('sb-spp-count').textContent    = SPECIES.length;
+
+  populateOverview();
   buildSidebarGenera();
   buildGeneraList();
   buildAllSpecies();
   buildGlossary();
 }
 
+/* ── HASH-BASED NAVIGATION (back/forward + deep link) ── */
+function pushHash(hash) {
+  history.pushState({hash}, '', '#' + hash);
+}
+
+function handleHash() {
+  const hash = location.hash.slice(1);
+  if (!hash || hash === 'overview') { showPage('overview'); return; }
+  if (hash === 'genera')   { showPage('genera');  return; }
+  if (hash === 'species')  { showPage('species'); return; }
+  if (hash === 'glossary') { showPage('glossary');return; }
+  if (hash.startsWith('genus/')) {
+    const name = decodeURIComponent(hash.slice(6));
+    const g = GENERA.find(x => x.genus_name === name);
+    if (g) { _showPage('genus', g); return; }
+  }
+  if (hash.startsWith('spp/')) {
+    const key = decodeURIComponent(hash.slice(4));
+    const [genus, species] = key.split('/');
+    const s = SPECIES.find(x => x.genus === genus && x.species === species);
+    if (s) { _showPage('spp', s); return; }
+  }
+  showPage('overview');
+}
+
+window.addEventListener('popstate', handleHash);
+
 /* ── NAVIGATION ── */
 function showPage(id, data=null) {
+  let hash = id;
+  if (id === 'genus' && data) hash = 'genus/' + encodeURIComponent(data.genus_name);
+  if (id === 'spp'   && data) hash = 'spp/' + encodeURIComponent(data.genus) + '/' + encodeURIComponent(data.species);
+  pushHash(hash);
+  _showPage(id, data);
+}
+
+function _showPage(id, data=null) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sb-nav-btn').forEach(b => b.classList.remove('active'));
   const pg = document.getElementById('pg-'+id);
@@ -524,18 +572,14 @@ function showPage(id, data=null) {
 }
 
 /* ── OVERVIEW ── */
-function rebuildOverview() {
-  document.getElementById('pg-overview').innerHTML = '';
-  // Status bars
+function populateOverview() {
   const statusCfg = [
-    {k:'EX',  label:'Extinct (EX)',                color:'#3D1515'},
-    {k:'CR',  label:'Critically Endangered (CR)',   color:'#C62828'},
-    {k:'EN',  label:'Endangered (EN)',              color:'#E64A19'},
-    {k:'VU',  label:'Vulnerable (VU)',              color:'#F9A825'},
-    {k:'NT',  label:'Near Threatened (NT)',         color:'#558B2F'},
-    {k:'LC',  label:'Least Concern (LC)',           color:'#2E7D32'},
-    {k:'DD',  label:'Data Deficient (DD)',          color:'#78909C'},
-    {k:'NE',  label:'Not Evaluated (NE)',           color:'#BDBDBD'},
+    {k:'CR', label:'Critically Endangered (CR)', color:'#C62828'},
+    {k:'EN', label:'Endangered (EN)',             color:'#E64A19'},
+    {k:'VU', label:'Vulnerable (VU)',             color:'#F9A825'},
+    {k:'NT', label:'Near Threatened (NT)',        color:'#558B2F'},
+    {k:'LC', label:'Least Concern (LC)',          color:'#2E7D32'},
+    {k:'DD', label:'Data Deficient (DD)',         color:'#78909C'},
   ];
   const maxN = Math.max(...statusCfg.map(s => SPECIES.filter(sp => sp.conservation_status===s.k).length), 1);
   const sbEl = document.getElementById('status-bars');
@@ -545,16 +589,16 @@ function rebuildOverview() {
     const w = Math.round((n/maxN)*180);
     return `<button class="status-row" style="border-left-color:${s.color}" onclick="filterByStatus('${s.k}')">
       <span class="status-lbl">${s.label}</span>
-      <span class="status-bar" style="width:${w}px;background:${s.color};height:6px;display:block"></span>
+      <span style="display:block;width:${w}px;height:6px;background:${s.color}"></span>
       <span class="status-n">${n}</span>
     </button>`;
   }).join('');
 
-  // Genera cards overview
   const gcEl = document.getElementById('genera-cards-ov');
   if (gcEl) gcEl.innerHTML = GENERA.map(g => {
     const n = SPECIES.filter(s => s.genus===g.genus_name).length;
-    return `<button class="genus-card-ov" onclick="showPage('genus',${JSON.stringify(g).replace(/"/g,'&quot;')})">
+    const gJson = esc(g);
+    return `<button class="genus-card-ov" onclick="showPage('genus',${gJson})">
       <div class="gc-name-ov">${g.genus_name}</div>
       <div class="gc-auth-ov">${g.authority||''}</div>
       <div class="gc-malay-ov">${g.local_name||g.common_name||''}</div>
@@ -566,10 +610,9 @@ function rebuildOverview() {
 
 /* ── SIDEBAR GENERA ── */
 function buildSidebarGenera() {
-  const el = document.getElementById('sb-genera-list');
-  el.innerHTML = GENERA.map(g => {
+  document.getElementById('sb-genera-list').innerHTML = GENERA.map(g => {
     const n = SPECIES.filter(s => s.genus===g.genus_name).length;
-    return `<button class="sb-genus-btn" onclick="showPage('genus',${JSON.stringify(g).replace(/"/g,'&quot;')})">
+    return `<button class="sb-genus-btn" onclick="showPage('genus',${esc(g)})">
       <span class="sb-genus-name">${g.genus_name}</span>
       <span class="sb-genus-n">${n}</span>
     </button>`;
@@ -578,65 +621,96 @@ function buildSidebarGenera() {
 
 /* ── GENERA LIST ── */
 function buildGeneraList() {
-  const el = document.getElementById('genera-list');
-  el.innerHTML = GENERA.map(g => {
+  document.getElementById('genera-list').innerHTML = GENERA.map(g => {
     const n = SPECIES.filter(s => s.genus===g.genus_name).length;
-    return `<button class="genus-row" onclick="showPage('genus',${JSON.stringify(g).replace(/"/g,'&quot;')})">
-      <div>
-        <div class="gr-name">${g.genus_name}</div>
-        <div class="gr-auth">${g.authority||''}</div>
-        <div class="gr-malay">${g.local_name||g.common_name||''}</div>
-      </div>
+    return `<button class="genus-row" onclick="showPage('genus',${esc(g)})">
+      <div><div class="gr-name">${g.genus_name}</div><div class="gr-auth">${g.authority||''}</div><div class="gr-malay">${g.local_name||g.common_name||''}</div></div>
       <div class="gr-fruit">${(g.description||'').slice(0,120)}…</div>
-      <div>
-        <div class="gr-n">${n}</div>
-        <div class="gr-n-lbl">spp. in PM</div>
-      </div>
+      <div><div class="gr-n">${n}</div><div class="gr-n-lbl">spp. in PM</div></div>
     </button>`;
   }).join('');
+}
+
+/* ── CARD / LIST VIEW TOGGLE ── */
+function viewToggleHtml(gridId) {
+  return `<div style="display:flex;gap:1px;margin-bottom:14px">
+    <button onclick="setView('card','${gridId}')" id="vt-card-${gridId}"
+      style="padding:6px 12px;font-size:12px;border:1px solid #DCD6C8;background:#16211B;color:#FBF9F4;letter-spacing:.06em">
+      ⊞ Card</button>
+    <button onclick="setView('list','${gridId}')" id="vt-list-${gridId}"
+      style="padding:6px 12px;font-size:12px;border:1px solid #DCD6C8;background:#FBF9F4;color:#6E7A70;letter-spacing:.06em">
+      ☰ List</button>
+  </div>`;
+}
+
+function setView(mode, gridId) {
+  viewMode = mode;
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+  const isCard = mode === 'card';
+  document.getElementById('vt-card-'+gridId).style.cssText = `padding:6px 12px;font-size:12px;border:1px solid #DCD6C8;background:${isCard?'#16211B':'#FBF9F4'};color:${isCard?'#FBF9F4':'#6E7A70'};letter-spacing:.06em`;
+  document.getElementById('vt-list-'+gridId).style.cssText = `padding:6px 12px;font-size:12px;border:1px solid #DCD6C8;background:${!isCard?'#16211B':'#FBF9F4'};color:${!isCard?'#FBF9F4':'#6E7A70'};letter-spacing:.06em`;
+  if (mode === 'list') {
+    grid.style.cssText = 'display:flex;flex-direction:column;gap:1px;background:#DCD6C8';
+    grid.querySelectorAll('.spp-card').forEach(c => {
+      c.style.cssText = 'background:#FBF9F4;display:grid;grid-template-columns:1fr auto;align-items:center;box-shadow:none';
+      const btns = c.querySelector('.spp-card-btns');
+      if(btns) btns.style.cssText = 'display:flex;flex-direction:column;border-top:none;border-left:1px solid #ECE7DA';
+    });
+  } else {
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,262px),1fr));gap:1px;background:#F2EFE7';
+    grid.querySelectorAll('.spp-card').forEach(c => {
+      c.style.cssText = 'background:#FBF9F4;display:flex;flex-direction:column;box-shadow:0 0 0 1px #DCD6C8';
+      const btns = c.querySelector('.spp-card-btns');
+      if(btns) btns.style.cssText = 'display:flex;border-top:1px solid #ECE7DA';
+    });
+  }
 }
 
 /* ── ALL SPECIES ── */
 function buildAllSpecies(filter=null) {
   const list = filter ? SPECIES.filter(filter) : SPECIES;
-  const el = document.getElementById('all-spp-grid');
-  if (el) el.innerHTML = list.length ? list.map(s => sppCardHtml(s)).join('') : '<div class="loading">No species match this filter.</div>';
-  // filter chips
+  const wrap = document.getElementById('all-spp-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = viewToggleHtml('all-spp-grid') +
+    `<div class="spp-grid" id="all-spp-grid">` +
+    (list.length ? list.map(s => sppCardHtml(s)).join('') : '<div class="loading">No species match this filter.</div>') +
+    '</div>';
+  // chips
   const chips = document.getElementById('spp-filter-chips');
   if (chips) {
-    const statuses = [...new Set(SPECIES.map(s=>s.conservation_status).filter(Boolean))].sort();
-    chips.innerHTML = `<button style="padding:5px 12px;border:1px solid #16211B;background:#16211B;color:#FBF9F4;font-size:12px;letter-spacing:.04em" onclick="buildAllSpecies()">All</button>` +
-    statuses.map(st => `<button style="padding:5px 12px;border:1px solid #DCD6C8;background:#FBF9F4;color:#16211B;font-size:12px;letter-spacing:.04em;transition:all .15s" onmouseover="this.style.background='#16211B';this.style.color='#FBF9F4'" onmouseout="this.style.background='#FBF9F4';this.style.color='#16211B'" onclick="buildAllSpecies(s=>s.conservation_status==='${st}')">${st}</button>`).join('');
+    const statuses = ['CR','EN','VU','NT','LC','DD'].filter(st => SPECIES.some(s=>s.conservation_status===st));
+    chips.innerHTML = `<button onclick="buildAllSpecies()" style="padding:5px 12px;border:1px solid #16211B;background:#16211B;color:#FBF9F4;font-size:12px">All</button>` +
+      statuses.map(st => `<button onclick="buildAllSpecies(s=>s.conservation_status==='${st}')" style="padding:5px 12px;border:1px solid #DCD6C8;background:#FBF9F4;color:#16211B;font-size:12px">${st}</button>`).join('');
   }
 }
 
-function filterByStatus(st) {
-  showPage('species');
-  buildAllSpecies(s => s.conservation_status === st);
-}
+function filterByStatus(st) { showPage('species'); buildAllSpecies(s => s.conservation_status === st); }
 
-/* ── SPP CARD HTML ── */
+/* ── SPP CARD ── */
 function statusColor(st) {
-  const m={CR:'#C62828',EN:'#E64A19',VU:'#F9A825',NT:'#558B2F',LC:'#2E7D32',DD:'#78909C',EX:'#3D1515'};
-  return m[st]||'#9E9E9E';
+  return {CR:'#C62828',EN:'#E64A19',VU:'#F9A825',NT:'#558B2F',LC:'#2E7D32',DD:'#78909C',EX:'#3D1515'}[st]||'#9E9E9E';
 }
-
+function esc(obj) {
+  return JSON.stringify(obj).replace(/\\/g,'\\\\').replace(/"/g,'&quot;').replace(/'/g,'\\'');
+}
 function sppCardHtml(s) {
-  const saved = savedIds.has(s.id);
-  const gc = encodeURIComponent(JSON.stringify(s));
+  const uid = (s.genus+'_'+s.species).replace(/\s/g,'_');
+  const saved = savedIds.has(uid);
+  const sj = esc(s);
   return `<div class="spp-card">
-    <button class="spp-card-top" onclick="showPage('spp',${JSON.stringify(s).replace(/"/g,'&quot;')})">
+    <button class="spp-card-top" onclick="showPage('spp',${sj})">
       <div class="spp-sci">${s.genus} ${s.species}</div>
       <div class="spp-auth">${s.author||''}</div>
-      <div class="spp-malay">${s.local_name||''}</div>
+      <div class="spp-malay">${lang==='bm'&&s.local_name_bm ? s.local_name_bm : s.local_name||''}</div>
       <div class="spp-tags">
-        ${s.conservation_status ? `<span class="spp-status" style="background:${statusColor(s.conservation_status)}20;color:${statusColor(s.conservation_status)}">${s.conservation_status}</span>` : ''}
-        ${s.height_max ? `<span class="spp-h-tag">to ${s.height_max} m</span>` : ''}
+        ${s.conservation_status?`<span class="spp-status" style="background:${statusColor(s.conservation_status)}20;color:${statusColor(s.conservation_status)}">${s.conservation_status}</span>`:''}
+        ${s.height_max?`<span class="spp-h-tag">to ${s.height_max} m</span>`:''}
       </div>
     </button>
     <div class="spp-card-btns">
-      <button class="spp-card-btn" id="save-${s.id}" onclick="toggleSave('${s.id}','${s.genus} ${s.species}')">${saved?'★ Saved':'☆ Save'}</button>
-      <button class="spp-card-btn" onclick="showPage('spp',${JSON.stringify(s).replace(/"/g,'&quot;')})">Open →</button>
+      <button class="spp-card-btn" id="save-${uid}" onclick="toggleSave('${uid}',true)">${saved?'★ Saved':'☆ Save'}</button>
+      <button class="spp-card-btn" onclick="showPage('spp',${sj})">Open →</button>
     </div>
   </div>`;
 }
@@ -651,41 +725,48 @@ function buildGenusPage(g) {
       <div class="genus-auth-txt">${g.authority||''}</div>
       <div class="genus-tags">
         <span class="genus-tag-dark">${g.local_name||g.common_name||'—'}</span>
-        ${g.etymology ? `<span class="genus-tag-outline">${g.etymology.slice(0,60)}</span>` : ''}
+        ${g.etymology?`<span class="genus-tag-outline">${g.etymology.slice(0,80)}</span>`:''}
       </div>
       <p class="genus-desc">${g.description||''}</p>
     </div>
     <div class="stat-grid" style="align-self:start">
       <div class="stat-cell"><div class="stat-n">${g.species_count_peninsular||sppList.length}</div><div class="stat-l">Spp. in PM</div></div>
-      <div class="stat-cell"><div class="stat-n">${g.species_count_malaysia||'—'}</div><div class="stat-l">Spp. in Malaysia</div></div>
-      <div class="stat-cell"><div class="stat-n">${g.species_count_world||'—'}</div><div class="stat-l">Spp. worldwide</div></div>
+      <div class="stat-cell"><div class="stat-n">${g.species_count_malaysia||'—'}</div><div class="stat-l">Spp. Malaysia</div></div>
+      <div class="stat-cell"><div class="stat-n">${g.species_count_world||'—'}</div><div class="stat-l">Spp. Worldwide</div></div>
       <div class="stat-cell"><div class="stat-n">${sppList.length}</div><div class="stat-l">In this edition</div></div>
     </div>`;
+
   const chars = [
-    {k:'Habit', v: g.habit||'Large trees'},
-    {k:'Fruit', v: g.fruit||'Winged nut (samara)'},
-    {k:'Etymology', v: g.etymology||'—'},
-    {k:'Type species', v: g.type_species||'—'},
-  ].filter(c => c.v && c.v !== '—');
+    {k:'Etymology', v: g.etymology},
+    {k:'Habit',     v: g.habit},
+    {k:'Fruit',     v: g.fruit},
+    {k:'Type species', v: g.type_species},
+  ].filter(c => c.v);
   document.getElementById('genus-chars').innerHTML = chars.map(c =>
     `<div class="genus-char"><div class="genus-char-k">${c.k}</div><div class="genus-char-v">${c.v}</div></div>`
   ).join('');
+
   document.getElementById('genus-spp-label').textContent = `${sppList.length} species recorded in Peninsular Malaysia`;
-  document.getElementById('genus-spp-grid').innerHTML = sppList.map(s => sppCardHtml(s)).join('');
+  const grid = document.getElementById('genus-spp-grid');
+  grid.innerHTML = viewToggleHtml('genus-spp-inner') +
+    `<div class="spp-grid" id="genus-spp-inner">${sppList.map(s => sppCardHtml(s)).join('')}</div>`;
 }
 
 /* ── SPECIES PAGE ── */
 function buildSppPage(s) {
   const genObj = GENERA.find(g => g.genus_name === s.genus) || {};
+  const uid = (s.genus+'_'+s.species).replace(/\s/g,'_');
+
   // Breadcrumb
   document.getElementById('spp-breadcrumb').innerHTML = `
     <button class="bc-btn" onclick="showPage('overview')">Dipterocarpaceae</button>
     <span class="bc-sep">/</span>
-    <button class="bc-btn" style="font-style:italic;font-family:'Newsreader',Georgia,serif" onclick="showPage('genus',${JSON.stringify(genObj).replace(/"/g,'&quot;')})">${s.genus}</button>
+    <button class="bc-btn" style="font-style:italic;font-family:'Newsreader',Georgia,serif" onclick="showPage('genus',${esc(genObj)})">${s.genus}</button>
     <span class="bc-sep">/</span>
     <span style="font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:14px;color:#16211B">${s.genus} ${s.species}</span>`;
+
   // Hero
-  const saved = savedIds.has(s.id);
+  const saved = savedIds.has(uid);
   document.getElementById('spp-hero').innerHTML = `
     <div>
       <div class="spp-timber">${genObj.common_name||genObj.local_name||''}</div>
@@ -694,79 +775,137 @@ function buildSppPage(s) {
       <div class="spp-malay-lg">${s.local_name||''}</div>
       <p class="spp-diag">${s.diagnostic_characters||s.description||''}</p>
       <div class="spp-action-btns">
-        <button class="spp-act-btn${saved?' saved':''}" id="spp-save-btn" onclick="toggleSave('${s.id}','${s.genus} ${s.species}',true)">${saved?'★ Saved':'☆ Save'}</button>
+        <button class="spp-act-btn${saved?' saved':''}" id="spp-save-btn" onclick="toggleSave('${uid}',false,true)">${saved?'★ Saved':'☆ Save'}</button>
       </div>
     </div>
     <div>
-      <div class="spp-img-placeholder"><span class="spp-img-txt">${s.genus} ${s.species}</span></div>
+      <div class="spp-img-placeholder"><span class="spp-img-txt" style="font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:13px;color:#A39C8C">${s.genus} ${s.species}</span></div>
       <div class="spp-stat-grid">
-        <div class="spp-stat-cell"><div class="spp-stat-n">${s.conservation_status||'—'}</div><div class="spp-stat-l">IUCN Status</div></div>
-        <div class="spp-stat-cell"><div class="spp-stat-n">${s.height_max ? s.height_max+' m' : '—'}</div><div class="spp-stat-l">Max height</div></div>
+        <div class="spp-stat-cell"><div class="spp-stat-n" style="color:${statusColor(s.conservation_status)}">${s.conservation_status||'—'}</div><div class="spp-stat-l">IUCN Status</div></div>
+        <div class="spp-stat-cell"><div class="spp-stat-n">${s.height_max?s.height_max+' m':'—'}</div><div class="spp-stat-l">Max height</div></div>
         <div class="spp-stat-cell"><div class="spp-stat-n">${s.distribution_peninsular?'Yes':'No'}</div><div class="spp-stat-l">Peninsular MY</div></div>
         <div class="spp-stat-cell"><div class="spp-stat-n">${s.distribution_sabah||s.distribution_sarawak?'Yes':'No'}</div><div class="spp-stat-l">Borneo</div></div>
       </div>
     </div>`;
+
   // Tabs
   activeTab = 'chars';
-  document.getElementById('spp-tabs').innerHTML = [
-    {id:'chars', label:'Characters'},
-    {id:'diag',  label:'Diagnostic'},
-    {id:'dist',  label:'Distribution'},
-    {id:'syn',   label:'Synonyms'},
-  ].map(t => `<button class="tab-btn${t.id===activeTab?' active':''}" onclick="setTab('${t.id}',${JSON.stringify(s).replace(/"/g,'&quot;')})">${t.label}</button>`).join('');
+  document.getElementById('spp-tabs').innerHTML =
+    [{id:'chars',label:'Characters'},{id:'diag',label:'Diagnostic'},{id:'dist',label:'Distribution'},{id:'syn',label:'Synonyms'}]
+    .map(t => `<button class="tab-btn${t.id===activeTab?' active':''}" onclick="setTab('${t.id}',${esc(s)})">${t.label}</button>`).join('');
   renderTab('chars', s);
 }
 
 function setTab(id, s) {
   activeTab = id;
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().startsWith(id.slice(0,4))));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().startsWith(id.slice(0,3))));
   renderTab(id, s);
 }
 
 function renderTab(id, s) {
   const el = document.getElementById('spp-tab-content');
+
   if (id === 'chars') {
     const chars = [
       {k:'Bark',        bm:'Kulit kayu', v: s.bark},
       {k:'Leaf',        bm:'Daun',       v: s.leaf},
       {k:'Fruit',       bm:'Buah',       v: s.fruit},
       {k:'Habitat',     bm:'Habitat',    v: s.habitat},
-      {k:'Description', bm:'Deskripsi',  v: s.description},
+      {k:'Description', bm:'Penerangan', v: s.description},
     ].filter(c => c.v);
-    el.innerHTML = chars.length ?
-      `<div class="chars-grid">${chars.map(c=>`<div class="char-cell"><div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><span class="char-k">${c.k}</span><span class="char-bm">${c.bm}</span></div><div class="char-v">${c.v}</div></div>`).join('')}</div>` :
-      '<div class="loading" style="font-style:italic;color:#8B9C8E">Morphological data not yet available for this species.</div>';
+    el.innerHTML = chars.length
+      ? `<div class="chars-grid">${chars.map(c=>`<div class="char-cell">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+            <span class="char-k">${c.k}</span>
+            <span class="char-bm">${lang==='bm'?c.bm:''}</span>
+          </div>
+          <div class="char-v">${c.v}</div>
+        </div>`).join('')}</div>`
+      : '<p class="loading" style="font-style:italic;color:#8B9C8E;font-size:15px">Morphological data not yet available for this species.</p>';
+
   } else if (id === 'diag') {
-    el.innerHTML = s.diagnostic_characters ?
-      `<div class="chars-grid"><div class="char-cell" style="grid-column:1/-1"><div class="char-k">Diagnostic Characters</div><div class="char-v">${s.diagnostic_characters}</div></div></div>` :
-      '<div class="loading" style="font-style:italic;color:#8B9C8E">Diagnostic characters not yet recorded.</div>';
+    const diag = s.diagnostic_characters || '';
+    /* Icon timeline for diagnostic characters */
+    const parts = diag ? diag.split(/[.;]/).map(p=>p.trim()).filter(Boolean) : [];
+    const icons = ['🌿','🌱','🌳','🪨','🍂','🍁','🌺','🪵'];
+    el.innerHTML = diag
+      ? `<div style="display:flex;flex-direction:column;gap:1px">
+          ${parts.map((p,i) => `<div style="display:flex;gap:16px;align-items:flex-start;background:#FBF9F4;padding:14px 18px;box-shadow:0 0 0 1px #DCD6C8">
+            <span style="font-size:18px;flex-shrink:0;margin-top:2px">${icons[i%icons.length]}</span>
+            <p style="font-family:'Newsreader',Georgia,serif;font-size:16px;line-height:1.6;color:#2C3B32;margin:0">${p}.</p>
+          </div>`).join('')}
+        </div>`
+      : '<p class="loading" style="font-style:italic;color:#8B9C8E">Diagnostic characters not yet recorded.</p>';
+
   } else if (id === 'dist') {
-    const states = ['Perlis','Kedah','Penang','Perak','Kelantan','Terengganu','Pahang','Selangor','N. Sembilan','Melaka','Johor'];
+    /* State dot-map + distribution details from table */
     const distText = s.distribution || '';
-    el.innerHTML = `<div class="dist-text">${distText || '<em style="color:#8B9C8E">Distribution data not yet recorded.</em>'}</div>
-    <div style="margin-top:20px;display:flex;flex-wrap:wrap;gap:6px">
-      ${states.map(st => {
-        const present = distText.toLowerCase().includes(st.toLowerCase());
-        return `<span style="padding:5px 12px;font-size:12px;background:${present?'#16211B':'#FBF9F4'};color:${present?'#FBF9F4':'#A39C8C'};border:1px solid ${present?'#16211B':'#DCD6C8'}">${st}</span>`;
-      }).join('')}
-    </div>`;
+    const detailRows = DIST_DETAILS.filter(d => d.genus===s.genus && d.species===s.species);
+    const PM_STATES = [
+      {name:'Perlis',  abbr:'PLS', x:62,  y:18},
+      {name:'Kedah',   abbr:'KDH', x:70,  y:50},
+      {name:'Penang',  abbr:'PNG', x:44,  y:72},
+      {name:'Perak',   abbr:'PRK', x:80,  y:120},
+      {name:'Kelantan',abbr:'KEL', x:162, y:55},
+      {name:'Terengganu',abbr:'TRG',x:180,y:115},
+      {name:'Pahang',  abbr:'PHG', x:155, y:175},
+      {name:'Selangor',abbr:'SEL', x:80,  y:195},
+      {name:'N.Sembilan',abbr:'NSN',x:100,y:240},
+      {name:'Melaka',  abbr:'MLK', x:90,  y:270},
+      {name:'Johor',   abbr:'JHR', x:130, y:315},
+    ];
+    const present = name => {
+      const n = name.toLowerCase().replace('n.sembilan','negeri sembilan').replace('nsn','negeri sembilan');
+      return distText.toLowerCase().includes(n) ||
+             detailRows.some(d => (d.state||'').toLowerCase().includes(n.split('.').pop().trim()));
+    };
+    const dots = PM_STATES.map(st => {
+      const p = present(st.name);
+      return `<circle cx="${st.x}" cy="${st.y}" r="10" fill="${p?'#BF5B2E':'#ECE7DA'}" stroke="${p?'#A04020':'#DCD6C8'}" stroke-width="1.5"/>
+              <text x="${st.x}" y="${st.y+4}" text-anchor="middle" font-size="7" font-family="Space Grotesk,sans-serif" fill="${p?'#FBF9F4':'#A39C8C'}">${st.abbr}</text>`;
+    }).join('');
+    el.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:clamp(20px,3vw,40px);align-items:start">
+        <div>
+          <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#BF5B2E;font-weight:600;margin-bottom:10px">Distribution</div>
+          <p class="dist-text">${distText||'<em style="color:#8B9C8E">Distribution data not yet recorded.</em>'}</p>
+          ${detailRows.length ? `<div style="margin-top:16px;display:flex;flex-direction:column;gap:4px">
+            ${detailRows.map(d=>`<div style="font-size:13px;color:#4A574E;padding:6px 10px;background:#FBF9F4;border-left:2px solid #BF5B2E"><strong>${d.state||''}</strong>${d.notes?' — '+d.notes:''}</div>`).join('')}
+          </div>` : ''}
+        </div>
+        <div>
+          <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#BF5B2E;font-weight:600;margin-bottom:10px">Peninsular Malaysia</div>
+          <svg viewBox="0 0 230 360" style="width:100%;max-width:200px;display:block;background:#F2EFE7;border:1px solid #DCD6C8;padding:8px">
+            ${dots}
+          </svg>
+          <div style="margin-top:8px;display:flex;gap:12px;font-size:11px;color:#6E7A70">
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#BF5B2E;margin-right:4px"></span>Recorded</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ECE7DA;margin-right:4px"></span>Not recorded</span>
+          </div>
+        </div>
+      </div>`;
+
   } else if (id === 'syn') {
-    el.innerHTML = `<div class="synonyms-box"><div class="synonyms-hd">Synonyms</div>
-      <div style="font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:15px;color:#6E7A70">No synonyms recorded for this species.</div>
+    /* Query synonyms from loaded SYNONYMS table */
+    const syns = SYNONYMS.filter(r => r.genus===s.genus && r.species===s.species);
+    el.innerHTML = `<div class="synonyms-box">
+      <div class="synonyms-hd">Synonyms</div>
+      ${syns.length
+        ? syns.map(r=>`<div class="synonym-item">${r.synonym_genus||''} ${r.synonym_species||''} ${r.synonym_author?'<span style="font-style:normal;font-size:13px;color:#6E7A70">'+r.synonym_author+'</span>':''}</div>`).join('')
+        : '<div style="font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:15px;color:#6E7A70">No synonyms recorded for this species.</div>'}
     </div>`;
   }
 }
 
 /* ── SAVE ── */
-function toggleSave(id, name, updateDetail=false) {
-  if (savedIds.has(id)) savedIds.delete(id);
-  else savedIds.add(id);
-  const saved = savedIds.has(id);
-  const cardBtn = document.getElementById('save-'+id);
+function toggleSave(uid, fromCard=true, fromDetail=false) {
+  if (savedIds.has(uid)) savedIds.delete(uid); else savedIds.add(uid);
+  const saved = savedIds.has(uid);
+  const cardBtn = document.getElementById('save-'+uid);
   if (cardBtn) cardBtn.textContent = saved ? '★ Saved' : '☆ Save';
-  if (updateDetail) {
+  if (fromDetail) {
     const detBtn = document.getElementById('spp-save-btn');
-    if (detBtn) { detBtn.textContent = saved ? '★ Saved' : '☆ Save'; detBtn.classList.toggle('saved', saved); }
+    if (detBtn) { detBtn.textContent = saved?'★ Saved':'☆ Save'; detBtn.classList.toggle('saved',saved); }
   }
 }
 
@@ -775,12 +914,12 @@ function onSearch(q) {
   const drop = document.getElementById('search-drop');
   if (!q.trim()) { drop.classList.remove('open'); drop.innerHTML=''; return; }
   const lq = q.toLowerCase();
-  const gHits = GENERA.filter(g => g.genus_name.toLowerCase().includes(lq) || (g.local_name||'').toLowerCase().includes(lq)).slice(0,3);
-  const sHits = SPECIES.filter(s => (s.genus+' '+s.species).toLowerCase().includes(lq) || (s.local_name||'').toLowerCase().includes(lq)).slice(0,6);
+  const gHits = GENERA.filter(g => g.genus_name.toLowerCase().includes(lq)||(g.local_name||'').toLowerCase().includes(lq)).slice(0,3);
+  const sHits = SPECIES.filter(s => (s.genus+' '+s.species).toLowerCase().includes(lq)||(s.local_name||'').toLowerCase().includes(lq)).slice(0,6);
   if (!gHits.length && !sHits.length) { drop.classList.remove('open'); return; }
   drop.innerHTML = [
-    ...gHits.map(g => `<button class="sd-item" onclick="showPage('genus',${JSON.stringify(g).replace(/"/g,'&quot;')});closeSearch()"><span class="sd-kind">Genus</span><span><span class="sd-name">${g.genus_name}</span><span class="sd-sub">${g.local_name||''}</span></span></button>`),
-    ...sHits.map(s => `<button class="sd-item" onclick="showPage('spp',${JSON.stringify(s).replace(/"/g,'&quot;')});closeSearch()"><span class="sd-kind">Species</span><span><span class="sd-name">${s.genus} ${s.species}</span><span class="sd-sub">${s.local_name||''} · ${s.conservation_status||''}</span></span></button>`),
+    ...gHits.map(g => `<button class="sd-item" onclick="showPage('genus',${esc(g)});closeSearch()"><span class="sd-kind">Genus</span><span><span class="sd-name">${g.genus_name}</span><span class="sd-sub">${g.local_name||''}</span></span></button>`),
+    ...sHits.map(s => `<button class="sd-item" onclick="showPage('spp',${esc(s)});closeSearch()"><span class="sd-kind">Species</span><span><span class="sd-name">${s.genus} ${s.species}</span><span class="sd-sub">${s.local_name||''} · ${s.conservation_status||''}</span></span></button>`),
   ].join('');
   drop.classList.add('open');
 }
@@ -794,26 +933,28 @@ function setLang(l) {
   lang = l;
   document.getElementById('btn-en').classList.toggle('active', l==='en');
   document.getElementById('btn-bm').classList.toggle('active', l==='bm');
+  /* refresh current species card if on spp page */
+  if (currentSpp && document.getElementById('pg-spp').classList.contains('active')) buildSppPage(currentSpp);
 }
 
 /* ── GLOSSARY ── */
 function buildGlossary() {
   const terms = [
-    {t:'Calyx',       d:'The collective term for the sepals of a flower; in dipterocarps, calyx lobes often enlarge into wings on the fruit.'},
-    {t:'Samara',      d:'A winged fruit in which part of the pericarp forms a flat papery wing that aids wind dispersal.'},
+    {t:'Buttress',    d:'Root flanges radiating from the trunk base, providing structural support for large emergent trees.'},
+    {t:'Calyx',       d:'The collective term for the sepals of a flower. In dipterocarps, calyx lobes often enlarge into wings on the fruit.'},
     {t:'Coriaceous',  d:'Leathery in texture; used to describe leaf surfaces that are thick and stiff.'},
-    {t:'Stipule',     d:'A leaf-like appendage at the base of the petiole, often used in dipterocarp identification.'},
-    {t:'Domatia',     d:'Small cavities or pockets in the axils of leaf veins, often associated with mites.'},
+    {t:'Damar',       d:'Solid resin exuded by dipterocarps, used commercially as a varnish and in incense.'},
+    {t:'Domatia',     d:'Small cavities in the axils of leaf veins, often associated with mites.'},
     {t:'Emergent',    d:'A tree that grows above the general canopy level of the surrounding forest.'},
-    {t:'Panicle',     d:'A loose, branched flower cluster (inflorescence) in which the flowers develop on stalks.'},
-    {t:'Resin',       d:'A sticky organic substance produced by dipterocarp trees, used commercially as damar.'},
-    {t:'Venation',    d:'The arrangement of veins in a leaf blade; secondary and tertiary venation patterns aid identification.'},
-    {t:'Bole',        d:'The trunk of a tree, especially the straight unbranched lower portion.'},
-    {t:'Buttress',    d:'Root flanges that radiate from the base of the trunk, providing structural support for large trees.'},
-    {t:'Lenticel',    d:'A pore in the bark of woody plants that allows gas exchange between the atmosphere and inner tissues.'},
-    {t:'Sessile',     d:'Attached directly by the base without a stalk (petiole or peduncle).'},
+    {t:'Lenticel',    d:'A pore in bark allowing gas exchange between the atmosphere and inner tissues.'},
+    {t:'Panicle',     d:'A loose, branched inflorescence in which flowers develop on stalks.'},
+    {t:'Resin canal', d:'Internal ducts in dipterocarp wood and bark that produce and store resin.'},
+    {t:'Samara',      d:'A winged fruit in which part of the pericarp forms a flat wing aiding wind dispersal.'},
     {t:'Serrate',     d:'Having a toothed margin, like a saw; used to describe leaf edges.'},
+    {t:'Sessile',     d:'Attached directly by the base, without a stalk.'},
+    {t:'Stipule',     d:'A leaf-like appendage at the base of the petiole; stipule scars are key ID characters in dipterocarps.'},
     {t:'Tomentose',   d:'Densely covered with matted hairs or down.'},
+    {t:'Venation',    d:'The arrangement of veins in a leaf blade; secondary and tertiary venation patterns aid identification.'},
   ].sort((a,b) => a.t.localeCompare(b.t));
   document.getElementById('glossary-list').innerHTML = terms.map(t =>
     `<div class="glossary-item"><div class="gl-term">${t.t}</div><div class="gl-def">${t.d}</div></div>`
