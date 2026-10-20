@@ -198,6 +198,12 @@ input{font-family:'Space Grotesk',system-ui,sans-serif}
 .spp-stat-n{font-family:'Newsreader',Georgia,serif;font-size:19px;line-height:1.2;color:#16211B}
 .spp-stat-l{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#6E7A70;margin-top:5px}
 .tabs{display:flex;border-bottom:1px solid #DCD6C8;margin:clamp(26px,3.5vw,44px) 0 26px;overflow-x:auto}
+.book-desc{font-family:'Newsreader',Georgia,serif;font-size:clamp(16px,1.4vw,18px);line-height:1.7;color:#2C3B32;max-width:72ch}
+.book-desc p{margin:0 0 .9em}.book-desc h3,.book-desc h4{font-family:'Newsreader',Georgia,serif;font-weight:500;color:#16211B;margin:1.2em 0 .4em}
+.book-desc aside{background:#FBF9F4;box-shadow:0 0 0 1px #DCD6C8;padding:14px 18px;margin:14px 0}.book-desc aside .bt{display:block;font-family:'Space Grotesk',sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#BF5B2E;margin-bottom:6px}
+.book-desc table{border-collapse:collapse;font-size:14px;margin:12px 0}.book-desc th,.book-desc td{border-bottom:1px solid #DCD6C8;padding:6px 10px;text-align:left;vertical-align:top}
+.book-desc-note{font-family:'Space Grotesk',sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#A39C8C}
+.book-refs{margin-top:18px;max-width:78ch}.book-refs ul{list-style:none;padding:0;margin:0;display:grid;gap:6px}.book-refs li{font-size:13.5px;line-height:1.55;color:#4A574E;padding-left:1.4em;text-indent:-1.4em}
 .tab-btn{padding:12px 18px;background:none;border:none;border-bottom:2px solid transparent;font-size:13px;color:#6E7A70;letter-spacing:.06em;white-space:nowrap;transition:all .15s;margin-bottom:-1px}
 .tab-btn:hover{color:#16211B}
 .tab-btn.active{color:#16211B;border-bottom-color:#16211B;font-weight:500}
@@ -339,6 +345,9 @@ input{font-family:'Space Grotesk',system-ui,sans-serif}
           <div class="stat-cell"><div class="stat-n">11</div><div class="stat-l">States in PM</div></div>
         </div>
       </div>
+
+      <!-- ── DESCRIPTION FROM THE BOTANI DENDRO BOOK ── -->
+      <section id="ov-book-desc" style="margin-top:clamp(28px,3.5vw,48px)"></section>
 
       <!-- ── DIAGNOSTIC CHARACTERS ── -->
       <section style="margin-top:clamp(28px,3.5vw,48px)">
@@ -519,8 +528,10 @@ const SPP_T   = "dipterocarp_species_2025_12_11_02_08";
 const GEN_T   = "dipterocarp_genera_2025_12_11_02_08";
 const SYN_T   = "dipterocarp_synonyms_2025_12_13_08_35";
 const DIST_T  = "distribution_details_2025_12_11_02_08";
+const DESC_T  = "taxon_descriptions";   /* family, genus and species descriptions written and cited in the Botani Dendro book */
 
 let SESSION = null, GENERA = [], SPECIES = [], SYNONYMS = [], DIST_DETAILS = [];
+let DESCS = [], DESC_REFS = {};
 let lang = 'en', savedIds = new Set();
 let currentGenus = null, currentSpp = null, activeTab = 'chars';
 let viewMode = 'card';   /* card | list */
@@ -593,12 +604,16 @@ async function loadData() {
   document.head.insertAdjacentHTML('beforeend',
     '<style>@keyframes progress{0%{transform:scaleX(0);transform-origin:left}50%{transform:scaleX(1);transform-origin:left}51%{transform:scaleX(1);transform-origin:right}100%{transform:scaleX(0);transform-origin:right}}</style>');
 
-  [GENERA, SPECIES, SYNONYMS, DIST_DETAILS] = await Promise.all([
+  [GENERA, SPECIES, SYNONYMS, DIST_DETAILS, DESCS] = await Promise.all([
     sbGet(GEN_T,  'species_count_peninsular=gt.0&order=genus_name&select=*'),
     sbGet(SPP_T,  'distribution_peninsular=eq.true&order=genus,scientific_name&select=id,scientific_name,genus,authority,publication,local_name_malay,conservation_status,my_redlist_status,height_range,trunk_diameter,bark_description,leaf_description,fruit_description,flower_description,habitat,elevation_range,ecological_notes,economic_importance,diagnostic_characters,forest_type,distribution_pm,synonym_notes,distribution_peninsular,distribution_sabah,distribution_sarawak,endemic_to_malaysia'),
     sbGet(SYN_T,  'select=*'),
     sbGet(DIST_T, 'select=*'),
+    sbGet(DESC_T, 'select=rank,name,lang,html,ref_ids,updated_at'),
   ]);
+  /* references cited in the descriptions */
+  const refIds = [...new Set((DESCS || []).flatMap(d => d.ref_ids || []))];
+  if (refIds.length) (await sbGet('reference_sources', `id=in.(${refIds.join(',')})&select=id,full_title`)).forEach(r => { DESC_REFS[r.id] = r.full_title; });
 
   spinner.remove();
   const el = id => document.getElementById(id);
@@ -608,6 +623,7 @@ async function loadData() {
   el('sb-spp-count').textContent    = SPECIES.length;
 
   populateOverview();
+  renderFamilyDesc();
   buildSidebarGenera();
   buildGeneraList();
   buildAllSpecies();
@@ -932,9 +948,10 @@ function buildGenusPage(g) {
       <div class="stat-cell"><div class="stat-n">${sppList.length}</div><div class="stat-l">${t('lbl_edition')}</div></div>
     </div>`;
 
-  /* DESCRIPTION */
+  /* DESCRIPTION (the book's cited description first; the database note otherwise) */
   const descEl = document.getElementById('genus-desc-section');
-  descEl.innerHTML = g.description
+  const bookDesc = descFor('genus', g.genus_name);
+  descEl.innerHTML = bookDesc ? descHtml(bookDesc) : g.description
     ? `<p style="font-family:'Newsreader',Georgia,serif;font-size:clamp(16px,1.5vw,20px);line-height:1.7;color:#2C3B32;max-width:72ch">${g.description}</p>`
     : '';
 
@@ -987,6 +1004,35 @@ function buildGenusPage(g) {
   grid.innerHTML = sppList.length
     ? viewToggleHtml('genus-spp-inner') + `<div class="spp-grid" id="genus-spp-inner">${sppList.map(s=>sppCardHtml(s)).join('')}</div>`
     : `<p style="font-style:italic;color:#8B9C8E;font-size:15px;padding:20px 0">No species recorded for this genus in Peninsular Malaysia.</p>`;
+}
+
+
+/* ── DESCRIPTIONS FROM THE BOTANI DENDRO BOOK (taxon_descriptions) ── */
+function descFor(rank, name) {
+  const d = (DESCS || []).filter(x => x.rank === rank && x.name === name);
+  return d.find(x => x.lang === lang) || d.find(x => x.lang === 'en') || null;
+}
+function safeHtml(h) {
+  const tpl = document.createElement('template'); tpl.innerHTML = h || '';
+  tpl.content.querySelectorAll('script,style,iframe,object,embed,link,meta,form,input,button').forEach(n => n.remove());
+  tpl.content.querySelectorAll('*').forEach(n => [...n.attributes].forEach(a => {
+    const k = a.name.toLowerCase();
+    if (k.startsWith('on') || k === 'style' || ((k === 'href' || k === 'src') && /^\s*javascript:/i.test(a.value))) n.removeAttribute(a.name);
+  }));
+  tpl.content.querySelectorAll('img').forEach(n => n.remove()); /* book photos live in the book */
+  return tpl.innerHTML;
+}
+function descHtml(d) {
+  if (!d) return '';
+  const refs = (d.ref_ids || []).map(id => DESC_REFS[id]).filter(Boolean).sort();
+  const other = d.lang !== lang ? `<p class="book-desc-note">${lang === 'bm' ? 'English' : 'Bahasa Malaysia'}</p>` : '';
+  return `<div class="book-desc">${other}${safeHtml(d.html)}</div>
+    ${refs.length ? `<div class="book-refs"><div class="char-k" style="margin-bottom:8px">${t('lbl_refs')}</div><ul>${refs.map(r => `<li>${r}</li>`).join('')}</ul></div>` : ''}`;
+}
+function renderFamilyDesc() {
+  const el = document.getElementById('ov-book-desc'); if (!el) return;
+  const d = descFor('family', 'Dipterocarpaceae');
+  el.innerHTML = d ? `<div class="section-hd"><h2 class="section-h2">${t('tab_desc')}</h2></div>${descHtml(d)}` : '';
 }
 
 /* ── SPECIES PAGE ── */
@@ -1064,8 +1110,10 @@ function buildSppPage(s) {
   }
 
   /* ── TABS ── */
-  activeTab = 'chars';
+  const hasDesc = !!descFor('species', s.scientific_name);
+  activeTab = hasDesc ? 'desc' : 'chars';
   const tabDefs = [
+    ...(hasDesc ? [{id:'desc', label:t('tab_desc')}] : []),
     {id:'chars', label:t('tab_chars')},
     {id:'diag',  label:t('tab_diag')},
     {id:'dist',  label:t('tab_dist')},
@@ -1074,7 +1122,7 @@ function buildSppPage(s) {
   ];
   document.getElementById('spp-tabs').innerHTML = tabDefs
     .map(t => `<button class="tab-btn${t.id===activeTab?' active':''}" onclick="setTab('${t.id}',${esc(s)})">${t.label}</button>`).join('');
-  renderTab('chars', s);
+  renderTab(activeTab, s);
 }
 
 function setTab(id, s) {
@@ -1088,8 +1136,12 @@ function setTab(id, s) {
 function renderTab(id, s) {
   const el = document.getElementById('spp-tab-content');
 
+  /* ── TAB 0: DESCRIPTION (from the book, with references) ── */
+  if (id === 'desc') {
+    el.innerHTML = descHtml(descFor('species', s.scientific_name)) || `<p style="font-style:italic;color:#8B9C8E;font-size:15px;padding:20px 0">${t('note_no_data')}</p>`;
+
   /* ── TAB 1: CHARACTERS ── */
-  if (id === 'chars') {
+  } else if (id === 'chars') {
     const chars = [
       {k:t('lbl_bark'),   bm:'Kulit kayu',   v: s.bark_description},
       {k:t('lbl_leaf'),   bm:'Daun',         v: s.leaf_description},
@@ -1275,6 +1327,7 @@ const TR = {
     page_species:    'All Species',
     page_glossary:   'Glossary',
     search_placeholder: 'Search species, genus, Malay name…',
+    tab_desc:   'Description',  lbl_refs: 'References',
     tab_chars:  'Characters',
     tab_diag:   'Diagnostic',
     tab_dist:   'Distribution',
@@ -1310,6 +1363,7 @@ const TR = {
     page_species:    'Semua Spesies',
     page_glossary:   'Glosari',
     search_placeholder: 'Cari spesies, genus, nama Melayu…',
+    tab_desc:   'Penerangan',   lbl_refs: 'Rujukan',
     tab_chars:  'Ciri-ciri',
     tab_diag:   'Diagnostik',
     tab_dist:   'Taburan',
@@ -1367,7 +1421,7 @@ function setLang(l) {
     if (el && el.classList.contains('active')) {
       if (pg==='genus'   && currentGenus) buildGenusPage(currentGenus);
       if (pg==='spp'     && currentSpp)   buildSppPage(currentSpp);
-      if (pg==='overview') { populateOverview(); }
+      if (pg==='overview') { populateOverview(); renderFamilyDesc(); }
       if (pg==='species')  { renderFilterChips(); }
       break;
     }
