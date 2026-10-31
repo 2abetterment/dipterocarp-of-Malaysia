@@ -530,7 +530,8 @@ const SPP_T   = "dipterocarp_species_2025_12_11_02_08";
 const GEN_T   = "dipterocarp_genera_2025_12_11_02_08";
 const SYN_T   = "dipterocarp_synonyms_2025_12_13_08_35";
 const DIST_T  = "distribution_details_2025_12_11_02_08";
-const DESC_T  = "taxon_descriptions";   /* family, genus and species descriptions written and cited in the Botani Dendro book */
+/* family, genus and species descriptions written and cited in the Botani Dendro book:
+   private, served by get_book_descriptions() to licensed users only */
 
 let SESSION = null, GENERA = [], SPECIES = [], SYNONYMS = [], DIST_DETAILS = [];
 let DESCS = [], DESC_REFS = {};
@@ -547,6 +548,16 @@ async function sbGet(table, params='') {
   if (!r.ok) return [];
   return r.json();
 }
+/* database functions (licence check, private book content) */
+async function sbRpc(fn, args={}) {
+  const r = await fetch(`${SB_URL}/rest/v1/rpc/${fn}`, {
+    method: 'POST',
+    headers: {'apikey': SB_KEY, 'Authorization': 'Bearer '+SB_KEY, 'Content-Type': 'application/json'},
+    body: JSON.stringify(args)
+  });
+  if (!r.ok) return null;
+  return r.json();
+}
 
 /* ── AUTH ── */
 async function signIn() {
@@ -557,8 +568,7 @@ async function signIn() {
   if (!email || !key) { err.textContent = 'Please enter your email and licence key.'; return; }
   btn.textContent = 'Checking…'; btn.disabled = true;
   try {
-    const data = await sbGet('user_access',
-      `email=eq.${encodeURIComponent(email)}&licence_key=eq.${encodeURIComponent(key)}&is_active=eq.true&select=*`);
+    const data = await sbRpc('check_licence', {p_email: email, p_key: key});
     if (!data || data.length === 0) {
       err.textContent = 'Invalid email or licence key.';
     } else {
@@ -566,7 +576,7 @@ async function signIn() {
       if (new Date(u.access_expiry) < new Date()) {
         err.textContent = 'Your licence has expired. Please contact the publisher.';
       } else {
-        SESSION = {email: u.email, tier: u.access_tier, expiry: u.access_expiry, guest: false};
+        SESSION = {email: u.email, key, tier: u.access_tier, expiry: u.access_expiry, guest: false};
         launchApp();
       }
     }
@@ -580,7 +590,7 @@ function enterGuest() {
 }
 
 function signOut() {
-  SESSION = null; GENERA = []; SPECIES = []; SYNONYMS = []; DIST_DETAILS = [];
+  SESSION = null; GENERA = []; SPECIES = []; SYNONYMS = []; DIST_DETAILS = []; DESCS = []; DESC_REFS = {};
   history.replaceState(null,'',window.location.pathname);
   document.getElementById('app').classList.remove('visible');
   document.getElementById('gate').style.display = 'grid';
@@ -606,16 +616,16 @@ async function loadData() {
   document.head.insertAdjacentHTML('beforeend',
     '<style>@keyframes progress{0%{transform:scaleX(0);transform-origin:left}50%{transform:scaleX(1);transform-origin:left}51%{transform:scaleX(1);transform-origin:right}100%{transform:scaleX(0);transform-origin:right}}</style>');
 
-  [GENERA, SPECIES, SYNONYMS, DIST_DETAILS, DESCS] = await Promise.all([
+  let book;
+  [GENERA, SPECIES, SYNONYMS, DIST_DETAILS, book] = await Promise.all([
     sbGet(GEN_T,  'species_count_peninsular=gt.0&order=genus_name&select=*'),
     sbGet(SPP_T,  'distribution_peninsular=eq.true&order=genus,scientific_name&select=id,scientific_name,genus,authority,publication,local_name_malay,conservation_status,my_redlist_status,height_range,trunk_diameter,bark_description,leaf_description,fruit_description,flower_description,habitat,elevation_range,ecological_notes,economic_importance,diagnostic_characters,forest_type,distribution_pm,synonym_notes,distribution_peninsular,distribution_sabah,distribution_sarawak,endemic_to_malaysia'),
     sbGet(SYN_T,  'select=*'),
     sbGet(DIST_T, 'select=*'),
-    sbGet(DESC_T, 'select=rank,name,lang,html,ref_ids,updated_at'),
+    SESSION.guest ? null : sbRpc('get_book_descriptions', {p_email: SESSION.email, p_key: SESSION.key}),
   ]);
-  /* references cited in the descriptions */
-  const refIds = [...new Set((DESCS || []).flatMap(d => d.ref_ids || []))];
-  if (refIds.length) (await sbGet('reference_sources', `id=in.(${refIds.join(',')})&select=id,full_title`)).forEach(r => { DESC_REFS[r.id] = r.full_title; });
+  /* book descriptions and the references they cite (licensed users only; guests get none) */
+  DESCS = (book && book.descs) || []; DESC_REFS = (book && book.refs) || {};
 
   spinner.remove();
   const el = id => document.getElementById(id);

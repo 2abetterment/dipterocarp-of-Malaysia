@@ -706,7 +706,6 @@ const TBL_SPECIES  = 'dipterocarp_species_2025_12_11_02_08';
 const TBL_GENERA   = 'dipterocarp_genera_2025_12_11_02_08';
 const TBL_SYNONYMS = 'dipterocarp_synonyms_2025_12_13_08_35';
 const TBL_DIST     = 'distribution_details_2025_12_11_02_08';
-const TBL_ACCESS   = 'user_access';
 
 // ══ STATE ══════════════════════════════════════════════════════════════
 let lang          = 'en';
@@ -748,8 +747,7 @@ async function loginWithKey() {
   if (!email || !key) { err.textContent = 'Please enter your email and licence key.'; return; }
   btn.disabled = true; btn.textContent = 'Checking…'; err.textContent = '';
   try {
-    const { data, error } = await sb.from(TBL_ACCESS)
-      .select('*').eq('email', email).eq('licence_key', key).eq('is_active', true).single();
+    const { data, error } = await sb.rpc('check_licence', { p_email: email, p_key: key }).maybeSingle();
     if (error || !data) { err.textContent = 'Invalid email or licence key. Please try again.'; return; }
     const expiry = new Date(data.access_expiry);
     if (expiry < new Date()) { userData = data; showScreen('screen-expired'); return; }
