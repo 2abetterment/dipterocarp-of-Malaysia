@@ -667,9 +667,9 @@ function Contribute({species,lang}){
     setSub(true);setErr('');
     try{
       const ext=file.name.split('.').pop(),fname=`submissions/${Date.now()}.${ext}`;
-      const up=await fetch(`${SB}/storage/v1/object/species-photos/${fname}`,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':file.type},body:file});
+      const up=await fetch(`${SB}/storage/v1/object/Species_photo/${fname}`,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':file.type},body:file});
       if(!up.ok)throw new Error(lang==='en'?'Upload failed.':'Muat naik gagal.');
-      const imgUrl=`${SB}/storage/v1/object/public/species-photos/${fname}`;
+      const imgUrl=`${SB}/storage/v1/object/public/Species_photo/${fname}`;
       const rs=await fetch(`${SB}/rest/v1/photo_submissions`,{method:'POST',headers:{...H,'Prefer':'return=minimal'},body:JSON.stringify({...form,image_url:imgUrl,status:'pending',submitted_at:new Date().toISOString()})});
       if(!rs.ok)throw new Error(lang==='en'?'Save failed.':'Simpan gagal.');
       setDone(true);
@@ -680,7 +680,7 @@ function Contribute({species,lang}){
     <div className="fgrid">
       <div>
         <label style={{cursor:'pointer',display:'block'}}>
-          <input type="file" accept="image/*" onChange={onFile} style={{display:'none'}}/>
+          <input type="file" accept="image/jpeg,image/webp" onChange={onFile} style={{display:'none'}}/>
           {prev?<img src={prev} style={{width:'100%',aspectRatio:'4/3',objectFit:'cover',borderRadius:'var(--r)',border:'2px solid var(--sage)'}}/>:<div className="dz"><svg width={32} height={32} viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="var(--text-3)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg><div style={{fontWeight:600,color:'var(--text-2)'}}>{lang==='en'?'Click to select photo':'Klik untuk pilih foto'}</div><div style={{fontSize:12}}>JPG, PNG · Max 10MB</div></div>}
         </label>
         <div style={{display:'flex',flexWrap:'wrap',gap:6,marginTop:14}}>{['habit','daun','kulit','bunga','buah'].map(t=><button key={t} onClick={()=>upd('photo_type',t)} style={{padding:'5px 12px',borderRadius:999,fontSize:12,fontWeight:500,cursor:'pointer',background:form.photo_type===t?'var(--forest)':'var(--parch)',color:form.photo_type===t?'white':'var(--text-2)',border:'1px solid '+(form.photo_type===t?'var(--forest)':'var(--border-2)')}}>{t}</button>)}</div>
@@ -713,17 +713,27 @@ function About({lang}){
 }
 
 
-// ─── ADMIN CREDENTIALS ────────────────────────────────────
-const ADMIN_USER = 'admin';
-const ADMIN_PASS = 'dipterocarp2025';
+// ─── ADMIN SESSION (Supabase Auth) ──────────────────────
+let ADMIN_TOKEN=null;
+const AH=()=>({...H,'Authorization':'Bearer '+ADMIN_TOKEN});
+async function adminSignIn(email,password){
+  const r=await fetch(`${SB}/auth/v1/token?grant_type=password`,{method:'POST',headers:{'apikey':KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+  if(!r.ok)return false;
+  ADMIN_TOKEN=(await r.json()).access_token;
+  return true;
+}
+function adminSignOut(){
+  if(ADMIN_TOKEN)fetch(`${SB}/auth/v1/logout`,{method:'POST',headers:AH()}).catch(()=>{});
+  ADMIN_TOKEN=null;
+}
 
 // ─── LOGIN MODAL ──────────────────────────────────────────
 function LoginModal({onLogin, onClose}){
   const[u,setU]=useState('');
   const[p,setP]=useState('');
   const[err,setErr]=useState(false);
-  const submit=()=>{
-    if(u===ADMIN_USER&&p===ADMIN_PASS){onLogin();}
+  const submit=async()=>{
+    if(await adminSignIn(u.trim(),p)){onLogin();}
     else{setErr(true);setP('');}
   };
   return <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
@@ -733,13 +743,13 @@ function LoginModal({onLogin, onClose}){
       </div>
       <div className="modal-title">Admin Login</div>
       <div className="modal-sub">Access the administration panel</div>
-      {[['Username',u,setU,'text'],['Password',p,setP,'password']].map(([label,val,setter,type])=>(
+      {[['Email',u,setU,'email'],['Password',p,setP,'password']].map(([label,val,setter,type])=>(
         <div key={label} className="mfield">
           <label>{label}</label>
-          <input type={type} value={val} onChange={e=>setter(e.target.value)} onKeyDown={e=>e.key==='Enter'&&submit()} autoFocus={label==='Username'}/>
+          <input type={type} value={val} onChange={e=>setter(e.target.value)} onKeyDown={e=>e.key==='Enter'&&submit()} autoFocus={label==='Email'}/>
         </div>
       ))}
-      {err&&<div className="merr">Incorrect username or password.</div>}
+      {err&&<div className="merr">Incorrect email or password.</div>}
       <button className="btn ba" style={{width:'100%',padding:12,marginBottom:10}} onClick={submit}>Log In</button>
       <button className="btn bg" style={{width:'100%',padding:10}} onClick={onClose}>Cancel</button>
     </div>
@@ -760,7 +770,7 @@ function AdminPanel({species,setSpecies,onLogout,lang}){
 
   const loadSubs=()=>{
     setLoading(true);
-    fetch(`${SB}/rest/v1/photo_submissions?select=*&order=submitted_at.desc`,{headers:H})
+    fetch(`${SB}/rest/v1/photo_submissions?select=*&order=submitted_at.desc`,{headers:AH()})
       .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
       .then(d=>{setSubs(d);setLoading(false);})
       .catch(e=>{toast(e.message,true);setLoading(false);});
@@ -772,15 +782,15 @@ function AdminPanel({species,setSpecies,onLogout,lang}){
     try{
       // Update submission status
       const r1=await fetch(`${SB}/rest/v1/photo_submissions?id=eq.${id}`,{
-        method:'PATCH',headers:{...H,'Prefer':'return=minimal'},
+        method:'PATCH',headers:{...AH(),'Prefer':'return=minimal'},
         body:JSON.stringify({status,reviewed_at:new Date().toISOString()})
       });
-      if(!r1.ok) throw new Error('Update failed');
+      if(!r1.ok) throw new Error(r1.status===401?'Session expired — please log in again.':'Update failed');
 
       // If approved — update species image_url so it shows immediately
       if(status==='approved'&&speciesId&&imgUrl){
         const r2=await fetch(`${SB}/rest/v1/${TBL}?id=eq.${speciesId}`,{
-          method:'PATCH',headers:{...H,'Prefer':'return=representation'},
+          method:'PATCH',headers:{...AH(),'Prefer':'return=representation'},
           body:JSON.stringify({image_url:imgUrl,updated_at:new Date().toISOString()})
         });
         if(r2.ok){
@@ -873,7 +883,7 @@ function App(){
       {route==='detail'&&<Detail species={species} detailId={detailId} setRoute={setRoute} setQuery={setQuery}/>}
       {route==='contribute'&&<Contribute species={species} lang={lang}/>}
       {route==='about'&&<About lang={lang}/>}
-      {route==='admin'&&<AdminPanel species={species} setSpecies={setSpecies} onLogout={()=>setIsAdmin(false)} lang={lang}/>}
+      {route==='admin'&&isAdmin&&<AdminPanel species={species} setSpecies={setSpecies} onLogout={()=>{adminSignOut();setIsAdmin(false);setRoute('home');}} lang={lang}/>}
     </main>
     <footer><div className="fi"><div className="flogo"><span>🌿</span><span>Dipterokarp Malaysia</span></div><div><a href="#home" style={{color:'var(--text-3)',textDecoration:'none',transition:'color .2s'}} onMouseEnter={e=>e.target.style.color='var(--forest)'} onMouseLeave={e=>e.target.style.color='var(--text-3)'}>Contact · Data · License</a></div></div></footer>
     {showLogin&&<LoginModal onLogin={()=>{setIsAdmin(true);setShowLogin(false);}} onClose={()=>setShowLogin(false)}/>}
