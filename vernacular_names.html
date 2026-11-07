@@ -244,7 +244,7 @@ footer p { font-size: 10.5px; color: var(--ink-3); }
 </div>
 
 <div class="main">
-  <p class="sn-legend" id="lbl-legend">Each local name is listed once, with every source that records it (author, year: page). “as …” gives the scientific name printed in that source when it differs from today’s name. Lines under a species give old names used by the sources, with the reason in [ ] (synonym, spelling variant, misapplied …).</p>
+  <p class="sn-legend" id="lbl-legend">Each local name is listed once, with every source that records it (author, year). Lines under a species give the scientific name exactly as printed in a source (“as …”), with the reason in [ ]: synonym, spelling variant of …, misapplied of …</p>
   <div class="results-table">
     <table>
       <thead>
@@ -297,7 +297,7 @@ const labels = {
     stat1:'documented<br>names', stat2:'species<br>covered', stat3:'indexed<br>sources', stat4:'preferred<br>names set',
     searchPh:'Search local name or scientific name…', allLang:'All languages',
     allRegion:'All regions', peninsular:'Peninsular Malaysia', sabah:'Sabah', sarawak:'Sarawak',
-    allGroup:'All groups', dip:'Dipterocarpaceae', nonDip:'Non-Dipterocarpaceae', clim:'Climbers & lianas', nw:'Non-woody plants', printed:'Names as printed', synOf:'synonym of', legend:'Each local name is listed once, with every source that records it (author, year: page). “as …” gives the scientific name printed in that source when it differs from today’s name. Lines under a species give old names used by the sources, with the reason in [ ] (synonym, spelling variant, misapplied …).', spell:'spelling corrected', by:'by', allSrc:'All sources',
+    allGroup:'All groups', dip:'Dipterocarpaceae', nonDip:'Non-Dipterocarpaceae', clim:'Climbers & lianas', nw:'Non-woody plants', printed:'Names as printed', synOf:'synonym of', legend:'Each local name is listed once, with every source that records it (author, year). Lines under a species give the scientific name exactly as printed in a source (“as …”), with the reason in [ ]: synonym, spelling variant of …, misapplied of …', spell:'spelling corrected', by:'by', allSrc:'All sources',
     thSci:'Scientific name', thFam:'Family', thReg:'Region', thNames:'Local names & sources',
     noResults:'No species match your search.', species:'species'
   },
@@ -306,7 +306,7 @@ const labels = {
     stat1:'nama<br>didokumen', stat2:'spesies<br>diliputi', stat3:'sumber<br>diindeks', stat4:'nama<br>pilihan',
     searchPh:'Cari nama tempatan atau nama saintifik…', allLang:'Semua bahasa',
     allRegion:'Semua kawasan', peninsular:'Semenanjung Malaysia', sabah:'Sabah', sarawak:'Sarawak',
-    allGroup:'Semua kumpulan', dip:'Dipterokarp', nonDip:'Bukan Dipterokarp', clim:'Pemanjat & liana', nw:'Tumbuhan bukan berkayu', printed:'Nama seperti dicetak', synOf:'sinonim bagi', legend:'Setiap nama tempatan disenaraikan sekali bersama semua sumber yang merekodkannya (pengarang, tahun: halaman). “as …” ialah nama saintifik yang dicetak dalam sumber itu jika berbeza daripada nama kini. Baris di bawah spesies ialah nama lama yang digunakan oleh sumber, dengan sebabnya dalam [ ] (synonym, spelling variant, misapplied …).', spell:'ejaan dibetulkan', by:'oleh', allSrc:'Semua sumber',
+    allGroup:'Semua kumpulan', dip:'Dipterokarp', nonDip:'Bukan Dipterokarp', clim:'Pemanjat & liana', nw:'Tumbuhan bukan berkayu', printed:'Nama seperti dicetak', synOf:'sinonim bagi', legend:'Setiap nama tempatan disenaraikan sekali bersama semua sumber yang merekodkannya (pengarang, tahun). Baris di bawah spesies ialah nama saintifik tepat seperti dicetak dalam sumber (“as …”), dengan sebabnya dalam [ ]: synonym, spelling variant of …, misapplied of …', spell:'ejaan dibetulkan', by:'oleh', allSrc:'Semua sumber',
     thSci:'Nama saintifik', thFam:'Famili', thReg:'Kawasan', thNames:'Nama tempatan & sumber',
     noResults:'Tiada spesies sepadan dengan carian anda.', species:'spesies'
   }
@@ -448,35 +448,37 @@ function buildGroups(rows) {
 }
 
 /* ── NAMES AS PRINTED: Horsfieldia lemanniana (A.DC.) Warb. [Horsfieldia lehmanniana by Watson (1928)] — synonym of H. irya ── */
-/* Old names used by the sources, as notes under the species:
-   Shorea globifera Ridl. (Watson, 1928) [synonym]
-   Horsfieldia lemanniana (A.DC.) Warb. (Watson, 1928: 112, as Horsfieldia lehmanniana) [spelling variant; synonym] */
-const NOTE_TAG = { Synonym:'synonym', Misapplied:'misapplied', Illegitimate:'illegitimate name', Invalid:'invalid name', Unplaced:'unplaced name', Orthographic:'spelling variant' };
-function noteTags(x){
-  const t = [];
-  if (x.items.some(i => i.misspelt)) t.push('spelling variant');
-  if (x.status && x.status !== 'Accepted') t.push(NOTE_TAG[x.status] || x.status.toLowerCase());
-  else if (x.syn) t.push(x.status === 'Accepted' ? 'accepted elsewhere; filed here by decision' : 'filed here by decision');
-  return [...new Set(t)];
+/* Old names used by the sources, written exactly as printed (name + authority):
+   as Acronychia laurifolia Bl. (Watson, 1928) [synonym]
+   as Horsfieldia Lehmanniana Warb. (Ridley, 1924: 59) [synonym Horsfieldia lemanniana (A.DC.) Warb.]
+   as Ageratum conyoides L. (Watson, 1928) [spelling variant of Ageratum conyzoides L.] */
+function asNoteTag(g, esc){
+  const correct = g.correct ? `<i>${esc(g.correct)}</i>${g.cauthor ? ' ' + esc(g.cauthor) : ''}` : '';
+  const base = { Synonym:'synonym', Illegitimate:'illegitimate name', Invalid:'invalid name', Unplaced:'unplaced name' }[g.status];
+  if (g.status === 'Misapplied') return `misapplied of ${correct}`;
+  if (g.synonym && g.status && g.status !== 'Accepted') return g.misspelt && correct ? `${base || g.status.toLowerCase()} ${correct}` : (base || g.status.toLowerCase());
+  if (g.synonym) return g.misspelt && correct ? `filed here by decision; spelling variant of ${correct}` : 'filed here by decision';
+  if (g.misspelt && correct) return `spelling variant of ${correct}`;
+  return '';
+}
+function asNoteLines(items, esc){
+  const by = new Map();
+  items.forEach(i => { const k = i.printed + '|' + (i.pauthor || '') + '|' + (i.correct || '');
+    if (!by.has(k)) by.set(k, { ...i, cites: [] }); by.get(k).cites.push(i); });
+  return [...by.values()].map(g => {
+    g.cites.sort((a, b) => (a.year || 0) - (b.year || 0));
+    const cites = [...new Map(g.cites.map(c => [c.cite + '|' + (c.page || ''), c])).values()]
+      .map(c => esc(String(c.cite || '').replace(/ \((\d{4})\)$/, ', $1'))).join('; ');
+    const tag = asNoteTag(g, esc);
+    return `<li>as <i>${esc(g.printed)}</i>${g.pauthor ? ' ' + esc(g.pauthor) : ''} (${cites})${tag ? ` <span class="sn-tag">[${tag}]</span>` : ''}</li>`;
+  }).join('');
 }
 function notesHTML(grp) {
   const list = NOTES.get(grp.species_id); if (!list) return '';
-  const by = new Map();
-  list.forEach(n => {
-    const name = n.correct_name || n.printed_name;
-    if (!n.correct_name && name.toLowerCase() === grp.scientific_name.toLowerCase()) return;
-    const k = name + '|' + (n.correct_author || '');
-    if (!by.has(k)) by.set(k, { name, author: n.correct_author || (n.correct_name ? '' : n.printed_authority) || '', syn: n.is_synonym, status: n.wcvp_status, items: [] });
-    by.get(k).items.push(n);
-  });
-  if (!by.size) return '';
-  const li = [...by.values()].map(x => {
-    x.items.sort((a, b) => (a.src_year || 0) - (b.src_year || 0));
-    const cites = x.items.map(i => esc((i.cite || '').replace(/ \((\d{4})\)$/, ', $1')) + (i.page ? ': ' + esc(i.page) : '') + (i.misspelt ? `, as <i>${esc(i.printed_name)}</i>` : '')).join('; ');
-    const tags = noteTags(x);
-    return `<li><i>${esc(x.name)}</i> ${esc(x.author)} (${cites})${tags.length ? ` <span class="sn-tag">[${esc(tags.join('; '))}]</span>` : ''}</li>`;
-  }).join('');
-  return `<ul class="sn-notes">${li}</ul>`;
+  const items = list.filter(n => n.correct_name || n.printed_name.toLowerCase() !== grp.scientific_name.toLowerCase())
+    .map(n => ({ printed: n.printed_name, pauthor: n.printed_authority, cite: n.cite, page: n.page, year: n.src_year,
+                 correct: n.correct_name, cauthor: n.correct_author, status: n.wcvp_status, misspelt: n.misspelt, synonym: n.is_synonym }));
+  return items.length ? `<ul class="sn-notes">${asNoteLines(items, esc)}</ul>` : '';
 }
 
 /* "as Sarcocephalus Junghuhnii Miq." = the name printed in that source, when it differs from today's name */
@@ -501,7 +503,7 @@ function renderTable(groups) {
     const nameRows = grp.names.map(n => {
       const star = n.is_pref ? '<span class="pref-star">★</span>' : '';
       const lang = n.language && n.language !== 'Malay' ? `<span class="ne-lang">${esc(n.language)}</span>` : '';
-      const cites = n.cites.length ? ` <span class="ne-cites">(${n.cites.map(c => esc(c.cite) + (c.page ? ': ' + esc(String(c.page).replace(/^p\.\s*/, '')) : '') + asPrinted(c.printed, grp.scientific_name)).join('; ')})</span>` : '';
+      const cites = n.cites.length ? ` <span class="ne-cites">(${n.cites.map(c => esc(c.cite)).join('; ')})</span>` : '';
       return `<div class="name-entry${n.is_pref ? ' pref' : ''}"><span class="ne-name">${star}${esc(capFirst(n.vernacular_name))}</span>${lang}${cites}</div>`;
     }).join('');
     const withAuth = grp.authority && !grp.scientific_name.includes(grp.authority.trim()) ? grp.scientific_name + ' ' + grp.authority.trim() : grp.scientific_name;
