@@ -457,7 +457,6 @@ function asNoteTag(g, esc){
   const base = { Synonym:'synonym', Illegitimate:'illegitimate name', Invalid:'invalid name', Unplaced:'unplaced name' }[g.status];
   if (g.status === 'Misapplied') return `misapplied of ${correct}`;
   if (g.synonym && g.status && g.status !== 'Accepted') return g.misspelt && correct ? `${base || g.status.toLowerCase()} ${correct}` : (base || g.status.toLowerCase());
-  if (g.synonym) return g.misspelt && correct ? `filed here by decision; spelling variant of ${correct}` : 'filed here by decision';
   if (g.misspelt && correct) return `spelling variant of ${correct}`;
   return '';
 }
