@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="robots" content="noindex, nofollow"><!-- under development: remove this line at public launch -->
 <script>/* Moved to mypokok.com: forward visitors from the old GitHub address */(function(){var h=location.hostname;if(h==="2abetterment.github.io"){var p=location.pathname.replace(/^\/dipterocarp-of-malaysia/i,"")||"\/";location.replace("https:\/\/mypokok.com"+p+location.search+location.hash);}})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -190,12 +191,12 @@ footer p { font-size: 10.5px; color: var(--ink-3); }
 
 <nav>
   <div class="nav-left">
-    <a class="nav-back" href="portal.html">
+    <a class="nav-back" href="./">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
       Portal
     </a>
     <div class="nav-divider"></div>
-    <a class="nav-brand" href="portal.html">Trees of <em>Malaysia</em></a>
+    <a class="nav-brand" href="./">Trees of <em>Malaysia</em></a>
   </div>
   <div class="nav-right">
     <div class="nav-lang">
@@ -381,7 +382,7 @@ async function init() {
       if (d.infraspecific_epithet && !d.scientific_name.includes(d.infraspecific_epithet)) d.scientific_name += ' ' + d.infraspecific_epithet;
       SPECIES[d.id] = { ...d, species_type: type, page_url: page ? BASE + page : '' };
     });
-    add(dip, 'dipterocarp', 'index.html'); add(non, 'non_dipterocarp', 'non_dipterocarp_trees_malaysia.html'); add(clim, 'climber', ''); add(nw, 'non_woody', '');
+    add(dip, 'dipterocarp', 'dipterokarp.html'); add(non, 'non_dipterocarp', 'non_dipterocarp_trees_malaysia.html'); add(clim, 'climber', ''); add(nw, 'non_woody', '');
     const prefSet = new Set(pref.map(p => p.species_id + '|' + (p.language || 'Malay')));
     const srcMap = {}; src.forEach(s => srcMap[s.id] = s);
     notes.forEach(n => { if (!NOTES.has(n.species_id)) NOTES.set(n.species_id, []); NOTES.get(n.species_id).push(n); });
