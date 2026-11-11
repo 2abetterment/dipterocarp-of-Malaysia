@@ -1,0 +1,3 @@
+# Under development: block all search engines. At public launch, change "Disallow: /" to "Allow: /"
+User-agent: *
+Disallow: /
