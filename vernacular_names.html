@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>/* Moved to mypokok.com: forward visitors from the old GitHub address */(function(){var h=location.hostname;if(h==="2abetterment.github.io"){var p=location.pathname.replace(/^\/dipterocarp-of-malaysia/i,"")||"\/";location.replace("https:\/\/mypokok.com"+p+location.search+location.hash);}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nama Tempatan · Trees of Malaysia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #faf8f3;
+  --ink: #1a1a18;
+  --ink-2: #4a4a44;
+  --ink-3: #8a8a80;
+  --forest: #2d5a27;
+  --forest-mid: #3d7a35;
+  --blue: #334499;
+  --blue-mid: #4455bb;
+  --blue-light: #eef2ff;
+  --blue-border: #b8c4ee;
+  --border: #e0ddd5;
+  --border-strong: #c8c4b8;
+  --white: #ffffff;
+  --radius: 6px;
+  --radius-lg: 10px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+
+nav {
+  background: var(--white); border-bottom: 1px solid var(--border);
+  padding: 0 2.5rem; display: flex; align-items: center;
+  justify-content: space-between; height: 54px;
+  position: sticky; top: 0; z-index: 100;
+}
+.nav-left { display: flex; align-items: center; gap: 1rem; }
+.nav-back { font-size: 11px; color: var(--ink-3); text-decoration: none; display: flex; align-items: center; gap: 4px; transition: color 0.15s; }
+.nav-back:hover { color: var(--ink); }
+.nav-divider { width: 1px; height: 18px; background: var(--border); }
+.nav-brand { font-family: 'EB Garamond', serif; font-size: 17px; color: var(--ink); text-decoration: none; }
+.nav-brand em { color: var(--forest-mid); font-style: italic; }
+.nav-right { display: flex; align-items: center; gap: 1.5rem; }
+.nav-lang { display: flex; gap: 3px; }
+.lang-btn { font-size: 10px; font-weight: 500; letter-spacing: 0.05em; padding: 3px 10px; border-radius: 99px; border: 1px solid var(--border); background: transparent; color: var(--ink-3); cursor: pointer; transition: all 0.15s; }
+.lang-btn.active { background: var(--forest); color: white; border-color: var(--forest); }
+.nav-meta { font-size: 10px; color: var(--ink-3); text-align: right; line-height: 1.4; }
+
+.page-header { background: var(--white); border-bottom: 1px solid var(--border); padding: 2.5rem 2.5rem 2rem; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; }
+.header-eye { font-size: 9px; font-weight: 500; letter-spacing: 0.14em; color: var(--ink-3); text-transform: uppercase; margin-bottom: 0.5rem; }
+.header-title { font-family: 'EB Garamond', serif; font-size: 2.2rem; font-weight: 400; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+.header-title em { color: var(--blue-mid); font-style: italic; }
+.header-sub { font-size: 12px; color: var(--ink-3); font-style: italic; }
+.header-stats { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.stat-pill { background: var(--cream); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 0.7rem 1.1rem; text-align: center; min-width: 80px; }
+.stat-n { font-family: 'EB Garamond', serif; font-size: 1.6rem; font-weight: 400; color: var(--ink); line-height: 1; }
+.stat-l { font-size: 10px; color: var(--ink-3); margin-top: 3px; line-height: 1.3; }
+
+.toolbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0.9rem 2.5rem; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+.search-wrap { position: relative; flex: 1; min-width: 220px; max-width: 420px; }
+.search-wrap svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--ink-3); pointer-events: none; }
+.search-input { width: 100%; padding: 9px 12px 9px 34px; font-family: 'DM Sans', sans-serif; font-size: 13px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--cream); color: var(--ink); outline: none; transition: border-color 0.15s, background 0.15s; }
+.search-input:focus { border-color: var(--blue); background: var(--white); }
+.search-input::placeholder { color: var(--ink-3); }
+.filter-select { padding: 8px 12px; font-family: 'DM Sans', sans-serif; font-size: 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--ink-2); cursor: pointer; outline: none; }
+.result-count { font-size: 11px; color: var(--ink-3); margin-left: auto; white-space: nowrap; }
+.search-clear {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; color: var(--ink-3);
+  font-size: 14px; line-height: 1; padding: 2px 4px; border-radius: 99px;
+  display: none; transition: color 0.15s, background 0.15s;
+}
+.search-clear:hover { color: var(--ink); background: var(--border); }
+.search-clear.visible { display: block; }
+
+.main { flex: 1; max-width: 1200px; width: 100%; margin: 0 auto; padding: 1.5rem 2.5rem; }
+
+/* TABLE */
+.results-table { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+thead th { background: var(--cream); padding: 10px 14px; font-size: 10px; font-weight: 500; letter-spacing: 0.07em; color: var(--ink-3); text-transform: uppercase; text-align: left; border-bottom: 1px solid var(--border); }
+th.col-sci  { width: 24%; }
+th.col-fam  { width: 16%; }
+th.col-reg  { width: 10%; }
+th.col-names { width: 50%; }
+
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #f4f2ec; }
+tbody td { padding: 11px 14px; font-size: 12.5px; color: var(--ink-2); vertical-align: top; }
+td.sci-cell { font-size: 12.5px; color: var(--ink); font-weight: 500; padding-top: 13px; }
+td.fam-cell { font-size: 11px; color: var(--ink-3); padding-top: 13px; line-height: 1.5; }
+td.reg-cell { font-size: 11px; color: var(--ink-3); padding-top: 13px; }
+
+/* Name entries inside the names cell */
+.names-list { display: flex; flex-direction: column; gap: 5px; }
+.name-entry {
+  display: flex; align-items: baseline; gap: 8px;
+  padding: 5px 8px; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--cream);
+}
+.name-entry.pref {
+  background: var(--blue-light); border-color: var(--blue-border);
+}
+.name-entry .ne-name {
+  font-size: 13px; font-weight: 500; color: var(--ink); min-width: 140px; flex-shrink: 0;
+}
+.name-entry.pref .ne-name { color: var(--blue); }
+.pref-star { color: var(--forest-mid); margin-right: 3px; font-size: 11px; }
+.ne-lang {
+  font-size: 10px; color: var(--ink-3); background: var(--white);
+  border: 1px solid var(--border); border-radius: 99px;
+  padding: 1px 6px; flex-shrink: 0;
+}
+.name-entry.pref .ne-lang { color: var(--blue-mid); background: var(--blue-light); border-color: var(--blue-border); }
+.ne-source { font-size: 11px; color: var(--ink-3); font-style: italic; flex: 1; }
+
+.state-row td { text-align: center; padding: 3rem; color: var(--ink-3); font-size: 13px; font-style: italic; }
+.sci-link { color: var(--ink); text-decoration: none; }
+.sci-link:hover { color: var(--blue); text-decoration: underline; }
+.ext-icon { font-size: 10px; color: var(--ink-3); font-style: normal; }
+.authority { font-style: normal; font-weight: 400; }
+.no-name { font-size: 11.5px; color: var(--ink-3); font-style: italic; }
+
+footer { background: var(--white); border-top: 1px solid var(--border); padding: 1rem 2.5rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; }
+footer p { font-size: 10.5px; color: var(--ink-3); }
+
+/* ── Tablet ≤900px ───────────────────────────── */
+@media (max-width: 900px) {
+  nav { padding: 0 1.25rem; }
+  .nav-meta { display: none; }
+  .nav-brand { font-size: 15px; }
+  .page-header { flex-direction: column; align-items: flex-start; padding: 1.5rem 1.25rem 1.25rem; gap: 1rem; }
+  .header-title { font-size: 1.8rem; }
+  .header-stats { gap: 0.5rem; }
+  .stat-pill { padding: 0.5rem 0.8rem; min-width: 70px; }
+  .stat-n { font-size: 1.3rem; }
+  .toolbar { padding: 0.75rem 1.25rem; gap: 0.5rem; flex-wrap: wrap; }
+  .search-wrap { min-width: 180px; flex: 1 1 180px; }
+  .filter-select { font-size: 11.5px; padding: 7px 10px; }
+  .result-count { width: 100%; margin-left: 0; }
+  .main { padding: 0.75rem 1.25rem; }
+  footer { padding: 1rem 1.25rem; flex-direction: column; gap: 0.25rem; }
+}
+
+/* ── Mobile ≤600px ───────────────────────────── */
+@media (max-width: 600px) {
+  nav { padding: 0 0.75rem; height: 44px; }
+  .nav-meta { display: none; }
+  .nav-brand { font-size: 14px; }
+  .lang-btn { padding: 2px 8px; font-size: 9.5px; }
+  .page-header { padding: 1rem 0.75rem; }
+  .header-title { font-size: 1.4rem; }
+  .header-stats { gap: 0.4rem; }
+  .stat-pill { padding: 0.4rem 0.6rem; min-width: 58px; }
+  .stat-n { font-size: 1.1rem; }
+  .stat-l { font-size: 9px; }
+  .toolbar { padding: 0.6rem 0.75rem; gap: 0.4rem; }
+  .search-wrap { min-width: 100%; }
+  .filter-select { font-size: 11px; padding: 6px 8px; }
+  .result-count { display: none; }
+  .main { padding: 0.5rem 0.75rem; }
+  /* Hide only Family and Region columns on very small screens */
+  th.col-fam, td.fam-cell { display: none; }
+  th.col-reg, td.reg-cell { display: none; }
+  th.col-sci { width: 40%; }
+  th.col-names { width: 60%; }
+  /* Keep source label visible always */
+  .ne-source { font-size: 10.5px; }
+  .ne-name { font-size: 12.5px; }
+  .ne-lang { font-size: 9px; padding: 1px 5px; }
+  footer { padding: 0.75rem; }
+  footer p { font-size: 10px; }
+}
+
+/* names as printed + merged sources */
+.sn-notes { margin: 6px 0 0; padding: 0; list-style: none; font-size: 11.5px; color: var(--ink-2); line-height: 1.5; }
+.sn-notes li { margin-top: 3px; padding-left: 10px; border-left: 2px solid var(--blue-border); }
+.sn-notes .sn-tag { color: var(--ink-3); }
+.sn-notes .sn-lbl { display:block; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); margin-top: 6px; }
+.sn-notes i { font-family: 'EB Garamond', serif; font-size: 13px; }
+.ne-cites { font-size: 11px; color: var(--ink-3); }
+.ne-reg { font-size: 10px; color: var(--ink-3); margin-left: 4px; }
+.sn-legend { margin: 0 0 10px; font-size: 11.5px; color: var(--ink-3); line-height: 1.5; }
+.ne-cites i { font-family: 'EB Garamond', serif; font-size: 12.5px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a class="nav-back" href="portal.html">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+      Portal
+    </a>
+    <div class="nav-divider"></div>
+    <a class="nav-brand" href="portal.html">Trees of <em>Malaysia</em></a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-lang">
+      <button class="lang-btn active" onclick="setLang('en',this)">EN</button>
+      <button class="lang-btn" onclick="setLang('bm',this)">BM</button>
+    </div>
+    <p class="nav-meta">Malaysian Forest Botany<br>M. Nazre Saleh · UPM</p>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="header-left">
+    <p class="header-eye" id="lbl-eye">Local name database · All families</p>
+    <h1 class="header-title">Nama Tempatan · <em>Local Names</em></h1>
+    <p class="header-sub" id="lbl-sub">Multi-source documented local names for trees of Malaysia</p>
+  </div>
+  <div class="header-stats">
+    <div class="stat-pill"><div class="stat-n" id="stat-total">—</div><div class="stat-l" id="lbl-stat1">documented<br>names</div></div>
+    <div class="stat-pill"><div class="stat-n" id="stat-species">—</div><div class="stat-l" id="lbl-stat2">species<br>covered</div></div>
+    <div class="stat-pill"><div class="stat-n" id="stat-sources">—</div><div class="stat-l" id="lbl-stat3">indexed<br>sources</div></div>
+    <div class="stat-pill"><div class="stat-n" id="stat-preferred">—</div><div class="stat-l" id="lbl-stat4">preferred<br>names set</div></div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input class="search-input" id="search" type="text" placeholder="Search local name or scientific name…" autocomplete="off">
+    <button class="search-clear" id="search-clear" onclick="clearSearch()" title="Clear search">✕</button>
+  </div>
+  <select class="filter-select" id="filter-lang"><option value="">All languages</option></select>
+  <select class="filter-select" id="filter-region">
+    <option value="">All regions</option>
+    <option value="Peninsular">Peninsular Malaysia</option>
+    <option value="Sabah">Sabah</option>
+    <option value="Sarawak">Sarawak</option>
+  </select>
+  <select class="filter-select" id="filter-type">
+    <option value="">All groups</option>
+    <option value="dipterocarp">Dipterocarpaceae</option>
+    <option value="non_dipterocarp">Non-Dipterocarpaceae</option>
+    <option value="climber">Climbers &amp; lianas</option>
+    <option value="non_woody">Non-woody plants</option>
+  </select>
+  <select class="filter-select" id="filter-source" style="max-width:320px"><option value="">All sources</option></select>
+  <span class="result-count" id="result-count"></span>
+</div>
+
+<div class="main">
+  <p class="sn-legend" id="lbl-legend">Each local name is listed once, with every source that records it (author, year). Lines under a species give the scientific name exactly as printed in a source (“as …”), with the reason in [ ]: synonym, spelling variant of …, misapplied of …</p>
+  <div class="results-table">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-sci"  id="th-sci">Scientific name</th>
+          <th class="col-fam"  id="th-fam">Family</th>
+          <th class="col-reg"  id="th-reg">Region</th>
+          <th class="col-names" id="th-names">Local names &amp; sources</th>
+        </tr>
+      </thead>
+      <tbody id="results-body">
+        <tr class="state-row"><td colspan="4">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<footer>
+  <p>Nama Tempatan Database · Trees of Malaysia · CC-BY 4.0</p>
+  <p>M. Nazre Saleh · Universiti Putra Malaysia · 2025–2026</p>
+</footer>
+
+<script>
+/* ── Format scientific name: taxon italic, authority roman ── */
+function formatSci(name){
+  if(!name||name==='—') return name;
+  const m = name.match(/^([A-Z][a-zÀ-ɏ×+]+\s+[a-zÀ-ɏ×+\-]+(?:\s+(?:subsp\.|ssp\.|var\.|f\.)\s+[a-zÀ-ɏ×+\-]+)?)(.*)/);
+  if(!m) return `<i>${name}</i>`;
+  const taxon = m[1].trim(), auth = m[2].trim();
+  return auth ? `<i>${taxon}</i> <span class="authority">${auth}</span>` : `<i>${taxon}</i>`;
+}
+
+const SB_URL  = 'https://xrntnarchlglhllvlrnv.supabase.co';
+const SB_ANON = 'sb_publishable_N968wHizQmuFaPYlHwDxhw_WXCOs32h';
+const H = { 'apikey': SB_ANON, 'Authorization': 'Bearer ' + SB_ANON, 'Content-Type': 'application/json' };
+
+async function get(path) {
+  const r = await fetch(SB_URL + '/rest/v1/' + path, { headers: H });
+  if (!r.ok) {
+    const body = await r.text().catch(()=>'');
+    throw new Error(r.status + ' on ' + path.split('?')[0] + ' — ' + body.slice(0,200));
+  }
+  return r.json();
+}
+
+/* ── LABELS ───────────────────────────────────────── */
+const labels = {
+  en: {
+    eye:'Local name database · All families', sub:'Multi-source documented local names for trees of Malaysia',
+    stat1:'documented<br>names', stat2:'species<br>covered', stat3:'indexed<br>sources', stat4:'preferred<br>names set',
+    searchPh:'Search local name or scientific name…', allLang:'All languages',
+    allRegion:'All regions', peninsular:'Peninsular Malaysia', sabah:'Sabah', sarawak:'Sarawak',
+    allGroup:'All groups', dip:'Dipterocarpaceae', nonDip:'Non-Dipterocarpaceae', clim:'Climbers & lianas', nw:'Non-woody plants', printed:'Names as printed', synOf:'synonym of', legend:'Each local name is listed once, with every source that records it (author, year). Lines under a species give the scientific name exactly as printed in a source (“as …”), with the reason in [ ]: synonym, spelling variant of …, misapplied of …', spell:'spelling corrected', by:'by', allSrc:'All sources',
+    thSci:'Scientific name', thFam:'Family', thReg:'Region', thNames:'Local names & sources',
+    noResults:'No species match your search.', species:'species'
+  },
+  bm: {
+    eye:'Pangkalan nama tempatan · Semua famili', sub:'Nama tempatan pokok Malaysia dari pelbagai sumber rujukan',
+    stat1:'nama<br>didokumen', stat2:'spesies<br>diliputi', stat3:'sumber<br>diindeks', stat4:'nama<br>pilihan',
+    searchPh:'Cari nama tempatan atau nama saintifik…', allLang:'Semua bahasa',
+    allRegion:'Semua kawasan', peninsular:'Semenanjung Malaysia', sabah:'Sabah', sarawak:'Sarawak',
+    allGroup:'Semua kumpulan', dip:'Dipterokarp', nonDip:'Bukan Dipterokarp', clim:'Pemanjat & liana', nw:'Tumbuhan bukan berkayu', printed:'Nama seperti dicetak', synOf:'sinonim bagi', legend:'Setiap nama tempatan disenaraikan sekali bersama semua sumber yang merekodkannya (pengarang, tahun). Baris di bawah spesies ialah nama saintifik tepat seperti dicetak dalam sumber (“as …”), dengan sebabnya dalam [ ]: synonym, spelling variant of …, misapplied of …', spell:'ejaan dibetulkan', by:'oleh', allSrc:'Semua sumber',
+    thSci:'Nama saintifik', thFam:'Famili', thReg:'Kawasan', thNames:'Nama tempatan & sumber',
+    noResults:'Tiada spesies sepadan dengan carian anda.', species:'spesies'
+  }
+};
+
+let currentLang = 'en';
+function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const L = labels[lang];
+  document.getElementById('lbl-eye').textContent = L.eye;
+  document.getElementById('lbl-sub').textContent = L.sub;
+  ['stat1','stat2','stat3','stat4'].forEach(k => document.getElementById('lbl-'+k).innerHTML = L[k]);
+  document.getElementById('search').placeholder = L.searchPh;
+  const fl = document.getElementById('filter-lang');
+  if (fl.options[0]) fl.options[0].text = L.allLang;
+  const fr = document.getElementById('filter-region');
+  [L.allRegion,L.peninsular,L.sabah,L.sarawak].forEach((t,i) => { if(fr.options[i]) fr.options[i].text=t; });
+  const ft = document.getElementById('filter-type');
+  [L.allGroup,L.dip,L.nonDip,L.clim,L.nw].forEach((t,i) => { if(ft.options[i]) ft.options[i].text=t; });
+  const fs = document.getElementById('filter-source'); if (fs.options[0]) fs.options[0].text = L.allSrc;
+  document.getElementById('lbl-legend').textContent = L.legend;
+  document.getElementById('th-sci').textContent = L.thSci;
+  document.getElementById('th-fam').textContent = L.thFam;
+  document.getElementById('th-reg').textContent = L.thReg;
+  document.getElementById('th-names').textContent = L.thNames;
+  applyFilters();
+}
+
+/* ── STATE ────────────────────────────────────────── */
+let allRows = [];          // enriched flat rows from DB
+let allGroups = [];        // grouped by species, built once
+let SPECIES = {};          // id → species
+let NOTES = new Map();     // species_id → names as printed (corrected-spelling synonyms)
+const BASE = new URL('./', location.href).href;
+const esc = t => String(t ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const capFirst = t => t ? t[0].toUpperCase() + t.slice(1) : t;
+
+/* Short citation: "Watson, 1928" — from reference_sources.cite_short + year */
+const OLD_LABEL = { POCKET_CHECKLIST:'Kochummen, 1997', EXISTING_DB:'Database record', FLORA_MP_VOL1:'Ridley, 1922', FLORA_MP_VOL2:'Ridley, 1923',
+  FLORA_MP_VOL3:'Ridley, 1924', TFSS_VOL5:'Ashton, 2004', RIDLEY_CURTIS_1902:'Ridley & Curtis, 1902' };
+function citeOf(v, s){
+  if (v.basis === 'own experience' || (!v.source_id && v.observer)) return (v.observer || 'pers. obs.') + (v.observed_year ? ', ' + v.observed_year : '');
+  if (s && s.cite_short) return s.cite_short + (s.year ? ', ' + s.year : '');
+  if (s && OLD_LABEL[s.short_code]) return OLD_LABEL[s.short_code];
+  if (s && s.authors) return s.authors.split(',')[0] + (s.year ? ', ' + s.year : '');
+  return v.source ? (v.source.length > 40 ? v.source.slice(0, 40) + '…' : v.source) + (v.source_year ? ', ' + v.source_year : '') : '';
+}
+
+/* ── INIT ─────────────────────────────────────────── */
+async function init() {
+  try {
+    async function getAll(path, pageSize=1000) {
+      let all=[], offset=0, page;
+      do { page = await get(path + '&limit=' + pageSize + '&offset=' + offset); all = all.concat(page); offset += pageSize; } while (page.length === pageSize);
+      return all;
+    }
+    const [vn, dip, non, clim, nw, pref, src, notes] = await Promise.all([
+      getAll('vernacular_names?select=id,species_id,species_type,vernacular_name,language,region,source_id,source,source_year,source_page,basis,observer,observed_year,is_preferred,name_as_published&status=eq.active&order=vernacular_name.asc'),
+      get('dipterocarp_species_2025_12_11_02_08?select=id,scientific_name,authority,genus,family&limit=1000'),
+      getAll('non_dipterocarp_species?select=id,scientific_name,authority,infraspecific_epithet,genus,family'),
+      getAll('malaysia_climbers_lianas?select=id,scientific_name,authority,genus,family'),
+      getAll('malaysia_non_woody_plants?select=id,scientific_name,authority,genus,family'),
+      get('preferred_vernacular_names?select=species_id,language,preferred_name&limit=1000'),
+      get('reference_sources?select=id,short_code,full_title,authors,year,cite_short'),
+      getAll('mv_name_notes?select=species_id,printed_name,printed_authority,cite,page,src_year,correct_name,correct_author,wcvp_status,misspelt,is_synonym').catch(() => [])
+    ]);
+
+    const add = (list, type, page) => list.forEach(d => {
+      if (d.infraspecific_epithet && !d.scientific_name.includes(d.infraspecific_epithet)) d.scientific_name += ' ' + d.infraspecific_epithet;
+      SPECIES[d.id] = { ...d, species_type: type, page_url: page ? BASE + page : '' };
+    });
+    add(dip, 'dipterocarp', 'index.html'); add(non, 'non_dipterocarp', 'non_dipterocarp_trees_malaysia.html'); add(clim, 'climber', ''); add(nw, 'non_woody', '');
+    const prefSet = new Set(pref.map(p => p.species_id + '|' + (p.language || 'Malay')));
+    const srcMap = {}; src.forEach(s => srcMap[s.id] = s);
+    notes.forEach(n => { if (!NOTES.has(n.species_id)) NOTES.set(n.species_id, []); NOTES.get(n.species_id).push(n); });
+
+    allRows = vn.map(v => {
+      const sp = SPECIES[v.species_id] || {}, s = srcMap[v.source_id];
+      return { ...v, scientific_name: sp.scientific_name || '—', genus: sp.genus || '', family: sp.family || '',
+        source_code: s ? s.short_code : '', cite: citeOf(v, s), year: (s && s.year) || v.source_year || v.observed_year || 9999,
+        is_pref: prefSet.has(v.species_id + '|' + (v.language || 'Malay')) };
+    });
+
+    document.getElementById('stat-total').textContent   = allRows.length.toLocaleString();
+    document.getElementById('stat-species').textContent = new Set(allRows.filter(r => r.scientific_name !== '—').map(r => r.species_id)).size.toLocaleString();
+    document.getElementById('lbl-stat2').innerHTML = currentLang === 'bm' ? 'spesies<br>bernama' : 'species<br>with names';
+    document.getElementById('stat-preferred').textContent = prefSet.size.toLocaleString();
+    const usedSrc = [...new Set(allRows.map(r => r.source_id).filter(Boolean))];
+    document.getElementById('stat-sources').textContent = usedSrc.length.toLocaleString();
+
+    const langs = [...new Set(allRows.map(r => r.language).filter(Boolean))].sort();
+    const fl = document.getElementById('filter-lang');
+    while (fl.options.length > 1) fl.remove(1);
+    langs.forEach(lang => { const o = document.createElement('option'); o.value = o.text = lang; fl.appendChild(o); });
+    const fs = document.getElementById('filter-source');
+    usedSrc.map(id => srcMap[id]).filter(Boolean).sort((a, b) => (a.year || 0) - (b.year || 0)).forEach(s => {
+      const o = document.createElement('option'); o.value = s.id;
+      o.text = citeOf({}, s) + (s.full_title ? ' — ' + s.full_title : ''); fs.appendChild(o); });
+
+    allGroups = buildGroups(allRows);
+
+    const urlId = new URLSearchParams(window.location.search).get('id');
+    const match = urlId ? allGroups.filter(g => g.species_id === urlId) : [];
+    if (match.length) {
+      renderTable(match);
+      document.getElementById('search').value = match[0].scientific_name;
+      document.getElementById('search-clear').classList.add('visible');
+    } else renderTable(allGroups);
+  } catch(e) {
+    document.getElementById('results-body').innerHTML = '<tr class="state-row"><td colspan="4">Unable to load data — check Supabase connection.</td></tr>';
+    console.error(e);
+  }
+}
+
+/* ── GROUP: one row per species; one entry per local name with ALL its sources ── */
+function buildGroups(rows) {
+  const map = new Map();
+  rows.forEach(r => {
+    const sp = SPECIES[r.species_id]; if (!sp) return;
+    if (!map.has(r.species_id)) map.set(r.species_id, { species_id: r.species_id, species_type: sp.species_type, scientific_name: sp.scientific_name,
+      authority: sp.authority || '', genus: sp.genus || '', family: sp.family || '', page_url: sp.page_url, names: new Map() });
+    const grp = map.get(r.species_id), key = r.vernacular_name.trim().toLowerCase() + '||' + (r.language || '').toLowerCase();
+    if (!grp.names.has(key)) grp.names.set(key, { vernacular_name: r.vernacular_name.trim(), language: r.language || '', regions: new Set(), cites: new Map(), is_pref: false });
+    const n = grp.names.get(key);
+    if (r.region && r.region !== 'Preferred') n.regions.add(r.region);
+    if (r.is_pref) n.is_pref = true;
+    if (r.cite && !n.cites.has(r.cite)) n.cites.set(r.cite, { cite: r.cite, year: r.year, page: r.source_page, printed: r.name_as_published });
+    if (/^[A-Z]/.test(r.vernacular_name)) n.vernacular_name = r.vernacular_name.trim();
+  });
+  return [...map.values()].map(g => {
+    g.names = [...g.names.values()].map(n => ({ ...n, cites: [...n.cites.values()].sort((a, b) => a.year - b.year) }))
+      .sort((a, b) => a.is_pref !== b.is_pref ? (a.is_pref ? -1 : 1) : (a.language === 'Malay') !== (b.language === 'Malay') ? (a.language === 'Malay' ? -1 : 1)
+        : b.cites.length - a.cites.length || a.vernacular_name.localeCompare(b.vernacular_name));
+    g.regions = [...new Set(g.names.flatMap(n => [...n.regions]))].join(', ') || '—';
+    return g;
+  }).sort((a, b) => a.scientific_name.localeCompare(b.scientific_name));
+}
+
+/* ── NAMES AS PRINTED: Horsfieldia lemanniana (A.DC.) Warb. [Horsfieldia lehmanniana by Watson (1928)] — synonym of H. irya ── */
+/* Old names used by the sources, written exactly as printed (name + authority):
+   as Acronychia laurifolia Bl. (Watson, 1928) [synonym]
+   as Horsfieldia Lehmanniana Warb. (Ridley, 1924: 59) [synonym Horsfieldia lemanniana (A.DC.) Warb.]
+   as Ageratum conyoides L. (Watson, 1928) [spelling variant of Ageratum conyzoides L.] */
+function asNoteTag(g, esc){
+  const correct = g.correct ? `<i>${esc(g.correct)}</i>${g.cauthor ? ' ' + esc(g.cauthor) : ''}` : '';
+  const base = { Synonym:'synonym', Illegitimate:'illegitimate name', Invalid:'invalid name', Unplaced:'unplaced name' }[g.status];
+  if (g.status === 'Misapplied') return `misapplied of ${correct}`;
+  if (g.synonym && g.status && g.status !== 'Accepted') return g.misspelt && correct ? `${base || g.status.toLowerCase()} ${correct}` : (base || g.status.toLowerCase());
+  if (g.misspelt && correct) return `spelling variant of ${correct}`;
+  return '';
+}
+function asNoteLines(items, esc){
+  const by = new Map();
+  items.forEach(i => { const k = i.printed + '|' + (i.pauthor || '') + '|' + (i.correct || '');
+    if (!by.has(k)) by.set(k, { ...i, cites: [] }); by.get(k).cites.push(i); });
+  return [...by.values()].map(g => {
+    g.cites.sort((a, b) => (a.year || 0) - (b.year || 0));
+    const cites = [...new Map(g.cites.map(c => [c.cite + '|' + (c.page || ''), c])).values()]
+      .map(c => esc(String(c.cite || '').replace(/ \((\d{4})\)$/, ', $1'))).join('; ');
+    const tag = asNoteTag(g, esc);
+    return `<li>as <i>${esc(g.printed)}</i>${g.pauthor ? ' ' + esc(g.pauthor) : ''} (${cites})${tag ? ` <span class="sn-tag">[${tag}]</span>` : ''}</li>`;
+  }).join('');
+}
+function notesHTML(grp) {
+  const list = NOTES.get(grp.species_id); if (!list) return '';
+  const items = list.filter(n => n.correct_name || n.printed_name.toLowerCase() !== grp.scientific_name.toLowerCase())
+    .map(n => ({ printed: n.printed_name, pauthor: n.printed_authority, cite: n.cite, page: n.page, year: n.src_year,
+                 correct: n.correct_name, cauthor: n.correct_author, status: n.wcvp_status, misspelt: n.misspelt, synonym: n.is_synonym }));
+  return items.length ? `<ul class="sn-notes">${asNoteLines(items, esc)}</ul>` : '';
+}
+
+/* "as Sarcocephalus Junghuhnii Miq." = the name printed in that source, when it differs from today's name */
+function asPrinted(printed, current){
+  if (!printed) return '';
+  const words = printed.trim().split(/\s+/), key = t => (t || '').toLowerCase().replace(/æ/g, 'ae').replace(/œ/g, 'oe');
+  const n = /^(var\.|subsp\.|ssp\.|f\.)$/.test(words[2] || '') ? 4 : 2;
+  const nm = words.slice(0, n).join(' '), au = words.slice(n).join(' ');
+  if (key(nm) === key((current || '').split(/\s+/).slice(0, n).join(' '))) return '';
+  return `, as <i>${esc(nm)}</i>${au ? ' ' + esc(au) : ''}`;
+}
+
+/* ── RENDER ───────────────────────────────────────── */
+function renderTable(groups) {
+  const L = labels[currentLang];
+  const tbody = document.getElementById('results-body');
+  document.getElementById('result-count').textContent = groups.length.toLocaleString() + ' ' + L.species;
+  if (!groups.length) { tbody.innerHTML = `<tr class="state-row"><td colspan="4">${L.noResults}</td></tr>`; return; }
+
+  const slice = groups.slice(0, 400);
+  tbody.innerHTML = slice.map(grp => {
+    const nameRows = grp.names.map(n => {
+      const star = n.is_pref ? '<span class="pref-star">★</span>' : '';
+      const lang = n.language && n.language !== 'Malay' ? `<span class="ne-lang">${esc(n.language)}</span>` : '';
+      const cites = n.cites.length ? ` <span class="ne-cites">(${n.cites.map(c => esc(c.cite)).join('; ')})</span>` : '';
+      return `<div class="name-entry${n.is_pref ? ' pref' : ''}"><span class="ne-name">${star}${esc(capFirst(n.vernacular_name))}</span>${lang}${cites}</div>`;
+    }).join('');
+    const withAuth = grp.authority && !grp.scientific_name.includes(grp.authority.trim()) ? grp.scientific_name + ' ' + grp.authority.trim() : grp.scientific_name;
+    const sciLink = grp.page_url
+      ? `<a href="${grp.page_url}?id=${grp.species_id}" target="_blank" class="sci-link" title="Open species page">${formatSci(withAuth)} <span class="ext-icon">↗</span></a>`
+      : formatSci(withAuth);
+    return `<tr>
+      <td class="sci-cell">${sciLink}${notesHTML(grp)}</td>
+      <td class="fam-cell">${esc(grp.family || '—')}</td>
+      <td class="reg-cell">${esc(grp.regions)}</td>
+      <td><div class="names-list">${nameRows || '<span class="no-name">No local name recorded</span>'}</div></td>
+    </tr>`;
+  }).join('');
+  if (groups.length > 400) tbody.innerHTML += `<tr class="state-row"><td colspan="4">${(groups.length - 400).toLocaleString()} more — refine your search to see all.</td></tr>`;
+}
+
+/* ── FILTERS ───────────────────────────────────────── */
+let filterTimer;
+function applyFilters() {
+  clearTimeout(filterTimer);
+  filterTimer = setTimeout(() => {
+    const q   = document.getElementById('search').value.trim().toLowerCase();
+    const lng = document.getElementById('filter-lang').value;
+    const reg = document.getElementById('filter-region').value;
+    const typ = document.getElementById('filter-type').value;
+    const src = document.getElementById('filter-source').value;
+
+    // Filter raw rows, then regroup
+    const filteredRows = allRows.filter(r => {
+      if (r.scientific_name === '—') return false; // skip unresolved species
+      if (q && !r.vernacular_name.toLowerCase().includes(q) &&
+               !r.scientific_name.toLowerCase().includes(q) &&
+               !(r.genus||'').toLowerCase().includes(q) &&
+               !(NOTES.get(r.species_id) || []).some(n => (n.printed_name + ' ' + (n.correct_name || '')).toLowerCase().includes(q))) return false;
+      if (lng && r.language !== lng) return false;
+      if (reg && r.region !== reg && r.region !== 'Preferred') return false;
+      if (typ && r.species_type !== typ) return false;
+      if (src && String(r.source_id) !== src) return false;
+      return true;
+    });
+
+    // Default: show only species that have vernacular names
+    const noFilters = !q && !lng && !reg && !typ && !src;
+    if(noFilters){
+      renderTable(allGroups);
+    } else {
+      renderTable(buildGroups(filteredRows));
+    }
+  }, 220);
+}
+
+document.getElementById('search').addEventListener('input', function(){
+  const btn = document.getElementById('search-clear');
+  btn.classList.toggle('visible', this.value.length > 0);
+  applyFilters();
+});
+
+function clearSearch(){
+  const inp = document.getElementById('search');
+  inp.value = '';
+  document.getElementById('search-clear').classList.remove('visible');
+  inp.focus();
+  applyFilters();
+}
+document.getElementById('filter-lang').addEventListener('change', applyFilters);
+document.getElementById('filter-region').addEventListener('change', applyFilters);
+document.getElementById('filter-type').addEventListener('change', applyFilters);
+document.getElementById('filter-source').addEventListener('change', applyFilters);
+
+init();
+</script>
+</body>
+</html>
