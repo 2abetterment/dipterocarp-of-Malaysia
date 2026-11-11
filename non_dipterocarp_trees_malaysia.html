@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+<meta name="robots" content="noindex, nofollow"><!-- under development: remove this line at public launch -->
 <script>/* Moved to mypokok.com: forward visitors from the old GitHub address */(function(){var h=location.hostname;if(h==="2abetterment.github.io"){var p=location.pathname.replace(/^\/dipterocarp-of-malaysia/i,"")||"\/";location.replace("https:\/\/mypokok.com"+p+location.search+location.hash);}})();</script>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -506,7 +507,7 @@ function TopBar({route,setRoute,query,setQuery,onSearch,navigate,lang,setLang,is
     <button className="lt" onClick={()=>setLang(l=>l==='en'?'bm':'en')}><span style={{opacity:lang==='en'?1:.35}}>EN</span><span style={{color:'var(--border-2)'}}>|</span><span style={{opacity:lang==='bm'?1:.35}}>BM</span></button>
     <button className="btn ba bsm" onClick={()=>setRoute('contribute')}>{ui.contribute}</button>
     {isAdmin?<button className="btn bs bsm" style={{borderColor:'var(--forest)',color:'var(--forest)'}} onClick={()=>setRoute('admin')}>⚙ Admin</button>:<button className="btn bg bsm" style={{fontSize:12,color:'var(--text-3)'}} onClick={()=>setShowLogin(true)}>Admin</button>}
-    <a href="index.html" target="_blank" className="btn bs bsm" style={{fontSize:11,gap:4}}>← {lang==='en'?'Dipterocarp site':'Laman Dipterokarp'}</a>
+    <a href="dipterokarp.html" target="_blank" className="btn bs bsm" style={{fontSize:11,gap:4}}>← {lang==='en'?'Dipterocarp site':'Laman Dipterokarp'}</a>
   </div></div>;
 }
 
@@ -733,7 +734,7 @@ function About({lang}){
     <div className="agrid">
       <div className="acard"><h3>{lang==='en'?'Database contents':'Kandungan pangkalan data'}</h3><ul>{(lang==='en'?['Scientific names (POWO 2026)','Malay local names & etymology','IUCN conservation status','State-level distribution','Morphological descriptions','Field photographs (community)']:['Nama saintifik (POWO 2026)','Nama tempatan Melayu & maksud','Status pemuliharaan IUCN','Taburan mengikut negeri','Huraian morfologi','Gambar lapangan (komuniti)']).map(i=><li key={i}>{i}</li>)}</ul></div>
       <div className="acard"><h3>{lang==='en'?'About this database':'Perihal pangkalan data ini'}</h3><p>{lang==='en'?'This database covers non-dipterocarp tree species of Malaysia — all tree families except Dipterocarpaceae, which is covered by the Dipterokarp Malaysia database. Both databases share the same Supabase backend.':'Pangkalan data ini meliputi spesies pokok bukan dipterokarp Malaysia — semua famili pokok kecuali Dipterocarpaceae, yang diliputi oleh pangkalan data Dipterokarp Malaysia.'}</p></div>
-      <div className="acard"><h3>{lang==='en'?'Series':'Siri'}</h3><p style={{marginBottom:8}}>{lang==='en'?'Part of the Trees of Malaysia initiative by M. Nazre Saleh, Universiti Putra Malaysia:':'Sebahagian daripada inisiatif Pokok Malaysia oleh M. Nazre Saleh, UPM:'}</p><ul><li style={{marginBottom:4}}><a href="index.html" style={{color:'var(--forest)'}}>Dipterokarp Malaysia</a> — Dipterocarpaceae (free)</li><li>Trees of Peninsular Malaysia — Interactive Reference (paid)</li></ul></div>
+      <div className="acard"><h3>{lang==='en'?'Series':'Siri'}</h3><p style={{marginBottom:8}}>{lang==='en'?'Part of the Trees of Malaysia initiative by M. Nazre Saleh, Universiti Putra Malaysia:':'Sebahagian daripada inisiatif Pokok Malaysia oleh M. Nazre Saleh, UPM:'}</p><ul><li style={{marginBottom:4}}><a href="dipterokarp.html" style={{color:'var(--forest)'}}>Dipterokarp Malaysia</a> — Dipterocarpaceae (free)</li><li>Trees of Peninsular Malaysia — Interactive Reference (paid)</li></ul></div>
       <div className="acard"><h3>Technical</h3><p>Database: Supabase · Nomenclature: POWO 2026 · Classification: APG IV<br/><br/><code style={{fontFamily:'DM Mono',fontSize:11,background:'var(--parch)',padding:'2px 6px',borderRadius:4}}>v1.0 · CC-BY 4.0 · 2025–2026</code></p></div>
     </div>
   </div>;
