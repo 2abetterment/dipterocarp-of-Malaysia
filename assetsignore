@@ -1,9 +1,12 @@
 # Files that must NOT be published on the website
-.git
-.gitignore
-.assetsignore
-wrangler.jsonc
-node_modules
-*.md
-*.py
-*.ipynb
+   .git
+   .gitignore
+   .assetsignore
+   assetsignore
+   wrangler.jsonc
+   node_modules
+   *.md
+   *.py
+   *.ipynb
+   01*.html
+   index01.html
