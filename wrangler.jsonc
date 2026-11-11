@@ -1,0 +1,10 @@
+// Cloudflare settings for mypokok.com (static site, no build step)
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "dipterocarp-of-malaysia",
+  "compatibility_date": "2026-11-10",
+  "observability": { "enabled": true },
+  "assets": { "directory": "." },
+  "workers_dev": true,
+  "preview_urls": true
+}
